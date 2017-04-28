@@ -266,8 +266,9 @@ disjiont是判断给定的两个集合是否有交集，没有的话则返回tru
 
 Collections可以查找集合中的最大值最小值，提供了一下四个方法
 
-- min(Collection<? extends T> coll)
-- min(Collection<? extends T> coll,Comparator<? super T> comp)
-- max(Collection<? extends T> coll)
-- max(Collection<? extends T> coll,Comparator<? super T> comp)
+- **min**(Collection<? extends T> coll)
+- **min**(Collection<? extends T> coll,Comparator<? super T> comp)
+- **max**(Collection<? extends T> coll)
+- **max**(Collection<? extends T> coll,Comparator<? super T> comp)   
+
 极值查找的方法需要集合的元素实现Comparable接口，按照自然排序的方式对比元素，如果元素没有继承Comparable接口，还可以使用第二种方式，在方法中我们自己提供一个排序器，对元素进行比较。
