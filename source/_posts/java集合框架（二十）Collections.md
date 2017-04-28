@@ -259,5 +259,15 @@ Collections提供了频率（frequency ）和不相交（disjoint ）两种算�
 - frequency(Collection<?> c,Object o)
 - disjoint(Collection<?> c1,Collection<?> c2)
 
-frequency可以统计给定对象在集合中出现的次数。
-disjiont是判断给定的两个集合是否有交集，没有的话则返回true
+frequency可以统计给定对象在集合中出现的次数,如果元素不在集合中的话则返回0；
+disjiont是判断给定的两个集合是否有交集，没有的话则返回true。
+
+## 极值查找
+
+Collections可以查找集合中的最大值最小值，提供了一下四个方法
+
+- min(Collection<? extends T> coll)
+- min(Collection<? extends T> coll,Comparator<? super T> comp)
+- max(Collection<? extends T> coll)
+- max(Collection<? extends T> coll,Comparator<? super T> comp)
+极值查找的方法需要集合的元素实现Comparable接口，按照自然排序的方式对比元素，如果元素没有继承Comparable接口，还可以使用第二种方式，在方法中我们自己提供一个排序器，对元素进行比较。
