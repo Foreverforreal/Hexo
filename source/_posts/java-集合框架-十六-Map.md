@@ -5,7 +5,7 @@ tags:
   - java
   - 集合
 categories:
-  - java 集合
+  - java集合框架
 date: 2017-04-28 15:41:00
 ---
 # 概述

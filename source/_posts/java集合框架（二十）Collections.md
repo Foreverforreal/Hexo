@@ -26,10 +26,10 @@ Collections提供的功能可以大体分为以下几种
 3. **集合操作（Collections Operation）**
 	- 排序（Sorting）
 	- 混排（Shuffling）
- 	- 查找（Searching）
- 	- 常规数据操作（Routine Data Manipulation）
-   - 组成（Composition）
- 	- 极值查找（Finding Extreme Values）
+	- 查找（Searching）
+	- 常规数据操作（Routine Data Manipulation）
+	- 组成（Composition）
+	- 极值查找（Finding Extreme Values）
 ***
 # 包装实现
 ***
