@@ -1,4 +1,4 @@
-title: java 集合框架(十)List
+title: java集合框架（十）List
 id: 1493363930074
 author: 不识
 categories:

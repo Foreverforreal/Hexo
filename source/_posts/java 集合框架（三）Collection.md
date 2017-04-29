@@ -1,12 +1,12 @@
-title: java 集合框架(三)Collection
+title: java集合框架（三）Collection
 id: 1493361277304
 author: 不识
-date: 2017-04-28 14:34:46
 categories:
   - java集合框架
 tags:
   - java
   - 集合
+date: 2017-04-28 14:34:46
 ---
 ***
 # 概述
@@ -45,8 +45,8 @@ tags:
 |Iterator|**iterator**()|返回集合迭代器|
 |defalut SplIteraror|**splIterator**()|	返回集合可分割迭代器|
 |**其他**|||
-|defalut Stream&lt;E&gt;|**stream**()|返回对象流|
-|defalut Stream&lt;E&gt;|**parallelStream**()|	返回对象并行流| 
+|defalut Stream&lt;E&gt;|**stream**()|返回流对象|
+|defalut Stream&lt;E&gt;|**parallelStream**()|	返回并行流对象| 
 
 Colletion接口中定义的方法是集合操作中最通用的操作方法,按照对元素不同的操作类型大致可以分为添加,删除,判断,获取这四种,集合为了实现元素的遍历还要提供一个获取迭代器的方法,此外在java 8之后为了应对现在分布式并行操作需求,提供了一个可分割迭代器spliterator(),为了方便开发者对集合元素快速遍历和处理,java 8新提出的聚合操作概念,可以通过stream()和parallelStream()方法来实现聚合操作.
 
@@ -86,8 +86,8 @@ Colletion接口中定义的方法是集合操作中最通用的操作方法,按�
 >bde  
 
 # 子接口
-- Set是一种无序而元素唯一的集合类型,它是比如扑克中的卡牌,学生课程表安排的课程,计算机中运行的进程这些事物的数学概念的抽象表示.Set接口相比Colletion并没有更多的操作方法,而他的子接口SortedSet和NavigableSet进行了更多的拓展,可以看出子接口中方法侧重对元素的比较和排序
+- **Set**是一种无序而元素唯一的集合类型,它是比如扑克中的卡牌,学生课程表安排的课程,计算机中运行的进程这些事物的数学概念的抽象表示.Set接口相比Colletion并没有更多的操作方法,而他的子接口SortedSet和NavigableSet进行了更多的拓展,可以看出子接口中方法侧重对元素的比较和排序
 
-- List是一种有序且元素可重复的集合类型,它像数组一样可以通过索引来快速查找操作元素.
+- **List**是一种有序且元素可重复的集合类型,它像数组一样可以通过索引来快速查找操作元素.
 
-- Queue是一种队列结构,它更适合用来存储数据而不是处理数据.Queue常用来做先见先出的(FIFO)的存储结构,新加入的元素会被存储在集合尾部,取出元素则会从头部取出.Deque是一种双向队列,既可以做先进先出(FIFO)也可以做先进后出（LIFO）。
+- **Queue**是一种队列结构,它更适合用来存储数据而不是处理数据.Queue常用来做先见先出的(FIFO)的存储结构,新加入的元素会被存储在集合尾部,取出元素则会从头部取出.Deque是一种双向队列,既可以做先进先出(FIFO)也可以做先进后出（LIFO）。

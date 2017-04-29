@@ -1,4 +1,4 @@
-title: java 集合框架(十七) 对象排序
+title: java集合框架（十七） 对象排序
 id: 1493265180995
 author: 不识
 categories:

@@ -1,4 +1,4 @@
-title: java 集合框架(十四)Queue
+title: java集合框架（十四）Queue
 id: 1493364922877
 author: 不识
 tags:
