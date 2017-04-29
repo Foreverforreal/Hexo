@@ -146,6 +146,7 @@ Collections还提供了返回空集的静态方法和字段常量
 - public static final &lt;T&gt; List&lt;T&gt; ***emptyList***();
 - public static fibal &lt;T&gt; Set&lt;T&gt; ***emptySet***();
 - public static final &lt;T&gt; List&lt;T&gt; ***emptyMap***();
+
 > - 可以看出方法相比提供的常量，只是添加了泛型机制   
 > - 这些空集都是不可变的，执行元素的添加操作会抛出UnsupportedOperationException异常
 
@@ -162,8 +163,8 @@ Collections的排序方法可以将List集合内元素按自然排序方式，�
 ## 混排
 
 Collections提供了两个混排方法
- - shuffle(List<?> list)
- - shuffle(List<?> list,Random rnd)   
+ - **shuffle**(List<?> list)
+ - **shuffle**(List<?> list,Random rnd)   
   
 shuffle(List)将传入的List集合内元素随机打乱排序。而shuffle(List,Random)则还需要一个Random作为随机源，其实shuffle(List)也是调用shuffle(List,Random)方法，只是使用了默认的Random对象，以系统时间作为Random的随机种子。
 
@@ -171,8 +172,8 @@ shuffle(List)将传入的List集合内元素随机打乱排序。而shuffle(List
 
 Collections提供了二分查找算法查找元素二分查找法会从集合中间元素开始，按照自然排序的规则开始对比，如果集合中间元素大于给定元素，则向集合前移动继续对比，如果小于给定元素，则向后移动继续对比，直到找到相同元素为止。所以按照这种查找方法，集合必须事先按升序排序好，否则查找结果是无法预知的，而且如果查找的元素在集合内有多个结果，也无法保证哪一个会被先找到。  
 Collections依此提供了两个静态方法
-- binarySearch((List<? extends Comparable<? super T>> list, T key))
-- binarySearch(List<? extends T> list, T key, Comparator<? super T> c)
+- **binarySearch**((List<? extends Comparable<? super T>> list, T key))
+- **binarySearch**(List<? extends T> list, T key, Comparator<? super T> c)
 
 第一个方法，假定了提供的List已经按照升序排序好，而第二种则需提供一个排序器，来先按升序排序集合，然后进行查找。如果找到元素，则返回其索引值，如果给定元素不在集合中的话，则返回(-(insertion point) - 1)，insertion point指的是如果要向集合中以升序排序方式插入该给定的元素，它的插入位置。
 

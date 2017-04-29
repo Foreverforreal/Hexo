@@ -20,7 +20,7 @@ Class Test{
     }
 }
 ```
-
+<!-- more -->
 上面代码中Test与Person在同一个包中,为何调用person.clone()会报错呢?再看下面的代码
 
 ```java

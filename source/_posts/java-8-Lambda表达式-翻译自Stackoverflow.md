@@ -3,7 +3,7 @@ id: 1493432350174
 author: 不识
 tags:
   - java
-  - Lambda表达式
+  - Lambda
 categories:
   - java其他
 date: 2017-04-29 10:19:00
