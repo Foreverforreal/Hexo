@@ -8,8 +8,6 @@ categories:
   - java集合框架
 date: 2017-04-28 15:35:00
 ---
-
-
 # 概述
 　　Queue一种队列结构集合,用来存储将要进行处理的元素.通常以FIFO的方式排序元素,但这并不是必须的.比如优先度队列就是一个例外,它是以元素的值来排序.但无论怎样,每个Queue的实现都必须指定它的排序属性.Queue通常不定义元素的equal和hashCode方法.
 
@@ -21,6 +19,7 @@ date: 2017-04-28 15:35:00
 |**Insert**	|add(e)   |offer(e) |
 |**Remove** |remove()  |poll()   |
 |**Examine**|element() |peek()   |
+<!-- more -->
 　　Queue的实现可能会限制集合存储的元素数,这种队列被称为有界队列,对于有界队列当调用add方法时,如果元素数超出其容量限制,就会抛出IllegalStateException异常.offer方法就是专门为有界队列设计的,和add不同的是当插入元素失败的的时候,它返回false而不是抛出异常.
 
 　　Remove和poll方法都是从队列头部弹出元素.具体是那个元素被弹出,这要看队列的排序策略.remove和poll仅当是空集合的时候才有区别,remove会抛出NoSuchElementException,而poll返回null值.
