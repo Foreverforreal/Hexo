@@ -320,6 +320,36 @@ shutdown [选项] 时间
 
 >其他的关机命令，halt ,poweroff, init 0但这些命令不能保证安全关机      
 >其他重启命令 ，reboot ,init 6，reboot是比较安全的重启命令
+***
+# 查看登陆用户信息命令
+***
+
+## w
+查看系统中所有登陆用户详细信息
+## who
+查看系统中所有登陆用户简略信息
+- 命令输出
+	- 用户名
+   - 登陆终端
+   - 登陆时间（以及登陆ip）
+## last
+查看系统中所有用户的登陆信息
+- last命令默认读取/var/log/wtmp文件
+- 命令输出 
+	- 用户名
+   - 登陆终端
+   - 登陆ip
+   - 登陆时间
+   - 退出时间（在线时间）
+   
+## lastlog
+查看所有用户的最后一次登录时间
+- lastlog命令默认读取的是/var/log/lastlog文件内容
+- 命令输出
+	- 用户名
+   - 登陆终端
+   - 登陆ip
+   - 最后一次登录时间
 
 ***
 # 其他命令
@@ -337,6 +367,14 @@ mout \[-t 文件系统] [-o 特殊选项] 设备文件名 挂载点
 
 ## umount
 umount [设备文件名或挂载点]   卸载挂载设备
+
+- 挂载光盘    
+ mount -t iso9660 /dev/cdrom/ /mnt/cdrom
+ umount /mnt/cdrom
+ 
+- 挂载u盘
+ mount -t vfat /dev/sdb1 /mnt/usb
+ umout /mnt/usb
 ***
 # 常用目录作用
 ***

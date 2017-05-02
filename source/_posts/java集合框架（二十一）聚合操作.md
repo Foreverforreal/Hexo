@@ -8,8 +8,6 @@ categories:
   - java集合框架
 date: 2017-04-29 20:42:00
 ---
-
-
 # 聚合操作（Aggregate Operations）
 ***
 
@@ -34,7 +32,7 @@ public class Person {
 }
 
 ```
-
+<!-- more -->
 我们要计算这个花名册内所有男性的平均年龄，可能会这么写
 ``` java
 
