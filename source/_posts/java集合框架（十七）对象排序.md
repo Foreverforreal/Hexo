@@ -28,7 +28,7 @@ date: 2017-04-29 11:53:00
 控制台将打印
 >[a, b, d, e, f, g]
 
-　之所以Collections.sort(list)能对list中的元素进行排序,是因为String实现了Comparable接口.Comparable接口为一个类提供了自然排序方法,这样这个对象就可以自动的进行排序.下面这些java中重要的类都实现了Comparable接口.
+　这种排序方式被称为自然排序,而之所以Collections.sort(list)能对list中的元素进行自然排序,是因为String实现了Comparable接口，换而言之，list中的元素只有实现了Comparable接口才能使用Collections.sort进行排序.下面这些java中重要的类都实现了Comparable接口.
  <!-- more -->
  
  |类|自然排序|
@@ -113,7 +113,7 @@ class Person implements Comparable<Person> {
 ***
 # Comparator
 ***
-在List接口定义的方法中，也有一个排序方法sort(Comparator),这个方法并不需要元素对象自己本身实现Comparable接口，而是由集合提供一个排序器Comparator，对元素进行排序。
+在List接口定义的方法中，也有一个排序方法sort(Comparator),这个方法并不需要元素对象本身实现Comparable接口，而是由我们来提供一个排序器Comparator，对元素进行比较排序。
 ``` java
 @FunctionalInterface
 public interface Comparator<T> {
@@ -155,4 +155,4 @@ Comparator是一个函数式接口，compare方法的两个参数就是需要进
 
 >[Person{name='lisi', age=16}, Person{name='zhangsan', age=14}, Person{name='zhangsan', age=15}]
 
-可见Person 排序先按照name字母顺序排序，如果相同的话，再然后按照年龄大小进行排序。
+我们对于元素的多个因素进行比较的时候，比如上面例子中的Person,我们首先比较第一个字段name，如果相同的话再进行比较第二个字段age。

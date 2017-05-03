@@ -14,7 +14,7 @@ date: 2017-04-28 14:34:46
 ![Collection](http://www.processon.com/chart_image/58e8a70ae4b01f83d25e1b79.png)
 　Collection是集合框架的根接口.不同的集合具有不同的特性,比如有的集合可以有重复元素,有的不可以,有的可以排序,有的不可排序,如此等等,而Collection作为集合的根接口,它规范定义了集合的通用方法,一个集合我们可以看作一个在内存中的小型数据库,而数据库的常用操作无外乎"增删改查",Collection中的方法也大体是这些类型操作.
 
-　　此外Colletion的所有通用实现类都会有一个转换器构造方法,它接收一个Collection类型参数,这样可以以另一个Collection类型集合中元素来初始化自己,也相当于实现了集合类型的相互转换.
+　　此外Colletion的所有通用实现类都会有一个**转换器构造方法**,它接收一个Collection类型参数,这样可以以另一个Collection类型集合中元素来初始化自己,也相当于实现了集合类型的相互转换.
   
 <!-- more -->
 ***
@@ -48,10 +48,10 @@ date: 2017-04-28 14:34:46
 |defalut Stream&lt;E&gt;|**stream**()|返回流对象|
 |defalut Stream&lt;E&gt;|**parallelStream**()|	返回并行流对象| 
 
-Colletion接口中定义的方法是集合操作中最通用的操作方法,按照对元素不同的操作类型大致可以分为添加,删除,判断,获取这四种,集合为了实现元素的遍历还要提供一个获取迭代器的方法,此外在java 8之后为了应对现在分布式并行操作需求,提供了一个可分割迭代器spliterator(),为了方便开发者对集合元素快速遍历和处理,java 8新提出的聚合操作概念,可以通过stream()和parallelStream()方法来实现聚合操作.
+Colletion接口中定义的方法是集合操作中最通用的操作方法,按照对元素不同的操作类型大致可以分为**添加,删除,判断,获取**这四种,集合为了实现元素的遍历还要提供一个获取迭代器的方法,此外在java 8之后为了应对现在分布式并行操作需求,提供了一个可分割迭代器spliterator(),为了方便开发者对集合元素快速遍历和处理,java 8新提出的聚合操作概念,可以通过stream()和parallelStream()方法来实现聚合操作.
 
 # 集合遍历
-　　对于集合的遍历,我们知道Collection继承了Iterable接口.所以可以使用迭代器和for-loop以及forEach()形式进行遍历. 在Java 8之后,我们可以获取集合的流(stream),然后进行聚合操作(Aggregate Operations)遍历,而聚合操作通常与lambda表达式相结合,使得代码更简洁有力.
+　　对于集合的遍历,我们知道Collection继承了Iterable接口.所以可以使用迭代器和for-loop以及forEach()形式进行遍历. 在Java 8之后,我们可以获取集合的流(stream),然后进行聚合操作(Aggregate Operations)遍历,聚合操作在后面文章有详细介绍。
 ```java
 
         Collection<String> c = new ArrayList();
