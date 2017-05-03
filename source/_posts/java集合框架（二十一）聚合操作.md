@@ -75,9 +75,9 @@ public class Person {
 
 - **一个数据源（source）**：数据源可能是集合（collection）或数组（array）或者是一个I/O通道
 - **零个或多个中间操作（intermediate operations）**：一个中间操作会产出一个新的流，交给下个中间操作或者终端操作处理。
-- **一个终端操作（terminal operation）**：终端操作最后必定产生一个非流形式的结果，比如一个原始类型的值，或集合，或者没有返回值。
+- **一个终端操作（terminal operation）**：终端操作最后必定产生一个非流形式的结果，返回要给结果或者副作用（side-effect），需要注意的是终端操作将会消耗掉流，所以一个管道只可能有一个终端操作。
 
-管道里中间操作是可以有多个的，但是需要注意的是这么多中间操作是懒（lazy）执行的，意思是调用中间操作的时候，并不会真正遍历操作流，而是等到调用终端操作时，在一次遍历中，执行所有的中间操作，我们可以理解为中间cuo'z。
+管道里中间操作是可以有多个的，但是需要注意的是这么多中间操作是懒（lazy）执行的，意思是调用中间操作的时候，并不会真正执行，而是等到调用终端操作时，才会真正执行。中间操作我们可以理解成管道的操作配置，程序运行时不是每调用一个中间操作就遍历一遍集合并进行相应的过滤或映射，而是在终端操作执行一次遍历，对每个元素依次按照配置的中间操作，执行相关方法。
 
 对于例子中代码来说，roster是数据源，通过stream()获取了流对象，通过一系列的fileter，mapToint中间操作来过滤检索元素，最后通过average是终端操作返回了一个double类型的原始类型数据。
 
@@ -89,23 +89,169 @@ public class Person {
 ***
 # Stream
 ***
-从理解意义上来说，聚合操作可以看成包含数据的流在管道内的流动的过程，但是就代码形式来言，聚合操作是集合获取的Stream对象调用自身的一系列方法，处理元素的过程。而这一系列的操作我们在上文中称为管道，我们可以依据管道的操作类型来划分下Stream中常用的方法。
+从理解意义上来说，聚合操作可以看成包含数据的流在管道内的流动的过程，但是就代码形式来言，聚合操作是集合获取的Stream对象调用自身的一系列方法，处理元素的过程。而这一系列的操作我们在上文中称为管道.
+管道中有中间操作和终端操作两种类型，除此之外，还有一种操作被称为short-circuiting,它用来处理一个无限大的Stream,一个中间操作或者终端操作，可以同时是一个short-circuiting.
+- 对于一个 intermediate 操作，如果它接受的是一个无限大（infinite/unbounded）的 Stream，但返回一个有限的新 Stream。
+- 对于一个 terminal 操作，如果它接受的是一个无限大的 Stream，但能在有限的时间计算出结果。
+
+依照这些操作，我们可以将Stream一些常用方法分类。
 - 中间操作（intermediate operations）  
 map (mapToInt, flatMap 等)、 filter、 distinct、 sorted、 peek、 limit、 skip、 parallel、 sequential、 unordered
 - 终端操作（terminal operation）  
 forEach、 forEachOrdered、 toArray、 reduce、 collect、 min、 max、 count、 anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 iterator
-- 短回路（short-circuting）
+- 短路（short-circuting）
 anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 limit
 
-## 映射（map）
-map的作用遍历每个元素，执行一定操作后，映射到一个新的流中，比如
+## 中间操作
+### map
+map的作用遍历每个元素，执行给定操作后，映射到一个新的流中。
 ```java 
-worList.stream().map( String::toUpperCase )
+roster.stream().map(Person::getName)
 ```
+获取roster内所有Person的姓名并映射到一个新的流中。
 
+### filter
+filter 对原始 Stream 进行某项测试，通过测试的元素被留下来生成一个新 Stream。
+```java
+   roster.stream().filter(p -> p.getGender() ==Person.Sex.MALE);
+```
+只保留为男性的Person到一个新的流中
 
+### peek
+peek 对每个元素执行操作并返回一个新的 Stream
+```java
+      roster.stream()
+                .filter(p -> p.getGender() ==Person.Sex.MALE)
+                .peek(p -> System.out.println(p.getName()))
+                .collect(Collectors.toList());
 
-## 参考 
+```
+这里peek是用来查看我们筛选后peson的姓名，可以用来debug.
+
+### limit/skip
+limit 返回 Stream 的前面 n 个元素；skip 则是扔掉前 n 个元素（它是由一个叫 subStream 的方法改名而来）。
+```java
+public void testLimitAndSkip(){
+        List<Person> persons=new ArrayList();
+        for(int i=1;i<=10000;i++){
+        Person person=new Person(i,"name"+i);
+        persons.add(person);
+        }
+        List<String> personList2=persons.stream().
+        map(Person::getName).limit(10).skip(3).collect(Collectors.toList());
+        System.out.println(personList2);
+        }
+
+private class Person {
+    public int no;
+    private String name;
+
+    public Person(int no, String name) {
+        this.no = no;
+        this.name = name;
+    }
+
+    public String getName() {
+        System.out.println(name);
+        return name;
+    }
+```
+输出结果为
+>name1
+>name2
+>name3
+>name4
+>name5
+>name6
+>name7
+>name8
+>name9
+>name10
+>[name4, name5, name6, name7, name8, name9, name10]
+
+### distinct
+distinct是去除流内重复元素
+```java
+        Integer[] arrays = {1, 1, 2, 2, 3, 3, 4, 4};
+        List<Integer> list = new ArrayList(Arrays.asList(arrays));
+
+        List<Integer> distinctList = list.stream()
+                .distinct()
+                .collect(Collectors.toList());
+
+        System.out.println(distinctList);
+```
+输出为
+>[1, 2, 3, 4]
+                                                                 
+### sorted
+sorted返回一个经过排序后的流，它有两种形式。sorted()或sorted(Comparator),这和集合类似，sorted()需要元素实现Comparable接口，而sorted(Comparator)是我们自己提供排序器。
+```java
+ List<Person> list = roster.stream()
+                .sorted((p1,p2) -> p1.getAge()-p2.getAge())
+                .collect(Collectors.toList());
+```
+例子为将roster中Person按年龄排序后返回一个新的List集合
+## 终端操作
+### forEach
+forEach 方法接收一个 Lambda 表达式，然后在 Stream 的每一个元素上执行该表达式,它与前面的peek功能类似，只是forEach是一个终端操作。
+```java
+      roster.stream().forEach(p -> System.out.println(p.getName()));
+```
+打印roster中所有person的姓名
+forEach和常规的for循环没有性能上差异，仅仅是函数式风格与传统java风格的差别，所以如果遍历过程中对集合元素进行增删，同样会抛出ConcurrentModificationException异常.
+>forEach 不能修改自己包含的本地变量值，也不能用 break/return 之类的关键字提前结束循环。
+
+### findFirst
+这是一个 termimal 兼 short-circuiting 操作，它总是返回 Stream 的第一个元素，或者空。需要注意的是findFirst返回的是一个Optional类型值，作为一个容器，它可能含有某值，或者不包含。使用它的目的是尽可能避免 NullPointerException。
+
+```java
+Person first = roster.stream().findFirst().get();
+```
+例子中为获取roster第一个元素
+
+### min/max
+min/max是返回流内元素的Optional类型的最小/最大值。
+```java
+Integer minAge = roster.stream()
+	  					.map(Person::getAge)
+	  					.min(Integer::max)
+	  					.get()
+```
+例子为获取roster中最大的年龄
+
+### count
+count返回流内元素个数
+
+```java
+Integer[] array={1,2,3,4,5,6,7};
+List<Integer> list = Arrays.asList(array);
+long count=list.stream()
+				.filter(i -> i>4)
+			   .count()
+```
+输出
+>3
+
+### reduce
+这个方法的主要作用是把 Stream 元素组合起来。它提供一个起始值（种子），然后依照运算规则（BinaryOperator），和前面 Stream 的第一个、第二个、第 n 个元素组合。如果没有起始值的情况，这时会把 Stream 的前面两个元素组合起来，返回的是 Optional。从这个意义上说，字符串拼接、数值的 sum、min、max、average 都是特殊的 reduce。
+```java
+roster.stream() 
+	  .map(Person::getAge)
+    .reduce(0, Integer::sum);
+```
+上面例子中返回了roster所有人的年龄之和
+### collect
+collect是一个收集器功能方法，它将流内元素收集到一个容器内，collect也有两种形式，但是通常使用的是与Collectors相结合，
+```java
+List<Person> list = roster.stream().collect(Collectors.toList());
+
+Map<Person.Sex, List<Person>> byGender =roster.stream().collect(Collectors.groupingBy(Person::getGender));
+
+```
+# 并行计算
+
 ***
- >[Java 8 中的 Streams API 详解](https://www.ibm.com/developerworks/cn/java/j-lo-java8streamapi/)  
- 
+# 参考 
+***
+ >[Java 8 中的 Streams API 详解](https://www.ibm.com/developerworks/cn/java/j-lo-java8streamapi/)
