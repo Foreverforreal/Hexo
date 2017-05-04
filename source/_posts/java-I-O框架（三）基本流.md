@@ -8,9 +8,9 @@ categories:
   - java I/O框架
 date: 2017-05-04 11:13:00
 ---
-# 概述
-　　基本流有字节输入输出流(InputStream,OutputStream),和字符输入输出流(Reader,Writer),它们都是抽象类,作为Java IO API中其他所有流的父类存在.
-　　我们知道数据存储在介质中时是以二进制的形式存在,用字节(byte)形式就可以实现读写,在jdk1.0版本中也只有字节输入输出流(InpuStream,OutputStream),在之后的1.1版本才加入了字符输入输出流(Reader,Writer),这是为了满足一些文本读写方便,比如中文字符可能占有两到三个字节,这时如果使用字节流,则不便使用,可能造成乱码,而字符流则可以根据字符编码一次读写一个字符.
+
+　　基本流有字节输入输出流(InputStream,OutputStream),和字符输入输出流(Reader,Writer),它们都是抽象类,作为Java I/O中其他所有字节字符流的父类存在.
+　　我们知道计算机数据都是以二进制的形式存在,用字节(byte)形式就可以实现读写,在最初的JDK1.0版本中也只有字节流的存在,在之后的1.1版本才加入了字符输入输出流(Reader,Writer)。在Java中存储字符是使用的Unicode编码集
 
 - **InputStream**
 - **OutputStream**
