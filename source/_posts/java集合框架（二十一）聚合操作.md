@@ -73,7 +73,7 @@ public class Person {
 ## 管道（Pipelines） 
 一个管道是指一序列的聚合操作，对于一个管道，它包含以下几个部分
 
-- **一个数据源（source）**：数据源可能是集合（collection）或数组（array）或者是一个I/O通道
+- **一个数据源（source）**：数据源可能是集合（collection）或数组（array）或者是一个I/O通道，对于聚合操作，数据源是可以无限大的。
 - **零个或多个中间操作（intermediate operations）**：一个中间操作会产出一个新的流，交给下个中间操作或者终端操作处理。
 - **一个终端操作（terminal operation）**：终端操作最后必定产生一个非流形式的结果，返回要给结果或者副作用（side-effect），需要注意的是终端操作将会消耗掉流，所以一个管道只可能有一个终端操作。
 
@@ -202,6 +202,9 @@ forEach 方法接收一个 Lambda 表达式，然后在 Stream 的每一个元�
 forEach和常规的for循环没有性能上差异，仅仅是函数式风格与传统java风格的差别，所以如果遍历过程中对集合元素进行增删，同样会抛出ConcurrentModificationException异常.
 >forEach 不能修改自己包含的本地变量值，也不能用 break/return 之类的关键字提前结束循环。
 
+### forEachOrder
+和forEach同样的功能，不过在并行计算的时候forEachOrder可以保证处理元素有序
+
 ### findFirst
 这是一个 termimal 兼 short-circuiting 操作，它总是返回 Stream 的第一个元素，或者空。需要注意的是findFirst返回的是一个Optional类型值，作为一个容器，它可能含有某值，或者不包含。使用它的目的是尽可能避免 NullPointerException。
 
@@ -250,6 +253,62 @@ Map<Person.Sex, List<Person>> byGender =roster.stream().collect(Collectors.group
 
 ```
 # 并行计算
+并行计算将一个大的问题分解成一个个子问题，同时在多个线程解决这些子问题，并且最后将结果合并起来。在java 7后JavaSE提供了fork/join 框架，但是我们需要自己来决定如果分割问题，合并结果，但在聚合操作中，使用stream可以帮我们完成这一切.
+完成并行计算的另一个难点是集合框架中大多数集合是线程不安全的，尽管可以使用同步包装器来获得线程安全的集合，但是还会带来线程竞争问题。而在聚合操作中stream可以让我们使用线程不安全的集合，同时不必关心线程问题。   
+虽然聚合操作更为便易的让我们实现并行计算，但并行计算并不一定是更有效率的，需要我们实际验证。
+
+
+## parallelStream
+如果我们想要执行流并行计算，可以使用两种方式，要么Collection.parallelStream，或者调用BaseStream.parrallel.聚合操作的并行计算相当于多个管道同时处理流。
+```java
+//Collection.parallelStream
+ roster
+	.parallelStream()
+	.forEach(p -> System.out.println(p.getName()));
+    
+//BaseStream.parrallel
+ roster
+	.stream()
+	.parallel()
+	.forEach(p -> System.out.println(p.getName()));
+```
+
+## 顺序
+管道处理流的顺序取决于我们使用的是并行流还是串行流,当使用并行流的时候，管道执行的顺序是由JVM来决定的,在并行流中如果想要包装元素处理的顺序的话，可以使用forEachOrder方法，但需要注意的是使用这个方法可能无法发挥出并行计算的好处。
+```java
+ Integer[] intArray = {1, 2, 3, 4, 5, 6, 7, 8 };
+        List<Integer> listOfIntegers =
+                new ArrayList<>(Arrays.asList(intArray));
+
+
+        System.out.println("Parallel stream");
+        listOfIntegers
+                .parallelStream()
+                .forEach(e -> System.out.print(e + " "));
+        System.out.println("");
+
+        System.out.println("Another parallel stream:");
+        listOfIntegers
+                .stream()
+                .parallel()
+                .forEach(e -> System.out.print(e + " "));
+        System.out.println("");
+
+        System.out.println("With forEachOrdered:");
+        listOfIntegers
+                .parallelStream()
+                .forEachOrdered(e -> System.out.print(e + " "));
+        System.out.println("");
+```
+
+控制台输出
+
+>Parallel stream  
+>6 5 8 7 2 3 1 4   
+>Another parallel stream:  
+>3 4 2 1 8 7 5 6   
+>With forEachOrdered:  
+>1 2 3 4 5 6 7 8   
 
 ***
 # 参考 

@@ -257,8 +257,8 @@ Collections提供了五种对List集合常规数据操作的算法。
 ## 组成
 
 Collections提供了频率（frequency ）和不相交（disjoint ）两种算法，来测试一个或多个集合的组成
-- frequency(Collection<?> c,Object o)
-- disjoint(Collection<?> c1,Collection<?> c2)
+- **frequency**(Collection<?> c,Object o)
+- **disjoint**(Collection<?> c1,Collection<?> c2)
 
 frequency可以统计给定对象在集合中出现的次数,如果元素不在集合中的话则返回0；
 disjiont是判断给定的两个集合是否有交集，没有的话则返回true。
