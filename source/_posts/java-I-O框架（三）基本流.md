@@ -9,18 +9,16 @@ categories:
 date: 2017-05-04 11:13:00
 ---
 
-　　基本流有字节输入输出流(InputStream,OutputStream),和字符输入输出流(Reader,Writer),它们都是抽象类,作为Java I/O中其他所有字节字符流的父类存在.
-　　我们知道计算机数据都是以二进制的形式存在,用字节(byte)形式就可以实现读写,在最初的JDK1.0版本中也只有字节流的存在,在之后的1.1版本才加入了字符输入输出流(Reader,Writer)。在Java中存储字符是使用的Unicode编码集
 
-- **InputStream**
-- **OutputStream**
-- **Reader**
-- **Writer**
+　　基本流有字节输入输出流(InputStream,OutputStream),和字符输入输出流(Reader,Writer),它们都是抽象类,作为Java I/O中其他所有字节字符流的父类存在.  
+　　我们知道计算机数据都是以二进制的形式存在,用字节(byte)形式就可以实现读写,在最初的JDK1.0版本中也只有字节流的存在,在之后的1.1版本才加入了字符输入输出流(Reader,Writer)。这是为了方便文本格式文件读写，在Java中存储字符是使用的Unicode编码集，使用字符流的时候Java可以自动帮我们实现与系统本地字符集之间的编码解码转换。
+　　实际字符流通用子类大多是包装了一个相同用途的字节流，字符流做的是将字节与字符之间的转换，比如字符流的一个子类FileReader,底层就是包装的一个FileInputStream.具体实现字节字符转换的是两个转换流来完成，InputStreamReader和OutputStreamWriter。
+
   
 <!-- more -->
 # InputStream
 ![InputStream](\images\java io\InputStream.png)
-　InputStream是java IO所有字节输入流的超类,如果你自己想要实现一个字节输入流组件,最好直接继承InputStream而不是他的子类,这样你可以处理所有类型的输入流.从上图中我们可以看到InputStream实现了Closeable接口,实际四个基本流都实现了此接口,其接口close()方法作为流操作结束时释放系统资源用.下面我们着重看InputStream的成员方法.
+　　InputStream是java IO所有字节输入流的超类,如果你自己想要实现一个字节输入流组件,最好直接继承InputStream而不是他的子类,这样你可以处理所有类型的输入流.从上图中我们可以看到InputStream实现了Closeable接口,实际四个基本流都实现了此接口,其接口close()方法作为流操作结束时释放系统资源用.下面我们着重看InputStream的成员方法.
 
 - **public abstract int read() throws IOException;**  
 　　read()是一个抽象方法,由子类重写具体实现方式,它用来读取数据,且每次只读取一个字节,并以int类型返回该字节,当InputStream读取到文件末尾,再也没有数据时,则返回-1;  
@@ -98,6 +96,7 @@ OutputStream是java IO所有字节输出流的超类,它实现了两个接口,Cl
      
 - **public void close() throws IOException {}**　  　　　　　
 　　同InputStream
+  
 # Reader
 ![Reader](\images\java io\Reader.png)
 

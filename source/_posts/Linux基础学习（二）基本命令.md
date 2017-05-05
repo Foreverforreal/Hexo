@@ -320,6 +320,7 @@ shutdown [选项] 时间
 
 >其他的关机命令，halt ,poweroff, init 0但这些命令不能保证安全关机      
 >其他重启命令 ，reboot ,init 6，reboot是比较安全的重启命令
+
 ***
 # 查看登陆用户信息命令
 ***
@@ -332,6 +333,7 @@ shutdown [选项] 时间
 	- 用户名
    - 登陆终端
    - 登陆时间（以及登陆ip）
+   
 ## last
 查看系统中所有用户的登陆信息
 - last命令默认读取/var/log/wtmp文件

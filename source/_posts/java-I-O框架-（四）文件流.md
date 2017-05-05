@@ -8,8 +8,6 @@ categories:
   - java I/O框架
 date: 2017-05-04 11:30:00
 ---
-
-
 # 文件读取
 
 　　FileInputStream和FileReader是文件字节输入流和文件字符输入流,都是提供文件读取功能,只是读取形式不同,一个以字节为最小单位读取,一个以字符为最小单位读取,并且两者都必须从文件头开始,按顺序读取,读取结束后需要调用close()方法释放流对象.  
@@ -39,19 +37,18 @@ import java.io.InputStream;
 public class FileInputStreamTest {
     private final static String filePath = "C:\\Users\\Administrator\\Desktop\\input.txt";
 
-    //测试read()方法单字节读取
+    //使用read()方法单字节读取
     public static void readCase() throws IOException {
         InputStream input = new FileInputStream(filePath);
 
-        int data = input.read();
-        while (data != -1) {
+        int data;
+        while ((data = input.read()) != -1) {
             System.out.print((char) data);
-            data = input.read();
         }
         input.close();
     }
 
-    //测试read(byte[] b)方法使用数组读取,read(byte[] b,int off,int len)相同
+    //使用read(byte[] b)方法使用数组读取,read(byte[] b,int off,int len)相同
     public static void readByteArrayCase() throws IOException {
         InputStream input = new FileInputStream(filePath);
 
@@ -367,4 +364,4 @@ public class RandomAccesseFileTest {
 >The tardy brown fox jumps over a lazy dog. 
 
 重新设置文件指针为4,第二次写入后,查看文件,内容是  
->The quick brown fox jumps over a lazy dog.  
+>The quick brown fox jumps over a lazy dog.

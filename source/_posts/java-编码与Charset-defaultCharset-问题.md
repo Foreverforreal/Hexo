@@ -7,14 +7,14 @@ categories:
   - java遇到的问题
 date: 2017-05-04 19:01:00
 ---
-
-
 学习I/O字符流的时候，使用FileReader读取一份txt文档，中文字符出现了乱码，这是读取文件的编码设置出了问题。学习时知道java字符流实际底层还是通过字节流，再由转换流来实现编码解码工作的，当我们没有设置字符编码时，转换流会自动获取默认的系统编码字符集。我们可以查看相关源码
 ```java
     public FileReader(String fileName) throws FileNotFoundException {
         super(new FileInputStream(fileName));
     }
 ```
+<!-- more -->
+
 FileReader调用父类初始化，而FileReader父类正是字节字符输入转换流InputStreamReader
 ```java
     public InputStreamReader(InputStream in) {
@@ -64,8 +64,7 @@ FileReader调用父类初始化，而FileReader父类正是字节字符输入转
 ```
 
 系统字符集的编码是根据我们设置的系统语言决定的，windows系统语言是中文时，默认字符集应该是GBK,创建的txt文档字符默认也是GBK格式的，按理来说我这里不应该出现乱码问题。    
-<!-- more -->
-实验一下，首先我将txt文档另存为UTF-8格式，再运行一次程序，乱码问题消失，这说明FileReader读取文件时使用的是UTF-8格式，实际验证一下
+实验一下，首先我将txt文档另存为UTF-8格式，再运行一次程序，乱码问题消失，这说明FileReader读取文件时使用的是UTF-8格式，用代码查看下
 ```java
 System.out.println("fileReader encoding is :"+fileReader.getEncoding());
 
@@ -90,4 +89,4 @@ System.out.println("defaultCharsetName is :"+defaultCharsetName);
 为了进一步确定是IDE对java的影响，先恢复IDE的字符编码设置为UTF-8，然后使用命令行javac编译，再运行一下class文件，命令行输出
 >fileReader encoding is :GBK   
 >systemEncoding is :GBK   
->defaultCharsetName is :GBK 
+>defaultCharsetName is :GBK
