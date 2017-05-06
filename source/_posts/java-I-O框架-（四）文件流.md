@@ -1,4 +1,4 @@
-title: java I/O框架 （四）文件流
+title: java I/O框架（四）文件流
 id: 1493868657034
 author: 不识
 tags:
@@ -11,6 +11,8 @@ date: 2017-05-04 11:30:00
 # 文件读取
 
 　　FileInputStream和FileReader是文件字节输入流和文件字符输入流,都是提供文件读取功能,只是读取形式不同,一个以字节为最小单位读取,一个以字符为最小单位读取,并且两者都必须从文件头开始,按顺序读取,读取结束后需要调用close()方法释放流对象.  
+>两个文件输入流都不支持mark(int),reset()操作，其markSupported()方法都返回false
+
 两个文件输入流的有参构造方法一致,以FileInputStream为例
 
 - public FileInputStream(String name)  
@@ -139,6 +141,8 @@ public class FileInputStreamTest {
 # 文件写入
 
 　　FileOutputStream和FileWriter是文件字节输出流和文件字符输出流,都是提供文件写入功能,只是写入形式不同,一个以字节为最小单位写入,一个以字符为最小单位写入,此外还可以选择是在原来文件基础上重新写入还是追加写入,写入结束后需要调用close()方法释放流对象.
+  
+>FileOutputStream没有缓冲区，其flush方法没有意义，而FileWriter有缓冲区，需要立即写入的话需要调用flush方法。
 
 两个文件输出流的有参构造方法一致,以FileOutputStream为例
 
