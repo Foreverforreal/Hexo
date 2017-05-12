@@ -7,13 +7,13 @@ tags:
 categories: []
 date: 2017-05-09 17:41:00
 ---
+每个对象不是一个引用类型是一个原始类型，引用类型全部继承自java.lang.Object.类，枚举，数组，和接口都是引用类型，还有一组固定的原始类型：boolean,byte,short,in,long,char,float,和double.引用类型的例子还包括java.lang.String,以及其他所有原始类型的包装器类，比如java.lang.Double等等。     
+对于每种类型的对象，JVM都会实例化一个java.lang.Class类型的不可变实例，也就是说所有类型包括原始类型都有一个相应的Class对象，它可以提供了一系列的方法来检查对象运行时期的属性，比如它的成员和类型信息。Class同样可以用来创建一个新的Class和对象.Class是所有java反射API的入口。
 
-
-
-Java反射使我们可以在运行时期检查类，接口，字段和方法。同样可以使用反射来初始化一个对象，调用方法，获取或设置字段的值。
 <!-- more -->
-
+***
 # 获取Class对象
+***
 对一个类执行反射操作的入口点是首先获得该类的java.lang.Class对象，Class对象的获取有三种方式，有的所有类型都使用，有的只能用于引用类型。
 
 ## Object.getClass()
@@ -33,7 +33,7 @@ Set<String> s = new HashSet<String>();
 Class c5 = s.getClass();
 ```
 ## .class语法
-如果我们有一个可用类型，而没有它的实例的话，我们那可以在类型名后添加.class获取其Class对象，这种方式也适用于原始类型，如例
+如果我们有一个可用类型，而没有它的实例的话，我们那可以在类型名后添加.class获取其Class对象，这种方式适用于原始类型，如例
 ```java
 boolean b;
 Class c1 = b.getClass();   // compile-time error
@@ -78,3 +78,149 @@ Class c = Double.TYPE
 ```
 这里Double.TYPE完全够等同于double.class。
 >void同样可以通过其包装类Void.TYPE来获得它的Class对象。
+
+***
+# 获取类信息
+***
+
+## 类名
+获取类名的方式有三种
+第一种使用***getName()***方法获取类的完整名称.
+```java
+System.out.println(int.class.getName());
+System.out.println(boolean[].class.getName());
+System.out.println(ArrayList.class.getName());
+System.out.println(new Object(){}.getClass().getName());
+```
+控制台输出
+>int   
+>[Z   
+>java.util.ArrayList   
+>com.java.reflection.reflectionCase$3   
+
+第二种使用**getCanonicalName()**方法获取该类在Java语言规范里的名称，没有时返回null。
+```java
+System.out.println(int.class.getSimpleName());
+System.out.println(boolean[].class.getSimpleName());
+System.out.println(ArrayList.class.getSimpleName());
+System.out.println(new Object(){}.getClass().getSimpleName());
+```
+
+控制台输出
+>int  
+>boolean[]  
+>java.util.ArrayList  
+>null 
+ 
+第三种使用**getSimpleName()**方法只获取类名，不包含包名。
+```java
+System.out.println(int.class.getCanonicalName());
+System.out.println(boolean[].class.getCanonicalName());
+System.out.println(ArrayList.class.getCanonicalName());
+System.out.println(new Object(){}.getClass().getCanonicalName());
+```
+
+控制台输出
+>int   
+>boolean[]  
+>ArrayList  
+>
+
+## 包名
+在获取类的完全限定名时就已经包含了包名，如果想要只获取包名的话，使用getPackage()方法
+
+```java
+Package aPackage = List.class.getPackage(); 
+System.out.println(aPackage.getName());
+```
+控制台输出
+>java.util
+
+## 修饰符
+一个类可能声明了一个或多个影响其运行时的行为的修饰符。
+- 访问权限修饰符：public,protected,private
+- 重写要求修饰符：abstract
+- 单例限制修饰符：static
+- 最终修饰符：final
+- 精确浮点修饰符：strictfp
+- 注解
+
+并不是所有的修饰符都可以用在任何类上，比如final无法修饰一个接口，abstract也无法用在枚举类上。Java.lang.reflect.Modifier包含了所有可能修饰符的声明，它还包含了一些可用于解码Class.getModifiers()返回的遗嘱修饰符的方法
+
+```java
+int modifiers = Set.class.getModifiers(); 
+System.out.println(Modifier.toString(modifiers));
+```
+控制台输出
+>public abstract interface
+
+这里Set是一个接口，接口会有默认的修饰符，编译器会给每个接口自动添加public abstract。
+
+## 父类
+使用getSuperClass()方法，通过基类的Class对象，我们可以获取父类的Class对象。如果是Object类的话，我们知道它是顶级父类，使用该方法则会返回null。
+
+
+## 接口
+Java中类是可以多实现的，所以一个类的接口可能有多个。使用getInterface()方法可以获取一个类的接口Class对象数组，如下
+```java
+ Class<?>[] interfaces = ArrayList.class.getInterfaces();
+        for (Class<?> anInterface : interfaces) {
+            System.out.println(anInterface.getName());
+        }
+```
+控制台输出
+>java.util.List
+>java.util.RandomAccess
+>java.lang.Cloneable
+>java.io.Serializable
+
+
+## 方法
+使用getMethods()方法获取类的成员方法.
+```java
+     Method[] methods = ArrayList.class.getMethods();
+        
+        for (Method method : methods) {
+            System.out.println(method.toGenericString());
+        }
+
+```
+控制台输出
+>public boolean java.util.ArrayList.add(E)  
+>public void java.util.ArrayList.add(int,E)   
+>public boolean java.util.ArrayList.remove(java.lang.Object)   
+>public E java.util.ArrayList.remove(int)  
+>..........
+
+## 注解
+使用getAnnotations()方法获取类的注解
+
+```java
+     Annotation[] annotations = Identity.class.getAnnotations();
+
+        for (Annotation annotation : annotations) {
+            System.out.println(annotation.toString());
+        }
+```
+
+控制台输出
+>@java.lang.Deprecated()
+
+需要注意的是并不是所有的注解都可以通过反射获得，只有标示Retention(value=RUNTIME)的注解才可以。Java中有三个预设注解@Deprecated, @Override, and @SuppressWarnings 其中只有@Deprecated在运行时期是可用的。
+
+# 创建一个新的类实例
+有两个可以利用反射创建新的类实例的方法，一个通过Class.newInstance()，一个Constructor.newInstance()，后面一个是构造器对象的方法，在后面类成员的学习里有。通常我们使用后者，他们之间有一下差异。
+
+- Class.newInstance()只能调用无参构造，而Constructor.newInstance()可以调用任何一个构造器，无论是否有参数
+- Class.newInstance() 可能会抛出任何异常，无论此异常是否被检查，而 Constructor.newInstance()则会使用InvocationTargetException包装抛出的异常
+- Class.newInstance()需要构造器是可见的，而 Constructor.newInstance()在某种环境下可以调用私有构造器。
+
+下面看Class.newInstance()的实际例子
+```java
+       Class<ArrayList> c1 = ArrayList.class;
+        Class<Math> c2 = Math.class;
+
+        ArrayList list = c1.newInstance();  //success
+        Math math = c2.newInstance();     //error
+```
+>java.lang.Math是一个工具类，只有一个私有无参构造
