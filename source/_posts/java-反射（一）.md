@@ -175,38 +175,26 @@ Java中类是可以多实现的，所以一个类的接口可能有多个。使�
 >java.io.Serializable
 
 
-## 方法
-使用getMethods()方法获取类的成员方法.
-```java
-     Method[] methods = ArrayList.class.getMethods();
-        
-        for (Method method : methods) {
-            System.out.println(method.toGenericString());
-        }
-
-```
-控制台输出
->public boolean java.util.ArrayList.add(E)  
->public void java.util.ArrayList.add(int,E)   
->public boolean java.util.ArrayList.remove(java.lang.Object)   
->public E java.util.ArrayList.remove(int)  
->..........
-
 ## 注解
-使用getAnnotations()方法获取类的注解
+使用getAnnotations()方法获取类的所有注解，或者使用getAnnotations(Class)来获取一个指定的注解
 
 ```java
-     Annotation[] annotations = Identity.class.getAnnotations();
+        Class c = Identity.class;
+        Annotation[] annotations = c.getAnnotations();
 
         for (Annotation annotation : annotations) {
             System.out.println(annotation.toString());
         }
+
+        System.out.println(c.getAnnotation(Deprecated.class));
+
 ```
 
 控制台输出
+>@java.lang.Deprecated()  
 >@java.lang.Deprecated()
 
-需要注意的是并不是所有的注解都可以通过反射获得，只有标示Retention(value=RUNTIME)的注解才可以。Java中有三个预设注解@Deprecated, @Override, and @SuppressWarnings 其中只有@Deprecated在运行时期是可用的。
+需要注意的是并不是所有的注解都可以通过反射获得，只有该注解对象的标示为Retention(value=RUNTIME)才可以，它表明该注解在运行时期可用。Java中有三个预设注解@Deprecated, @Override, and @SuppressWarnings 其中只有@Deprecated在运行时期是可用的。
 
 # 创建一个新的类实例
 有两个可以利用反射创建新的类实例的方法，一个通过Class.newInstance()，一个Constructor.newInstance()，后面一个是构造器对象的方法，在后面类成员的学习里有。通常我们使用后者，他们之间有一下差异。
