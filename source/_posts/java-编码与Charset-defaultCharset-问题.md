@@ -7,7 +7,10 @@ categories:
   - java遇到的问题
 date: 2017-05-04 19:01:00
 ---
-学习I/O字符流的时候，使用FileReader读取一份txt文档，中文字符出现了乱码，这是读取文件的编码设置出了问题。学习时知道java字符流实际底层还是通过字节流，再由转换流来实现编码解码工作的，当我们没有设置字符编码时，转换流会自动获取默认的系统编码字符集。我们可以查看相关源码
+
+
+　　在学习I/O字符流的时候，使用FileReader读取一份txt文档时，中文字符显示出现了乱码问题。Java中字符流实际底层实际还是使用字节流，再由转换流来实现编码解码工作的。当我们没有设置字符编码时，转换流会自动获取默认的系统编码字符集。
+具体我们可以查看相关源码，从FileReader的初始化开始，下面是它的构造方法。
 ```java
     public FileReader(String fileName) throws FileNotFoundException {
         super(new FileInputStream(fileName));
@@ -15,14 +18,13 @@ date: 2017-05-04 19:01:00
 ```
 <!-- more -->
 
-FileReader调用父类初始化，而FileReader父类正是字节字符输入转换流InputStreamReader
+可以发现FileReader初始化时使用super(new FileInputStream(fileName))调用父类构造方法，而FileReader父类正是字节字符输入转换流InputStreamReader，我们进入InputStreamReader查看其被调用的构造方法
 ```java
     public InputStreamReader(InputStream in) {
         super(in);
         try {
-            sd = StreamDecoder.forInputStreamReader(in, this, (String)null); // ## 这里进行编码设置
+            sd = StreamDecoder.forInputStreamReader(in, this, (String)null); // 编码是在这里进行设置，最后一个参数指定字符集，但这里传入了一个null
         } catch (UnsupportedEncodingException e) {
-            // The default encoding should always be available
             throw new Error(e);
         }
     }
@@ -30,23 +32,15 @@ FileReader调用父类初始化，而FileReader父类正是字节字符输入转
 继续跟进StreamDecoder.forInputStreamReader方法
 ```java
  public static StreamDecoder forInputStreamReader(InputStream var0, Object var1, String var2) throws UnsupportedEncodingException {
-        String var3 = var2;
-        if(var2 == null) {     //从上面调用知道var2为(String)null
-            var3 = Charset.defaultCharset().name(); //这里获取默认字符集格式
+        String var3 = var2;     // var2参数为字符集的名称
+        if(var2 == null) {     //从传入参数知道var2为(String)null
+            var3 = Charset.defaultCharset().name(); //这里获取默认字符集名称
         }
-
-        try {
-            if(Charset.isSupported(var3)) {
-                return new StreamDecoder(var0, var1, Charset.forName(var3));
-            }
-        } catch (IllegalCharsetNameException var5) {
-            ;
-        }
-
-        throw new UnsupportedEncodingException(var3);
+       ...
+       ...
     }
 ```
-继续进入Charset.defaultCharset()
+上面在Charset.defaultCharset()获取使用的字符集名称，我们进入该方法
 
 ```java
         if (defaultCharset == null) {
@@ -62,9 +56,10 @@ FileReader调用父类初始化，而FileReader父类正是字节字符输入转
         }
         return defaultCharset;
 ```
+可以看出当没有设置字符集名称时，在AccessController.doPrivileged(new GetPropertyAction("file.encoding"));中会去获取我们操作系统使用的字符集，来作为转换流的编码解码格式。
 
-系统字符集的编码是根据我们设置的系统语言决定的，windows系统语言是中文时，默认字符集应该是GBK,创建的txt文档字符默认也是GBK格式的，按理来说我这里不应该出现乱码问题。    
-实验一下，首先我将txt文档另存为UTF-8格式，再运行一次程序，乱码问题消失，这说明FileReader读取文件时使用的是UTF-8格式，用代码查看下
+而系统字符集的编码是根据我们设置的系统语言决定的，windows系统语言是中文时，默认字符集应该是GBK,创建的txt文档字符默认也是GBK格式的，按理来说我这里不应该出现乱码问题。    
+于是将txt文档另存为UTF-8格式，再运行一次程序，乱码问题消失，这说明FileReader读取文件时使用的是UTF-8格式，用代码获取字符流使用编码格式，以及Charset使用的字符集，和当前系统使用字符集，它们是一致的。
 ```java
 System.out.println("fileReader encoding is :"+fileReader.getEncoding());
 
@@ -80,13 +75,18 @@ System.out.println("defaultCharsetName is :"+defaultCharsetName);
 >systemEncoding is :UTF-8  
 >defaultCharsetName is :UTF-8  
 
-果然，java获取的并不是系统字符集，而很可能是IDE设置的字符编码，我是使用的intelliJ idea,在File→Settings→File Encodings→Project Encoding里将文件编码改为GBK,再次执行代码
+显示字符集使用的都是UTF-8，并不是我当前操作系统字的GBK符集，而很可能是IDE设置的字符编码，我是使用的intelliJ idea,在File→Settings→File Encodings→Project Encoding里将文件编码改为GBK,再次执行代码
 >fileReader encoding is :GBK   
 >systemEncoding is :GBK   
->defaultCharsetName is :GBK   
+>defaultCharsetName is :GBK  
 
-获取的编码也换成了GBK,读取的文档也没有乱码问题，就是这个原因了。
-为了进一步确定是IDE对java的影响，先恢复IDE的字符编码设置为UTF-8，然后使用命令行javac编译，再运行一下class文件，命令行输出
+此时乱码问题消失，并且可见IDE会影响JVM获取系统的字符集，在idea的run窗口运行程序时会显示其编译运行命令的一些参数如图
+![run window](\images\other\idea run.png)
+注意标红区域，这里idea在使用jdk时会事先设置了字符编码格式，当我们使用java获取系统编码时，获取的只是idea设置的编码格式。如果想看不在idea运行结果，我们可以命令行编译运行一下代码，命令行输出
 >fileReader encoding is :GBK   
 >systemEncoding is :GBK   
 >defaultCharsetName is :GBK
+
+显示的是系统使用的字符集。
+
+
