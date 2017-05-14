@@ -157,11 +157,11 @@ System.out.println(Modifier.toString(modifiers));
 这里Set是一个接口，接口会有默认的修饰符，编译器会给每个接口自动添加public abstract。
 
 ## 父类
-使用getSuperClass()方法，通过基类的Class对象，我们可以获取父类的Class对象。如果是Object类的话，我们知道它是顶级父类，使用该方法则会返回null。
+使用getSuperClass()方法，通过基类的Class对象，我们可以获取父类的Class对象。如果该类没有父类的话，则会返回null,比如Object或接口的Class对象调用getSuperClass.
 
 
 ## 接口
-Java中类是可以多实现的，所以一个类的接口可能有多个。使用getInterface()方法可以获取一个类的接口Class对象数组，如下
+Java中类是可以多实现的，所以一个类的接口可能有多个。使用getInterfaces()方法可以获取一个类的接口Class对象数组，如下
 ```java
  Class<?>[] interfaces = ArrayList.class.getInterfaces();
         for (Class<?> anInterface : interfaces) {
