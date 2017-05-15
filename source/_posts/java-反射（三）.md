@@ -137,8 +137,10 @@ public class DynamicProxy implements InvocationHandler {
 
 从输出可以看出，调用代理对象的方法后，其方法实际执行会转发到动态代理类DynamicProxy中的invoke方法中。此外我们输出的代理对象类型为com.sun.proxy.$Proxy0，而不是我们是使用的UserIn接口，这是因为代理对象是由JVM在运行时动态生成的，由JVM动态生成的代理对象名称都以$Proxy开头，后加上该代理对象的标号。
 
-## 序列化
+# 序列化
 
 java.lang.reflect.Proxy实现了序列化接口，所以所有的代理实例都可以被序列化。如果一个代理实例包含的invocation handler没有实现序列化接口的话，将该实例写入java.io.ObjectOutputStream时会抛出NotSerializableException异常
+
+。。。。
 
 >[java的动态代理机制详解](http://www.cnblogs.com/xiaoluo501395377/p/3383130.html)
