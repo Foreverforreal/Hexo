@@ -66,7 +66,7 @@ HttpURLConnection是最常使用的URLConnection实现类。它使用http协议�
 
 # 安全性（Security）
 
-安全性包括认证和权限相关的类。认证涉及到用户认证，包括用户名和密码的检查。用户的身份验证可能需要在一定的场景下，比如当一个用户尝试访问一个URL。权限设计到可能执行的操作，例如，除非存在NetPermission对的的setDefaultAuthenticator存在，否则叼你用Autherticator.setDefault(Authenticator a)会导致一个安全异常；
+安全性包括认证和权限相关的类。认证涉及到用户认证，包括用户名和密码的检查。用户的身份验证可能需要在一定的场景下，比如当一个用户尝试访问一个URL。权限涉及到可能执行的操作，例如，除非存在NetPermission对的的setDefaultAuthenticator存在，否则调用Autherticator.setDefault(Authenticator a)会导致一个安全异常；
 ## 验证（Authentication）
 一些代理和源服务器需要使用验证方案比如BASIC和DIGEST来验证信息。例如，当使用http通过一个代理来连接时，这个代理需要验证，我们调用Authenticator类来获取用户名，密码，以及其他需要验证的条目。下面这些类和验证有关
 - Authenticator

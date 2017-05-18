@@ -7,8 +7,6 @@ tags:
 categories: []
 date: 2017-05-16 16:44:00
 ---
-
-
 HttpURLConnection是一个支持HTTP特定功能的URLConnection。每个HttpURLConnection实例用于创建单个请求，但是到HTTP服务器的底层网络连接可以被其他实例共享。在请求之后，需要调用HttpURLConnection上InputStream和OutputStream的close()方法，来释放相关的网络资源，但是该方法对共享的持久化连接没有影响。可以调用disconnect()方法来关闭底层套接字，如果一个持久化连接闲置的话。
 
 <!-- more -->
@@ -20,9 +18,9 @@ HTTP通常用于分布式信息系统，通过使用响应缓存可以提高性�
 ![ResponseCache](/images/java base/ResponseCache.gif)
 
 在java.net包中有三个缓存相关的抽象类
-- ResponseCache
-- CacheRequest
-- CacheResponse
+- **ResponseCache**
+- **CacheRequest**
+- **CacheResponse**
 
 ## ResponseCache
 一个ResponseCache的具体子类代表一个URLConnection缓存。这种子类实例可以通过调用ResponseCache.setDefault()方法来注册进系统内。并且系统会按照一下顺序来调用这些对象。
@@ -54,7 +52,7 @@ HTTP状态管理机制指定了一种使用HTTP请求和响应创建有状态会
 这种方法容易分散代码，且容易出错不易维护。
 
 ## JDK 5.0后
-JDK 5.0通过抽象类引入了一个新的回调机制，将HTTP状态管理策略的实现连接到HTTP协议处理程序中。应用程序和Web容器可以通过提供新API的具体子类来引入Cookie管理。
+在JDK 5.0中通过一个抽象类引入了一个新的回调机制，将HTTP状态管理策略的实现连接到HTTP协议处理程序中。应用程序和Web容器可以通过提供新API的具体子类来引入Cookie管理。
 
 新的抽象类是java.net.CookieHandler。它提供了一种主次和检索JVM中当前CookieHandler的机制，以及检索和记录特定URI的相关Cookie的方法。
 
@@ -62,10 +60,6 @@ JDK 5.0通过抽象类引入了一个新的回调机制，将HTTP状态管理策
 
 cookies是使用一个Map&lt;String,List&lt;String&gt;&gt;来表示，一个由cookie头字段名称映射到由字符串表示的cookie的List的键值对。目前为止定义了两个状态管理头“Set-Cookie2”和“Cookie”.前一个用来返回相应头中的cookeis，后一个是在HTTP请求头中设置cookies。
 
+目前在JavaSE中没有cookie管理的实现类，但在Java Plugin 和 Java WebStart 中提供了默认的CookieHandler。
 
-
-
-
-
-
-
+## HTTP验证
