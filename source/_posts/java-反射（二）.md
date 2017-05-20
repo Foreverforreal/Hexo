@@ -4,7 +4,9 @@ author: 不识
 tags:
   - java
   - 反射
-categories: []
+categories:
+  - java 基础
+  - java 反射
 date: 2017-05-11 15:53:00
 ---
 在Java反射的包中定义一个接口java.lang.reflect.Member，它有三个实现类java.lang.reflect.Field, java.lang.reflect.Method, and java.lang.reflect.Constructor.同时这三个类的成员对象直接或间接还都继承了AccessibleObject,当类成员是私有的时候，如果我们使用反射来对这些类成员进行修改或调用，需要使用AccessibleObject的setAccessible()方法来绕过默认的Java访问权限检测，来实现对私有成员的使用。

@@ -4,7 +4,9 @@ author: 不识
 tags:
   - java
   - 网络编程
-categories: []
+categories:
+  - java 基础
+  - java 网络编程
 date: 2017-05-16 16:44:00
 ---
 HttpURLConnection是一个支持HTTP特定功能的URLConnection。每个HttpURLConnection实例用于创建单个请求，但是到HTTP服务器的底层网络连接可以被其他实例共享。在请求之后，需要调用HttpURLConnection上InputStream和OutputStream的close()方法，来释放相关的网络资源，但是该方法对共享的持久化连接没有影响。可以调用disconnect()方法来关闭底层套接字，如果一个持久化连接闲置的话。

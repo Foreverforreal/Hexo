@@ -4,7 +4,9 @@ author: 不识
 tags:
   - java
   - 反射
-categories: []
+categories:
+  - java 基础
+  - java 反射
 date: 2017-05-09 17:41:00
 ---
 每个对象不是一个引用类型是一个原始类型，引用类型全部继承自java.lang.Object.类，枚举，数组，和接口都是引用类型，还有一组固定的原始类型：boolean,byte,short,in,long,char,float,和double.引用类型的例子还包括java.lang.String,以及其他所有原始类型的包装器类，比如java.lang.Double等等。     

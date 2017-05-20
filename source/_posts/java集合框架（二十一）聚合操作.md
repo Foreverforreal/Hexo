@@ -247,9 +247,10 @@ roster.stream()
 ### collect
 collect是一个收集器功能方法，它将流内元素收集到一个容器内，collect也有两种形式，但是通常使用的是与Collectors相结合，
 ```java
-List<Person> list = roster.stream().collect(Collectors.toList());
+List<Person> list = roster.stream()
+						  .collect(Collectors.toList());
 
-Map<Person.Sex, List<Person>> byGender =roster.stream().collect(Collectors.groupingBy(Person::getGender));
+Map<Person.Sex, List<Person>> byGender = roster.stream().collect(Collectors.groupingBy(Person::getGender));
 
 ```
 # 并行计算

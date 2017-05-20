@@ -1,10 +1,12 @@
-title: java 网络编程（一）
+title: java 网络编程（一）概述
 id: 1494905730133
 author: 不识
 tags:
   - java
   - 网络编程
-categories: []
+categories:
+  - java 基础
+  - java 网络编程
 date: 2017-05-16 11:35:00
 ---
 # 地址
@@ -34,8 +36,8 @@ java.net提供了以下地址相关类
 
 对于客户端和服务端之间的简单连接，ServerSocket和Socket是经常会使用到的。
 
-ServerSocket表示服务器上等待并监听客户端服务请求的套接字。Socket表示服务器和客户端之间通信的端点。当服务器获得服务请求时，它创建一个Socket与客户端进行通信，，并且在ServerSocket上继续收听其他请求 。客户端同样创建一个 Socket与服务器进行通信。序列如下所示：
-![](/images/other/sockets.png)
+ServerSocket表示服务器上等待并监听客户端服务请求的套接字。一个socket表示一个服务器和客户端之间通信的端点。当服务器获得服务请求时，它创建一个socket与客户端进行通信，并且在ServerSocket上继续收听其他请求 。客户端同样创建一个 socket与服务器进行通信。序列如下所示：
+![TCP Connect](/images/other/sockets.png)
 一旦建立连接，getInputStream()和getOutputStream()可以用来套接字之间的通信。
 # 通过UDP接收/发送数据包
 以下类用来通过UDP接收和发送数据包
@@ -60,7 +62,7 @@ DatagramPacket表示一个数据包。数据报包用于无连接传送，通常
 
 URI代表一个统一资源标识符，它是资源的标识符，但不一定是该资源的定位符。URL代表资源的统一资源定位符。URL是URI的一个子集，尽管类URL不是 URI的子类。简而言之，URL描述了如何访问资源，而URI可能是也可能不是。统一资源名（URN）是URI的另一个子集，但是没有它的java类存在。
 
-URLConnection是表示所有应用程序和以URL标识的网络资源之间连接的抽象父类。给定一个URL和一个协议，URL.getConnection()返回一个URLConnection的适当实现的实例（协议在URL是已知的）。这个实例提供了URLConnection.connect()实际打开连接，访问URL的方法。
+URLConnection是表示所有应用程序和以URL标识的网络资源之间连接的抽象父类。给定一个URL和一个协议，URL.openConnection()返回一个URLConnection的适当实现的实例（协议在URL是已知的）。这个实例提供了URLConnection.connect()实际打开连接，访问URL的方法。
 
 HttpURLConnection是最常使用的URLConnection实现类。它使用http协议，该协议用来访问Web服务器上的内容。
 
