@@ -9,14 +9,12 @@ categories:
   - java 网络编程
 date: 2017-05-19 16:53:00
 ---
-
-
 URL和URLConnection为因特网提供了一个高水平的资源访问机制，但是有时我们需要一些低水平的网络通信，比如我们需要一个客户端-服务端程序。
 这种客户端-服务端程序可能依据不同的需求，使用不同的协议，比如有的程序需要建立一种可靠的连接，以确保数据不会丢失，而有的则不需要。在网络模型中的传输层，提供给我们两种协议。
 <!-- more -->
 
-- 传输控制协议（Transmission Control Protocol ）**TCP**
-- 用户数据包协议（User Datagram Protocol）**UDP**
+- **TCP** 传输控制协议（Transmission Control Protocol ）
+- **UDP** 用户数据包协议（User Datagram Protocol）
 
 TCP是一种可靠，面向连接的，且数据传输基于流的连接协议。使用TCP协议可以最大确保数据不会丢失，所以它使用于对可靠性要求较高的通信系统。应用层的Ftp,Http,Telnet,和Smtp都是基于TCP协议。
 

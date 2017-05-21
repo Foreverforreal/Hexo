@@ -4,7 +4,8 @@ author: 不识
 tags:
   - Linux
 categories:
-  - Linux基础学习
+  - Linux基础
+  - ''
 date: 2017-05-17 14:53:00
 ---
 # 网络环境查看命令
@@ -34,19 +35,38 @@ route add default gw 192.168.1.1
 临时设定网关
 >只有连接外网的网卡才能设置网关，否则无法连接网络
 
--**nsloopup** [域名]  
+-**nsloopup** [域名]   
 翻译域名对应的IP
 直接执行nsloopup然乎输入server可以查看DNS
 
 # 网络测试命令
 
-- **ping** [选项] ip或域名
+- **ping** [选项] ip或域名  
 探测指定IP或域名的网络状况
 
 |选项|意义|
 |----|----|
 |**-c**|指定ping包的次数|
 
-- **telnet**  [域名或IP] 、[端口]
+- **telnet**  [域名或IP] 、[端口]  
 远程管理与端口探测命令
 > 这种远程管理协议是明文不加密的，非常不安全，目前已经被SSH协议取代，但是可以用来做端口探测
+
+- **traceroute** [选项] IP或域名  
+路由跟踪命令
+
+>ping命令和traceroute命令都是使用的ICMP（Internet Control Message Protocol）Internet控制报文协议
+
+- **wget**  [URL]
+下载命令 
+
+- **tcpdump**  -i eht0 -nnX port 21
+抓包命令
+
+|选项|意义|
+|----|----|
+|**-i**|指定网卡接口|
+|**-nn**|将数据包中的域名与服务转为IP和端口|
+|**-X**|以十六进制和ASCII码显示数据包内容|
+|**port**|指定监听端口|
+|**-i**|指定网卡接口|
