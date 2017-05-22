@@ -8,7 +8,7 @@ categories:
   - java I/O框架
 date: 2017-05-04 11:13:00
 ---
-基本流有字节输入输出流(InputStream,OutputStream),和字符输入输出流(Reader,Writer),它们都是抽象类,作为Java I/O中其他所有字节字符流的父类存在.基本流定义了I/O读写的最基本方法，其中基本流都具有的一个方法是close,每个基本流都实现了Closeable接口接口，close方法也是继承自Closeable，在使用I/O流结束后，我们必须调用close方法来释放对资源的占用。
+基本流有字节输入输出流(InputStream,OutputStream),和字符输入输出流(Reader,Writer),它们都是抽象类,作为Java I/O中其他所有字节字符流的父类存在.基本流定义了I/O读写的最基本的读写方法。每个基本流都实现了Closeable接口接口，其继承的close方法，在使用I/O流结束后释放对资源的占用。
   
 　　我们知道计算机数据都是以二进制的形式存在,用字节(byte)形式就可以实现读写,在最初的JDK1.0版本中也只有字节流的存在,在之后的1.1版本才加入了字符输入输出流(Reader,Writer)。这是为了方便文本格式文件读写，在Java中存储字符是使用的Unicode编码集，使用字符流的时候Java可以自动帮我们实现与系统本地字符集之间的编码解码转换。
   
@@ -19,6 +19,9 @@ date: 2017-05-04 11:13:00
 # 输入流
 ***
 　　InputStream和Reader作为输入流的父类，其方法功能是基本一致的，InputStream中子类必须实现的抽象方法是read(),而Reader中子类必须实现的抽象方法有read(char[],int,int),close()。
+  
+  
+　　需要注意的是一直到输入的数据可用时输入流的read方法都是阻塞式的，比如读取本地文件，而此文件被其他程序占用时，read方法会一直等待取得读取权限，或者在网络传输过程中，read方法会一直阻塞直到数据传输进来。
   
 　　此外两个基本输入流除了读取方法外，都有markSupported(),mark(int)和reset()方法，mark(int)是在读取时标记一个读取位置，然后可以调用reset()方法在任何时候重置到该读取位置，这适用于一些分析器,这些分析器有时需要预读后面一部分字节,如果没有发现目标,则返回重写读取.而markSupported()则是返回一个布尔值表示是否支持这种标记重置方法，当不支持时如果调用以上方法，则会抛出IOException("mark/reset not supported")异常，基本流输入中markSupportered方法默认返回flase,由子类重写选择是否实现此功能。
 

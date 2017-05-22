@@ -31,7 +31,9 @@ URL是统一资源定位符的缩写，用来在网络中定位获取资源。ja
 
 对于大多数协议来说，主机名和文件名都是必须的，而端口号和引用则是可选的。例如HTTP URL的资源名称必须指定网络上服务器（主机名）和该机器上的文档路径（文件名）
 
+***
 # 创建URL
+***
 
 ## 常用构造方法
 
@@ -85,8 +87,9 @@ URL url1 = new URL("http","example.com/",URLEncoder.encode("hello world","utf-8"
 ```
 >需要注意的是URLEncode.encode会把“/”当作特殊字符进行编码，所以只能用来处理url中后缀部分。
 
+***
 # 解析URL
-
+***
 URL类提供了一系列的方法用来查询URL对象的属性，如下表
 
 |方法名|作用|
@@ -134,8 +137,9 @@ public class ParseURL {
 **filename** =/docs/books/tutorial/index.html?  name=networking  
 **ref** = DOWNLOADING  
 
+***
 # 连接URL
-
+***
 ## 直接读取URL
 
 使用URL对象，通过调用URL.openStream()方法，我们可以直接获取其在网络上的资源。openStream()方法返回一个java.io.InputStream()对象，这样我们就可以像使用一般I/O流一样，进行读操作。下面是示例代码，其中我们使用了一个输入缓冲字符流BufferedReader来提高读取性能。
