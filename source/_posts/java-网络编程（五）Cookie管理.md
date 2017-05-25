@@ -8,7 +8,6 @@ categories:
   - java 网络编程
 date: 2017-05-24 11:37:00
 ---
-
 Java SE为cookie管理提供一个主要的类——java.net.CookieHandler,以及一些相关的支持类和接口：java.net.CookieManager,java.net.CookiePolicy,java.net.CookieStore和java.net.HttpCookie。
 ***
 # 使用Cookie的HTTP状态管理
@@ -16,6 +15,8 @@ Java SE为cookie管理提供一个主要的类——java.net.CookieHandler,以�
 HTTP状态管理机制指定了一种使用HTTP请求和响应创建有状态会话的方法。
 
 通常，HTTP请求/响应是彼此独立的。然而状态管理机制使客户端和服务器能够交换状态信息，来将一个请求/相应对放在一个大的被称为会话（session）上下文中。这种用来创建和维持会话的状态信息就被称为cookie。
+
+<!-- more -->
 
 Cookie是可以存储在浏览器缓存中的一段数据。如果您访问网站，然后重新访问，则可以使用Cookie数据将您标识为再次访问者。Cookie可以记录状态信息，例如在线购物车。Cookie可以是短期保存单个Web会话的数据，直到您关闭浏览器它都会有效。同时Cookie也可以长期有效，在一周或一年的期限内保存数据。
 ***

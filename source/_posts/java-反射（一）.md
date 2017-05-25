@@ -101,11 +101,12 @@ System.out.println(new Object(){}.getClass().getName());
 >com.java.reflection.reflectionCase$3   
 
 第二种使用**getCanonicalName()**方法获取该类在Java语言规范里的名称，没有时返回null。
+
 ```java
-System.out.println(int.class.getSimpleName());
-System.out.println(boolean[].class.getSimpleName());
-System.out.println(ArrayList.class.getSimpleName());
-System.out.println(new Object(){}.getClass().getSimpleName());
+System.out.println(int.class.getCanonicalName());
+System.out.println(boolean[].class.getCanonicalName());
+System.out.println(ArrayList.class.getCanonicalName());
+System.out.println(new Object(){}.getClass().getCanonicalName());
 ```
 
 控制台输出
@@ -116,11 +117,12 @@ System.out.println(new Object(){}.getClass().getSimpleName());
  
 第三种使用**getSimpleName()**方法只获取类名，不包含包名。
 ```java
-System.out.println(int.class.getCanonicalName());
-System.out.println(boolean[].class.getCanonicalName());
-System.out.println(ArrayList.class.getCanonicalName());
-System.out.println(new Object(){}.getClass().getCanonicalName());
+System.out.println(int.class.getSimpleName());
+System.out.println(boolean[].class.getSimpleName());
+System.out.println(ArrayList.class.getSimpleName());
+System.out.println(new Object(){}.getClass().getSimpleName());
 ```
+
 
 控制台输出
 >int   
