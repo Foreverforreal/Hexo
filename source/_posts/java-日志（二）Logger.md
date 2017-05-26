@@ -1,8 +1,13 @@
-title: java 日志（二）
+title: java 日志（二）Logger
 id: 1495623286554
 author: 不识
 date: 2017-05-24 19:11:26
 tags:
+  - java
+  - logging
+categories:
+  - java 基础
+  - java 日志
 ---
 下图是Java Logging API的工作图 
 ![Logging Overview](/images/java base/Logging Overview.png)
@@ -32,32 +37,8 @@ public class LoggingExamples {
 }
 ```
 
-## 日志记录方法
+# 日志记录方法
 Logger记录日志信息的方法有很多，主要的有下面这些
-
- 
- 
-
-   
-
-entering(String sourceClass, String sourceMethod);  
-entering(String sourceClass, String sourceMethod, Object param1);  
-entering(String sourceClass, String sourceMethod, Object[] params);  
-
-exiting (String sourceClass, String sourceMethod);  
-exiting (String sourceClass, String sourceMethod, Object result);  
-
-fine   (String message);  
-fine   (String message);  
-finest  (String message);  
-
-config  (String message);  
-info   (String message);  
-warning (String message);  
-severe  (String message);  
-
-throwing(String sourceClass, String sourceMethod, Throwable t);
-
 
 ## log()方法
 ```java
@@ -114,7 +95,7 @@ java.lang.ArithmeticException: / by zero
 	at java.lang.reflect.Method.invoke(Method.java:497)    
 	at com.intellij.rt.execution.application.AppMain.main(AppMain.java:147)   
 
-## logp()方法
+## logp() methods
 ```java
 logp (Level level, String sourceClass, String sourceMethod, String msg);  
 logp (Level level, String sourceClass, String sourceMethod, String msg,Object param1);
@@ -125,7 +106,7 @@ logp()方法同log()方法类似，出来每个方法都会多接收两个参数
 
 这两个参数用来标识日志记录调用所在的类和方法名。
 
-## logrb()方法
+## logrb() methods
 ```java
 logrb(Level level, String sourceClass, String sourceMethod,String bundle, String msg);   
 logrb(Level level, String sourceClass, String sourceMethod,String bundle, String msg, Object param1);   
@@ -138,21 +119,130 @@ logrb(Level level, ResourceBundle bundle, String msg, Object... params)
 logrb(Level level, ResourceBundle bundle, String msg, Throwable thrown)
 ```
 
-logrb()方法和logp()方法也类似，但是一种多了一个String bundle参数，一种多了一个ResourceBundle bundle参数。Sting bundle参数表示一个资源束（resource bundle）所在的位置，资源束是一组包含很多键值对的文本文件，就像property属性文件一样，每个这样的文本文件都包含相同的键，但是它对应的值，在不同的文件使用了不同的语言资源束是用来做国际化功能的，但这种方法已经被弃用，在Java 8后新添了ResourceBundle类，由一个ResourceBundle来代表一个资源束文件
+logrb()方法和logp()方法也类似，但是一种多了一个String bundle参数，一种多了一个ResourceBundle bundle参数。Sting bundle参数表示一个资源束（resource bundle）所在的位置，资源束是一组包含很多键值对的文本文件，就像property属性文件一样，每个这样的文本文件都包含相同的键，但是它对应的值，在不同的文件使用了不同的语言,因此资源束是用来做国际化功能的，但这种使用文本文件形式方法已经被弃用，在Java 8后新添了ResourceBundle类，由一个ResourceBundle来代表一个资源束文件。多数日志输出方法都会有一个“msg”参数，在对消息字符串格式化的时候，如果Logger有一个关联的ResourceBundle对象，并且在ResourceBundle中有和“msg”相匹配的信息，那么该msg字符串就会被ResourceBundle本地化的字符串取代，否则的话还是使用msg。
 
-假如我们有一个资源束文件resources.myresources,其内容是
+**String bundle**  
+当使用带有String bundle参数形式的logrb方法时，假如我们有一个资源束文件resources.myresources,其内容是
 >key1 : This is message 1  
 key2 : this is message 2  
 
 然后使用日志
 ```java
-logger.logrb(Level.SEVERE, "logging.LoggingExamples", "main",
-        "resources.myresources", "key1");
+logger.logrb(Level.SEVERE, "logging.LoggingExamples", "main","resources.myresources","key1");
 
 ```
 控制台会输出
+>五月 26, 2017 12:21:13 下午 logging.LoggingExamples main  
+>严重: This is message 1  
 
+**ResourceBundle bundle**  
+```java
+public class LoggingCase {
+    public static void main(String[] args) {
+        Logger logger = Logger.getLogger(LoggingCase.class.getName());
 
+        logger.logrb(Level.SEVERE, "logging.LoggingExamples", "main",
+                new MyResourceBundle(), "key1");
+    }
+
+    static class MyResourceBundle extends ListResourceBundle {
+        @Override
+        protected Object[][] getContents() {
+            return new Object[][]{{"key1","This is message 1"},{"key2","This is message 2"}};
+        }
+    }
+}
+```
+此时控制台同样输出
+>五月 26, 2017 12:30:01 下午 logging.LoggingExamples main  
+>严重: This is message 1  
+
+## convenience methods
+   
+```java
+entering(String sourceClass, String sourceMethod);  
+entering(String sourceClass, String sourceMethod, Object param1);  
+entering(String sourceClass, String sourceMethod, Object[] params);  
+
+exiting (String sourceClass, String sourceMethod);  
+exiting (String sourceClass, String sourceMethod, Object result);  
+
+fine   (String message);  
+finer   (String message);  
+finest  (String message);  
+
+config  (String message);  
+info   (String message);  
+warning (String message);  
+severe  (String message);  
+
+throwing(String sourceClass, String sourceMethod, Throwable t);
+```
+fine,finer,finest,config,info,warning,sever这七种方法每个对应一种日志级别，它等同于使用log方法传入相应的Level参数，是一种便易调用方法。
+entering,exiting和throwing方法分别用来追踪方法进入、方法返回以及对抛出异常的日志记录。
+
+# Logger设置方法
+
+## Handler
+一个Logger可以有多个Handler，当记录日志消息时，就会将消息转发给Handler。如果想要给Logger添加一个Handler，使用addHandler(Handler)方法
+
+```java
+Logger logger = Logger.getLogger("myLogger");
+logger.addHandler(new ConsoleHandler()); //将消息输出到控制台
+```
+如果要想获取Logger的所有Handler使用getHandlers()方法
+```java
+Handler[] handlers = logger.getHandlers();
+```
+如果要删除Logger的一个Handler，使用removeHandler(Handler)
+```java
+Handler handler = new ConsoleHandler();
+
+logger.addHandler(handler);
+
+logger.remove(handler))
+```
+## Filter
+
+我们可以在Logger中设置一个Filter来过滤哪些LogRecord要转发到Handler中。使用setFilter方法来配置Filter。
+```java
+Filter filter = new MyFilterImpl();
+
+logger.setFilter(filter);
+```
+MyFilterImpl需要我们自己来实现Filter接口，具体在Filter章节中查看。
+同样，我们可以使用getFilter()方法来获取Logger中的Filter。
+```java
+Filter filter = logger.getFilter();
+```
+## Level
+我们在调用log()方法的时候，可以传入Level参数来指定一条消息的日志级别。也可以在Logger中设置日志级别，任何低于Logger中设置的日志级别的消息都不会被转发到Handler中。
+```java
+Logger logger = Logger.getLogger("myLogger");
+
+logger.setLevel(Level.INFO);
+```
+如果想要获取Logger中设置的日志级别使用getLevel()方法
+```java
+Level level = logger.getLevel();
+```
+我们也可以检测一个给定的日志级别的消息是否会被Logger转发，可以使用isLoggable()方法
+```java
+boolean isInfoLoggable = logger.isLoggable(Level.INFO);
+```
+# 父级
+前面提到Logger是以分级命名空间形式组织起来的，每个Logger都会追踪它的父级Logger,并且可能会从父级继承一些属性。如果我们想获取Logger的父级，使用getParent()方法。
+```java
+Logger parent = logger.getParent();
+```
+默认情况下，Logger会将任何输出消息记录到其父级的handler中,如果我们不想这么做的话，使用serUseParenthandlers()来关闭这种转发。
+```java
+logger.setUseParentHandlers(false);
+```
+同时也可以调用getUserParentHandlers()来查看我们是否使用了父级的Handlers
+```java
+boolean useParentLogger = logger.getUseParentHandlers();
+```
 
 
 # 翻译来源

@@ -1,28 +1,33 @@
-title: java 日志
+title: java 日志（一）概览
 id: 1495605524699
 author: 不识
 date: 2017-05-24 14:02:54
 tags:
+  - java
+  - logging
+categories:
+  - java 基础
+  - java 日志
 ---
 # 控制流程概述
 
 应用程序在Logger对象上进行日志记录调用。Logger以分层式命名空间组织并且自Logger可能会在命名空间中的父Logger继承一些日志记录属性.
 
-Logger对象分配LogRecord对象，LogReocord对象是被传递给Handler对象进行发布。Logger和Handler都有可能使用日记记录的Level和(可选的)Filter来决定是否对特定的LogRecord 感兴趣。当有必要从外部发布一个LogRecord时，一个Handler可以（可选地）在将其发布到一个I/O流之前，使用Formatter来本地化和格式化该消息。
+Logger会分配LogRecord，将其传递给Handler进行发布。Logger和Handler都有一个日志级别Level和(可选的)Filter来决定是否接收特定的LogRecord。当有必要发布一个LogRecord到外部时，一个Handler可以（可选地）在将其发布到一个I/O流之前，使用Formatter来本地化和格式化该消息。
 ![logging flow](/images/java base/logging1.gif)
 <!-- more -->
-每个Logger跟踪一组输出Handlers。默认的，所有的Logger同样发送它们的输出到它们的父Logger中。但是Logger也可能被配置为忽略树状结构上的Handler。
+每个Logger跟踪一组输出Handlers。默认情况下，所有的Logger会发送它们的消息输出到它们的父级的Handlers中。但是也可以设置关闭这一向父级的消息输出。
 
-一些Handler可能直接输出到其他的Handler上。比如MemoryHandler维持一个LogRecord的内部循环缓冲，并且被事件触发时它通过一个目标Handler来发布它的LogRecords。在这种情况下，任何格式化由链上的最后一个Handler来完成
+一些Handler可能会将日志消息输出到其他的Handler上。比如MemoryHandler维持一个存储LogRecord的内部循环缓冲，并且当一个指定事件被触发时，它就会通过一个目标Handler来发布它的缓冲区上的LogRecords。在这种情况下，格式化工作由最后一个Handler来进行处理。
 ![MemoryHandler](/images/java base/logging2.gif)
-这样的API结构可以使当日记被禁用时，能够轻易的来调用Logger API。如果对于给定的日志级别禁用日志记录，则Logger可以进行轻易的进行比较测试并返回。如果对于给定的日志级别禁用日志记录，在将LogRecord传递到处理程序之前，Logger仍然小心的降低成本开销。特别的，本地化和格式化（它们相对开销更大）被推迟到Handler请求处理它们时。比如MemoryHandler能够维持LogRecord的循环缓冲区，而不必支付格式化的开销。
+这样的API结构可以使当日志被禁用时，能够轻易的来调用Logger API。如果对于一个给定的被禁用的级别日志记录，则Logger可以进行轻易的进行比较测试并返回。如果启用一个日志级别记录，在将LogRecord传递到处理程序之前，Logger仍然会小心的降低成本开销。特别是，本地化和格式化（它们相对开销更大）被推迟到直到Handler请求处理它们时。比如MemoryHandler能够维持LogRecord的循环缓冲区，而不必执行格式化工作。
 
 # 日志级别
 每条日志信息都有一个关联的日志Level。Level对日志消息的重要性和紧迫性进行了大概的描述。日志Level对象封装了一个整数值，更高的值表示了更高的优先度。
 
 Level类定义了七个标准日志级别，范围从FINEST(最低的优先度，最低的整数值)到SEVERE（最高的有限度，最高的值）
 
-Logger可以设置一个最小的日志级别，它决定是否将消息转发到处理程序。这不是使用Filter，即使它具有相同的效果。这样，可以抑制低于一定级别的所有消息。
+Logger可以设置一个最小的日志级别，它决定是否将消息转发到处理程序。这不是通过Filter来进行过滤的，即使它具有相同的效果。这样，可以抑制低于一定级别的所有消息。
 
 # Loggers
 
@@ -87,22 +92,20 @@ Java SE 同样包括两种标准的Formatter。
 
 可以通过使用一个在启动时读取的日志配置文件来初始化日志配置。此日志记录配置文件采用标准的java.util.Properties格式。
 
-或者，可以通过指定可用于读取初始化属性的类来初始化日志记录配置。这种极值允许可以从任意资源比如配置数据LDAP，JDBC等等中读取配置数据。详细的请看 LogManager API Specification。
+或者，可以通过指定可用于读取初始化属性的类来初始化日志记录配置。这种机制允许可以从任意资源比如配置数据的LDAP，JDBC等等读取配置数据。详细的请看 LogManager API Specification。
 
 有一小组全局配置信息。这在LogManager类的描述中指定，并包括在启动期间安装的根级别Handler的列表。
 
-初始配置可以指定特定logger的日志级别。这些日志级别应用于命名的logger以及该命名层之下的所有logger。这些日志级别按照它们在配置文件中定义的顺序应用。
+初始配置可以指定特定Logger的日志级别。这些日志级别应用于指定名称的Logger以及该命名层级之下的所有Logger。这些日志级别按照它们在配置文件中定义的顺序应用。
 
-初始配置可能包含任意属性，供Handerl或子系统进行日志记录使用。按照惯例，这些属性应该使用以handler类名或子系统的主Logger的名称开头的名称。
+初始配置可能包含任意属性，供Handler或子系统进行日志记录使用。按照惯例，这些属性应该使用以Handler类名或子系统的主Logger的名称开头的名称。
 
 比如，MemoryHandler使用一个属性“java.util.logging.MemoryHandler.size”来决定它的循环缓冲区的大小。
 
 # 默认配置
-JRE附带的默认日志记录配置只是默认的，可以被ISV，系统管理员和最终用户覆盖。
-
-默认配置只是限制使用的磁盘空间。它不会向用户灌输信息，而是确保始终捕获关键故障信息。
-
-默认配置在根logger上建立一个单独的handler，用于将输出发送到控制台。
+JRE附带的默认日志记录配置只是默认的，可以被ISV，系统管理员和最终用户覆盖。  
+默认配置只是限制使用的磁盘空间。它不会向用户灌输信息，而是确保始终捕获关键故障信息。  
+默认配置在根Logger上只建立一个单独的handler，用于将日志输出发送到控制台。
 
 # 动态配置更新
 
