@@ -16,7 +16,9 @@ date: 2017-04-24 17:49:00
 ## 框架结构
 ***
 ![JCF结构图][1]
-　  从上图可以看出,java集合框架主要分两大类型,一种是**集合(Collection)**,另一种是**图(Map)**,Collection我们可以理解为一个大小可变,提供各种操作数据方法的数组,而Map是一种key-value数据结构的集合.Java集合框架的通用实现类的都提供两个"标准"的构造方法,一个无参构造,一个用来初始化集合大小的有参构造,但这并不是java的强制规范,但是集合框架中所有的通用类都遵循这个规则.
+　  从上图可以看出,java集合框架主要分两大类型,一种是**集合(Collection)**,另一种是**图(Map)**,Collection我们可以理解为一个大小可变,提供各种操作数据方法的数组,而Map是一种key-value数据结构的集合.
+   
+Java集合框架的通用实现类的都提供两个"标准"的构造方法,一个无参构造,一个用来初始化集合大小的有参构造,但这并不是java的强制规范,但是集合框架中所有的通用类都遵循这个规则.
 ### *Collection*
 　　Collection是存储一组对象的集合容器,它主要有以下三个接口子类:
 
@@ -31,8 +33,8 @@ Map是一种键值对结构的集合，它保存的键是唯一的，并且一�
 > Map并不是一个真正意义上的集合（are not true collections），但是这个接口提供了三种“集合视角”（collection views ），使得可以像操作集合一样操作它们
 
 *   把map的内容看作key的集合(Set<K> keySet())
-*   把map的内容看作value的集合(Collection<V> values)
-*   把map的内容看作key-value映射的集合(Set<Map.Entry<K,V>> entrySet())
+*   把map的内容看作value的集合(Collection&lt;V> values())
+*   把map的内容看作key-value映射的集合(Set&lt;Map.Entry&lt;K,V>> entrySet())
 
 ## 通用实现
 ***

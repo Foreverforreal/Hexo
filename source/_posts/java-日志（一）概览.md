@@ -1,13 +1,13 @@
 title: java 日志（一）概览
 id: 1495605524699
 author: 不识
-date: 2017-05-24 14:02:54
 tags:
   - java
   - logging
 categories:
   - java 基础
   - java 日志
+date: 2017-05-24 14:02:54
 ---
 # 控制流程概述
 
@@ -83,10 +83,10 @@ Java SE 同样包括两种标准的Formatter。
 # LogManager
 有一个全局LogManager对象跟踪全局日志记录信息。这包括：
 
-- 命名logger的分级命名空间。
-- 从配置文件读取的一系列的日志记录控制属性。见1.8节。
+- 管理Logger对象的分层命名空间,所有命名的Loggers都存储在这个命名空间中。
+- 管理一系列的日志控制属性。控制属性从配置类或配置文件读取，属性都是简单的键值对，用来配置Handler和其他Logger对象。
 
-有一个可以使用静态LogManager.getLogManager方法获取的LogManager对象。这是在LogManager初始化期间根据系统属性创建的。此属性允许容器应用程序（如EJB容器）用自己的LogManager子类代替默认类。
+可以使用静态LogManager.getLogManager方法获取一个单例的LogManager对象。这是在LogManager初始化期间根据系统属性创建的。此属性允许容器应用程序（如EJB容器）用自己的LogManager子类代替默认类。
 
 # 配置文件
 

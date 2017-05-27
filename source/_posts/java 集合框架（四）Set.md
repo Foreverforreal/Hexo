@@ -11,7 +11,7 @@ date: 2017-04-28 14:57:28
 # 概述
 ![Set](http://www.processon.com/chart_image/58e85dc4e4b0c32f7cf0e28f.png)
 　　Set是一种没有重复元素的集合,它所有的方法都是直接继承自Collection接口,但是添加了一个对重复元素的限制.Set要求元素强化equals和hashCode两个方法,以使Set集合可以对元素进行排序和对比.
-  Set中没有新添方法,而是在子接口SortedSet和NavigableSet中拓展了一些功能
+　　Set中没有新添方法,而是在子接口SortedSet和NavigableSet中拓展了一些功能
 <!-- more -->
 # SortedSet
 
