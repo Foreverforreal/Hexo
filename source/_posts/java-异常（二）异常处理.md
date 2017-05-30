@@ -4,7 +4,6 @@ author: 不识
 date: 2017-05-28 10:40:58
 tags:
 ---
-
 # 捕获异常
 捕获异常有三个组件——try,catch和finally代码块。在Java SE 7后新引进了try-with-resources语句。ry-with-resources语句特别适用于使用可关闭资源（如流）的情况。
 
@@ -44,8 +43,29 @@ catch (ExceptionType | ExceptionType ex) {
 
 ## finally代码块
 
-finally代码块总是在try代码块退出时执行。这确保即使发生意外异常也会执行finally。但是finallu不仅是用来做异常处理，它还允许程序员由于意外的绕过了return,continue或break时做代码清除工作。将清理代码放在finally块中始终是一个很好的做法，甚至即使没有预期到异常。
+finally代码块总是在try代码块退出时执行。这确保即使发生意外异常也会执行finally。但是finally不仅是用来做异常处理，它还允许程序员由于意外的绕过了return,continue或break时做代码清除工作。将清理代码放在finally块中始终是一个很好的做法，甚至即使没有预期到异常。
 >如果在执行try或catch代码时JVM退出，那么finally块可能不会执行。同样，如果执行try或catch代码的线程被中断或者被杀死，即使应用程序整体上继续，finally块也可能不会执行。
+
+在使用I/O流时，应当确保最终的流的关闭。使用finally
+```java
+  InputStream input = null;
+
+    try {
+        input = new FileInputStream("file.txt");
+
+        int data = input.read();
+        while(data != -1){
+            System.out.print((char) data);
+            data = input.read();
+        }
+    } finally {
+        if(input != null){
+            input.close();
+        }
+    }
+}
+
+```
 
 finally块是防止资源泄漏的关键工具。关闭文件或以其他方式恢复资源时，请将代码放在finally块中，以确保资源最终能够被释放。但是这种情况应当考虑使用try-with-resources语句，在不再需要时会自动释放系统资源。
 
@@ -60,7 +80,7 @@ static String readFirstLineFromFile(String path) throws IOException {
 }
 
 ```
-在此示例中，在try-with-resources语句中声明的资源是BufferedReader。BufferedReader在Java 7之后实现了java.lang.AutoCloseable接口由于它被声明在try-with-resource语句中，所以不管try语句是正常还是突然完成（由于方法BufferedReader.readLine抛出IOException），它都会被最终关闭。
+在此示例中，在try-with-resources语句中声明的资源是BufferedReader。BufferedReader在Java 7之后实现了java.lang.AutoCloseable接口由于它被声明在try-with-resource语句中，所以不管try语句是正常结束还是突然结束（由于方法BufferedReader.readLine抛出IOException），它都会被最终关闭。
 
 try-with-resources语句也可以包含多个资源声明，它们之间使用分号分割。并且在语句结束时，都会调用它们的close方法来关闭资源。需要注意的是，资源的close方法是与资源创建的相反顺序进行调用的。
 
