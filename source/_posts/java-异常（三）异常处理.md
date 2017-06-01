@@ -1,8 +1,9 @@
-title: java 异常（二）异常处理
+title: java 异常（三）异常处理
 id: 1495939244594
 author: 不识
-date: 2017-05-28 10:40:58
-tags:
+tags: []
+categories: []
+date: 2017-05-28 12:17:15
 ---
 # 捕获异常
 捕获异常有三个组件——try,catch和finally代码块。在Java SE 7后新引进了try-with-resources语句。ry-with-resources语句特别适用于使用可关闭资源（如流）的情况。
@@ -44,6 +45,8 @@ catch (ExceptionType | ExceptionType ex) {
 ## finally代码块
 
 finally代码块总是在try代码块退出时执行。这确保即使发生意外异常也会执行finally。但是finally不仅是用来做异常处理，它还允许程序员由于意外的绕过了return,continue或break时做代码清除工作。将清理代码放在finally块中始终是一个很好的做法，甚至即使没有预期到异常。
+
+**需要注意的是finally块中代码总会执行，如果在try块或catch块中遇到return语句时，finally语句块将在方法返回之前被执行。**
 >如果在执行try或catch代码时JVM退出，那么finally块可能不会执行。同样，如果执行try或catch代码的线程被中断或者被杀死，即使应用程序整体上继续，finally块也可能不会执行。
 
 在使用I/O流时，应当确保最终的流的关闭。使用finally
@@ -84,7 +87,7 @@ static String readFirstLineFromFile(String path) throws IOException {
 
 try-with-resources语句也可以包含多个资源声明，它们之间使用分号分割。并且在语句结束时，都会调用它们的close方法来关闭资源。需要注意的是，资源的close方法是与资源创建的相反顺序进行调用的。
 
-一个try-with-resources语句同样可以有一个catch代码块和finally代码块，就如普通的try语句一样。在一个try-with-resources语句中，任何catch或finally块都在关闭资源声明之后运行。比如下面使用try-with-resources语句自动关闭java.sql.Statement对象：
+一个try-with-resources语句同样可以有一个catch代码块和finally代码块，就如普通的try语句一样。在一个try-with-resources语句中，**<font color=tomato >任何catch或finally块都在关闭资源声明之后运行</font>**。比如下面使用try-with-resources语句自动关闭java.sql.Statement对象：
 ```java
 public static void viewTable(Connection con) throws SQLException {
 
@@ -112,7 +115,7 @@ public static void viewTable(Connection con) throws SQLException {
 
 # 抛出异常
 
-在异常的处理上，有时我们不需要在方法产生异常的地方进行处理，而是进一步由调用栈来处理该异常。这时候不必再使用try catch代码块来捕获异常，而是在方法体上使用throws抛出可能出现的异常，由调用该方法的部分来进行异常处理。这种异常处理方法写法如下
+在异常的处理上，有时我们不需要在方法产生异常的地方进行处理，而是进一步在调用栈上来处理该异常。这时候不必再使用try catch代码块来捕获异常，而是在方法体上使用throws抛出可能出现的异常，由调用该方法的部分来进行异常处理。这种异常处理方法写法如下
 
 ```java
 
