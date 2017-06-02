@@ -3,13 +3,18 @@ id: 1495945032365
 author: 不识
 date: 2017-05-28 10:40:00
 tags:
+  - java
+  - exception
+categories:
+  - java 基础
+  - java 异常
 ---
 在我们处理一个异常前，一定是在代码某个部分抛出了一个异常。任何代码都可以引发异常：您的代码，来自其他人（例如Java平台附带的软件包）或Java运行时环境的程序包编写的代码。无论什么要抛出什么异常，都要使用throw语句来抛出。
 
 # throw语句
 
 所有方法都使用throw语句抛出异常。 throw语句需要一个单个参数：一个可抛出的对象（a throwable object）。可抛出对象是任何一个Throwable类的子类的实例。throw语句写法如下。
->throw someThrowableObject
+>**throw** someThrowableObject
 
 在使用throw语句抛出异常后，程序会在抛出语句后立即终止，它后面的语句将会执行不到。如果抛出异常是检查型对象的话，任何调用该方法的方法都必须对此抛出的异常进行处理，要么使用catch进行捕获，要么使用throws进一步将此异常在调用栈上传播。
 

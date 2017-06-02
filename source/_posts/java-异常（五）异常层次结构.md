@@ -3,6 +3,11 @@ id: 1496032935984
 author: 不识
 date: 2017-05-29 12:42:22
 tags:
+  - java
+  - exception
+categories:
+  - java 基础
+  - java 异常
 ---
 在java中异常可以以分层结构组织，我们可以通过使一个（或多个）异常扩展另一个异常来创建层次结构。这样第一个异常成为第二个异常的子类。在前面也展示过Java中所有的异常都是Exception的子类，异常层次结构的优点是，如果您决定在层次结构中捕获（使用try-catch）某个异常，那么您还将自动捕获该异常的所有子类。比如下面示例代码
 ```java
@@ -17,8 +22,11 @@ tags:
 
 <!-- more -->
 上面代码中，有两处会抛出异常的地方
-- input = new FileInputStream("c://example.txt");此处会抛出FileNotFoundException
-- input.read();此处会抛出IOException
+- input = new FileInputStream("c://example.txt");  
+此处会抛出FileNotFoundException
+- input.read();  
+此处会抛出IOException
+
 由于IOException是FileNotFoundException的父类，所以代码中使用IOException就可以这两个可能的异常。
 
 ## 多catch捕获

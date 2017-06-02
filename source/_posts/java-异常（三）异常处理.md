@@ -1,8 +1,12 @@
 title: java 异常（三）异常处理
 id: 1495939244594
 author: 不识
-tags: []
-categories: []
+tags:
+  - java
+  - exception
+categories:
+  - java 基础
+  - java 异常
 date: 2017-05-28 12:17:15
 ---
 # 捕获异常
@@ -83,7 +87,7 @@ static String readFirstLineFromFile(String path) throws IOException {
 }
 
 ```
-在此示例中，在try-with-resources语句中声明的资源是BufferedReader。BufferedReader在Java 7之后实现了java.lang.AutoCloseable接口由于它被声明在try-with-resource语句中，所以不管try语句是正常结束还是突然结束（由于方法BufferedReader.readLine抛出IOException），它都会被最终关闭。
+在此示例中，在try-with-resources语句中声明的资源是BufferedReader。BufferedReader在Java 7之后实现了java.lang.AutoCloseable接口由于它被声明在try-with-resource语句中，所以不管try语句是正常结束还是突然结束（由于方法BufferedReader.readLine抛出IOException），它都会被调用资源的close()方法来关闭，如果资源close()方法抛出异常的话，需要在try-with-resources语句后进行捕获，或者在方法上抛出。
 
 try-with-resources语句也可以包含多个资源声明，它们之间使用分号分割。并且在语句结束时，都会调用它们的close方法来关闭资源。需要注意的是，资源的close方法是与资源创建的相反顺序进行调用的。
 
