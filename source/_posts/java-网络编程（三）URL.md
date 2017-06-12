@@ -154,21 +154,21 @@ public class ParseURL {
             }
         }
 ```
-控制台中将输出Html文档内容，这里I/O流使用了try-with-resource方式处理异常，所以我们不必自己关闭I/O流。
+控制台中将输出Html文档内容，这里I/O流使用了try-with-resource方式处理异常，程序会自动关闭I/O流。
 
 ## 使用URLConnection连接
 
-前面我们使用openStream()方法可以直接获取网络资源的输入流，但我们看下这个方法的源代码
+前面我们使用openStream()方法可以直接获取网络资源的输入流，我们看下该方法的源代码
 
 ```java 
 public final InputStream openStream() throws java.io.IOException {
         return openConnection().getInputStream();
     }
 ```
-其实这里是先调用了openConnection()方法，而openConnection()方法返回的是之前说过的URLConnection对象，它是代表应用程序和网络资源之间连接的抽象类。openConnection()方法会根据URL的协议名称返回相应的URLConnection子类，比如当使用http协议的时候，返回的就是HttpURLConnection对象,此时并不会有联网操作，只有当调用URLConnection.connect()方法时，才会实际建立与远程网络资源之间的通信连接。   
-实际不必每次都使用connect方法初始化连接，一些依赖连接的方法比如getInputStream()和getOutputStream()会自动调用该方法进行连接。  
-getInputStream()和getOutputStream()方法分别是从URLConnection连接中读取和写入流，获取流就是直接读取网络资源。写入流则是用于向服务器发送一些数据。很多网页上有一些表单，需要我们填写一些数据后发送到服务器端，然后服务端给我们一个响应。如果采用http的get请求，发送的查询数据直接在挂在url连接后，但是有些表单采用的post请求发送数据，这时就要使用一个OutputStream来写入需要的数据。
-下面是一段示例代码，这里虚拟一个网址，需要我们向其发送一个查询关键字，然后服务器返回给我们一个查询后的静态html文档,我们再将其打印到控制台中。
+　　其实这里是先调用了openConnection()方法，而openConnection()方法返回的是之前说过的URLConnection对象，它是代表应用程序和网络资源之间连接的抽象类。openConnection()方法会根据URL的协议名称返回相应的URLConnection子类，比如当使用http协议的时候，返回的就是HttpURLConnection对象,此时并不会有联网操作，只有当调用URLConnection.connect()方法时，才会实际建立与远程网络资源之间的通信连接。   
+　　实际不必每次都使用connect方法初始化连接，一些依赖连接的方法比如getInputStream()和getOutputStream()会自动调用该方法进行连接。  
+　　getInputStream()和getOutputStream()方法分别是从URLConnection连接中读取和写入流，获取流就是直接读取网络资源。写入流则是用于向服务器发送一些数据。很多网页上有一些表单，需要我们填写一些数据后发送到服务器端，然后服务端给我们一个响应。如果采用http的get请求，发送的查询数据直接在挂在url连接后，但是有些表单采用的post请求发送数据，这时就要使用一个OutputStream来写入需要的数据。
+　　下面是一段示例代码，这里虚拟一个网址，需要我们向其发送一个查询关键字，然后服务器返回给我们一个查询后的静态html文档,我们再将其打印到控制台中。
 
 ```java
 
