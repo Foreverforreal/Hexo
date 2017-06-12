@@ -1,4 +1,4 @@
-title: java集合框架（三）Collection
+title: java 集合框架（三）Collection
 id: 1493361277304
 author: 不识
 categories:

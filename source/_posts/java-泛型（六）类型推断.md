@@ -1,13 +1,13 @@
 title: java 泛型（六）类型推断
 id: 1496976973723
 author: 不识
-date: 2017-06-09 10:56:15
 tags:
   - java
   - 泛型
 categories:
   - java 基础
   - java 泛型
+date: 2017-06-09 10:56:15
 ---
 类型推断是Java编译器查看每个方法调用和相应声明的能力，以确定调用适用的类型参数（或参数）。推断算法确定参数的类型，如果可用的话，这个类型将被分配或返回。最后，推断算法尝试找到适用于所有参数的最适应类型。
 为了说明这个最后一点，在下面的例子中，推断确定传递给pick方法的第二个参数的类型是Serializable：
@@ -15,6 +15,7 @@ categories:
 static <T> T pick(T a1, T a2) { return a2; }
 Serializable s = pick("d", new ArrayList<String>());
 ```
+<!-- more -->
 在这种情况下，我们使用两种不同类型的T：String和ArryaList。编译器然后使用最普适的类型参数，使得方法调用类型正确。在这种情况下，它推断T是两种类型共同实现接口类型Serializable。
 
 # 类型推断和泛型方法

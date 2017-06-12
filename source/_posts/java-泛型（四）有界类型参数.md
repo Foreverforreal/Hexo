@@ -1,17 +1,17 @@
 title: java 泛型（四）有界类型参数
 id: 1496827549703
 author: 不识
-date: 2017-06-07 17:25:51
 tags:
   - java
   - 泛型
 categories:
   - java 基础
   - java 泛型
+date: 2017-06-07 17:25:51
 ---
 可能有时候要限制在参数化类型中可以用作类型参数的类型。例如，一个对数字进行操作的方法可能只希望接受Number或其子类的实例。这就是有界类型参数。
 要声明一个有界类型的参数，需要列出类型参数的名称，后跟extends关键字，再后跟其上边界，在此示例中为Number。请注意，在这种情况下，extends在一般意义上用于表示“extends”（如在类中）或“implements”（如在接口中）。
-
+<!-- more -->
 ```java
 public class Box<T> {
 
@@ -77,4 +77,3 @@ class D &lt;T extends A & B & C> { /* ... */ }
 如果指定边界A为第一个，那么就会产生一个编译时期错误:
 
 class D &lt;T extends B & A & C> { /* ... */ }  // compile-time error
-

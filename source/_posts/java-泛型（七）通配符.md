@@ -1,19 +1,18 @@
 title: java 泛型（七）通配符
 id: 1496977772390
 author: 不识
-date: 2017-06-09 11:09:33
 tags:
   - java
   - 泛型
 categories:
   - java 基础
   - java 泛型
+date: 2017-06-09 11:09:33
 ---
-
-
 在泛型代码中，问号（？）被称为通配符，表示一个未知类型。通配符可以用在多种情景下：作为参数的类型，字段，或者局部变量；有时也作为返回类型（尽管具体指定类型会是更好的编程实践）。通配符从不被用作泛型方法调用类型参数，泛型类实例创建或超类型。
 # 上边界通配符
-您可以使用上边界通配符来放宽对变量的限制。例如，假设你想编写一个适用于List &lt;Integer>，List &lt;Double>和List &lt;Number>的方法;您可以通过使用上限通配符来实现此目的。  
+您可以使用上边界通配符来放宽对变量的限制。例如，假设你想编写一个适用于List &lt;Integer>，List &lt;Double>和List &lt;Number>的方法;您可以通过使用上限通配符来实现此目的。 
+<!-- more -->
 要声明一个上限通配符，请使用通配符（'？'），后跟extends关键字，再后跟其上边界。请注意，在这种情况下，extends在一般意义上用于表示“extends”（如在类中）或“implements”（如在接口中）。   
 要写一个适用于Number以及它的子类型，比如Integer，Double和Float的list的方法，应当指定 List<? extends Number>。List &lt;Number>一词比List &lt;？extends Number>限制更大，因为前者匹配一个类型为Number的list，而后者匹配一个类型为Number或其任何子类的list。  
 考虑下面的process方法  
@@ -284,4 +283,3 @@ ln.add(new NaturalNumber(35));  // compile-time error
 - 您可以捕获通配符并写入从list中读取的元素。
 
 你可以看到定义为List<? extends NaturalNumber>的list不是最严格意义上的只读，您可能会想到这样，因为您不能存储新元素或更改list中的现有元素。
-

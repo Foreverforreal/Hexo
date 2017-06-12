@@ -1,12 +1,12 @@
-title: java集合框架（二）Iterable接口
+title: java 集合框架（二）Iterable接口
 id: 1493357522560
 author: 不识
-date: 2017-04-28 13:33:04
 categories:
   - java集合框架
 tags:
   - java
   - 集合
+date: 2017-04-28 13:33:04
 ---
 　　Iterable接口是java 集合框架的顶级接口,实现此接口使集合对象可以通过迭代器遍历自身元素,我们可以看下它的成员方法
 

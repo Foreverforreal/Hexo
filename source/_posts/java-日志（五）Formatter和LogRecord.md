@@ -1,13 +1,13 @@
 title: java 日志（五）Formatter和LogRecord
 id: 1495796101086
 author: 不识
-date: 2017-05-26 19:29:54
 tags:
   - java
   - logging
 categories:
   - java 基础
   - java 日志
+date: 2017-05-26 19:29:54
 ---
 # LogRecord
 
@@ -58,7 +58,7 @@ public class MyFormatter extends Formatter {
     }
 }
 ```
-子类必须覆盖Formatter类中的抽象方法format()。由format()返回的String是由处理程序转发到外部系统的。字符串应该如何格式化取决于你。
+子类必须覆盖Formatter类中的抽象方法format()。由format()返回的String是由handler转发到外部系统的。字符串应该如何格式化取决于你。
 此外Formatter中还给子类提供了一个便易方法formatMessage(LogRecord record)，它从LogRecord中本地化和格式化消息字符串，子类实现时我们可以直接调用
 ```java
 public class MyFormatter extends Formatter {

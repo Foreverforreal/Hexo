@@ -1,23 +1,21 @@
 title: java 泛型（五）泛型，继承和子类型
 id: 1496976381729
 author: 不识
-date: 2017-06-09 10:46:23
 tags:
   - java
   - 泛型
 categories:
   - java 基础
   - java 泛型
+date: 2017-06-09 10:46:23
 ---
-
-
-
 如您所知，如果类型是兼容的，则可以将一种类型的对象分配给另一种类型的对象。例如，您可以分配一个Integer给一个Object，因为Object是Integer的父类型之一：
 ```java
 Object someObject = new Object();
 Integer someInteger = new Integer(10);
 someObject = someInteger;   // OK
 ```
+<!-- more -->
 在面向对象的术语中，这被称为“是一个（is a）”关系。因为Integer是一种Object，所以这种赋值是允许的。但是Integer同时也是一种Number,所以下面的代码也是有效的：  
 ```java
 public void someMethod(Number n) { /* ... */ }

@@ -1,4 +1,4 @@
-title: java集合框架（二十）Collections
+title: java 集合框架（二十）Collections
 id: 1493102958141
 author: 不识
 tags:
