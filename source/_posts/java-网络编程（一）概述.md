@@ -21,7 +21,7 @@ java.net提供了以下地址相关类
 对于IP地址，有InetAddress,Inet4Address和Inet6Address三个类可用。InetAddress表示IP地址，它是IP使用的32位或128位无符号数，用来构建TCP和UDP协议的下级协议。Inet4Address提供IPv4地址，Inet6Address提供IPv6地址，他们都是InetAddress的子类。    
 <!-- more -->
 
-对于套接字地址，提供了SocketAddress和InetSocketAddress两个类。SockeAddress是一个抽象的独立于特定协议的套接字地址，是一个抽象类。InetAddress是SocketAddress的子类，它表示一个IP套接字地址，它有三种表示形式
+对于套接字地址，提供了SocketAddress和InetSocketAddress两个类。SockeAddress是一个抽象的独立于特定协议的套接字地址，是一个抽象类。InetSocketAddress 是SocketAddress的子类，它表示一个IP套接字地址，它有三种表示形式
 
 - 一个IP地址和一个端口号（192.168.0.01：8888）
 - 一个主机名和一个端口号（localhost：8888）

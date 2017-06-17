@@ -22,9 +22,9 @@ Cookie是可以存储在浏览器缓存中的一段数据。如果您访问网�
 ***
 # CookieHandler回调机制
 ***
-HTTP状态管理在Java SE中是通过java.net.CookieHandler来实现的。一个CookieHandler对象提供了一个回调机制，来在HTTP协议的处理程序中提供了HTTP状态管理策略实现。也即是说，URL使用HTTP作为协议的话，比如（URL("http://example.com")），它会使用HTTP协议处理程序。这个协议处理程序会调用CookeiHandler对象（如果我们设置了的话）来处理状态管理。
+HTTP状态管理在Java SE中是通过java.net.CookieHandler来实现的。一个CookieHandler对象提供了一个回调机制，来在HTTP协议的处理程序中提供了HTTP状态管理策略实现。也即是说，URL使用HTTP作为协议的话，比如（URL("http ://example.com")），它会使用HTTP协议处理程序。这个协议处理程序会调用CookeiHandler对象（如果我们设置了的话）来处理状态管理。
 
-CookieHandler是一个抽象类，它提供了两对相关的方法。第一对是getDefalut()和serDefault(coookieHandler),它们是静态方法使我们能获取和设置当前要使用的cookieHandler。
+CookieHandler是一个抽象类，它提供了两对相关的方法。第一对是getDefalut()和setDefault(coookieHandler),它们是静态方法使我们能获取和设置当前要使用的cookieHandler。
 默认情况下是没有设置cookieHandler的，并且如果我们安装一个cookieHandler的话是基于全系统安装。对于一个在安全环境下运行的应用程序，他们都有安装一个安全管理器，因此你必须有指定的权限来获取或设置这个cookieHandler.
 第二对相关方法是put(uri,responseHeaders)和get(uri,requestHeaders),这两个方法使我们能分别在在cookie缓存中为请求/响应头中的指定的URI，设置和获取所有的合适的cookies。这些方法都是抽象方法，需要我们在CookieHandler实现类中来实现。
 
@@ -114,7 +114,7 @@ CookieHandler.setDefault(cm);
 CookieStore是一个表示cookie存储区的接口。CookieManager为每个HTTP响应把cookie添加到CookieStore，并且在每个HTTP请求时，从CookieStore中取回cookie.
 
 我们可以实现这个接口来提供我们自己的CookieStore,并且在创建CookieManager传递它作为构造器参数。我们无法在创建CookieManager实例后再来设置CookieStore。
-但是我们可以通过调用CookieManager.getCookieStore()方法来会去cookie store的引用。这样做很有用，因为它可以利用CookieStoreJava SE提供的默认内存实现，并补充其功能。
+然而我们可以通过调用CookieManager.getCookieStore()方法来获取cookie store的引用。这样做很有用，因为它可以利用CookieStoreJava SE提供的默认内存实现，并补充其功能。
 
 例如，您可能需要创建一个保存Cookie的持久性Cookie存储，以便即使Java虚拟机重新启动也可以使用它们。您的实现将会以下类似。
 
