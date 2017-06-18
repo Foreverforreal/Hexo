@@ -8,15 +8,15 @@ categories:
   - java 网络编程
 date: 2017-05-18 23:30:00
 ---
-URL是统一资源定位符的缩写，用来在网络中定位获取资源。java.net包中提供一个URL类来代表一个URL地址。
+URL是统一资源定位符的缩写，用来在网络中定位获取资源。java.net包中提供一个URL类来代表一个URL地址。  
 尽管不确切，但是通常我们认为一个URL就是一个在万维网上的文件名，因为大多数的URL就是指一个在计算机或网络上的文件。但是需要注意的是URL同样可以指向网络上的其他资源，比如数据库查询和命令输出。
 
 <!-- more -->
 
 一个URL有两个主要组成部分
 
-- 协议标识符：对于URL http ://example.com来说，http就是协议标识符
-- 资源名：对于URL http: //example.com来说，example.com就是资源名
+- **协议标识符**：对于URL http ://example.com来说，http就是协议标识符
+- **资源名**：对于URL http: //example.com来说，example.com就是资源名
 
 需要注意的是协议标识符与资源名之间通过“://”来分割，协议标识符表示用来获取资源的协议名称，例子中使用的是超文本传输协议（HTTP）,通常用于提供超文本文档。资源名是资源的完整地址。资源名的格式完全依赖它所使用的协议，但是对于大多数协议来说，包括HTTP,资源命名通常包括一下一个或多个组成。
 
@@ -67,9 +67,10 @@ URL(String protocol, String host, String file)
 
 ## URL内特殊字符
 有些URL地址里含有一些特殊的字符，我们需要对其进行编码，比如
->http ://example.com/hello world/
 
-在创建URL时就需要特殊处理
+　　**http ://example.com/hello world/**
+
+因为hello world中包含一个空格，在创建URL时就需要特殊处理
 ```java
 URL url = new URL("http://example.com/hello%20world");
 
@@ -190,3 +191,4 @@ public final InputStream openStream() throws java.io.IOException {
         }
 
 ```
+> **需要注意的是，要想写入流，需要先调用setDoOutput(true)设置方法**
