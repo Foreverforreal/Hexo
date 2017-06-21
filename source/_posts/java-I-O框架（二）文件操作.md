@@ -8,8 +8,7 @@ categories:
   - java I/O框架
 date: 2017-05-04 11:05:00
 ---
-　
-　　java io中最常操作的就是我们电脑中的文件,将这些文件以流的形式本地读写,或者上传到网络上.java中的File类就是对这些存储于磁盘上文件的虚拟映射,这也体现了java面向对象的思想,在学习io流对文件的读写前,我们要先学习下如何通过File何操作文件;
+java io中最常操作的就是我们电脑中的文件,将这些文件以流的形式本地读写,或者上传到网络上.java中的File类就是对这些存储于磁盘上文件的虚拟映射,这也体现了java面向对象的思想,在学习io流对文件的读写前,我们要先学习下如何通过File何操作文件;
   
   <!-- more -->
 
@@ -23,17 +22,17 @@ File file=new File("C:\\Users\\Administrator\\Desktop\\a.txt");
 ```
 　　File提供了几个构造方法,大部分大同小异,上面是我们常用的一种,通过传入文件的路径名,来实例化File对象,不过需要注意的两点是
 
-　　　　1. 这个路径名并不需要在磁盘中真正存在,构造方法也不会检查这一点
-
-　　　　2. 文件路径名写法取决于你的操作系统,上面例子是在Windows系统中使用两个反斜线(\\)转义字符来表示一个反斜线(\),而在Unix系统中则是这样的"/home/myfile/data/a.txt",不过经测试,单斜线这种分隔符在Windows中同样可以,大家可以自己试一下
+　　　　1. 这个路径名并不需要在磁盘中真正存在,构造方法也不会检查这一点  
+　　　　2. 文件路径名写法取决于你的操作系统,上面例子是在Windows系统中使用两个反斜线(\\)转义字符来表示一个反斜线(\),而在Unix系统中则是这样的"/home/myfile/data/a.txt",不过经测试,单斜线这种分隔符在Windows中同样可以,大家可以自己试一下  
     
 
-其他的构造方法,这里我也列出一下,比较简单,不需多说
+此外File还有以下几种构造方法
 ```java
 public File(String parent, String child)
 public File(File parent, String child)
 public File(URI uri)
-``` 
+```
+
 # 成员方法
 
 ## 创建功能
@@ -71,7 +70,7 @@ public File(URI uri)
 
 ## 重命名功能
 
-- public boolean ***renameTo**(File dest)  重命名原文件
+- public boolean **renameTo**(File dest)  重命名原文件
 
 ```java
    public static void fileDeleteTest() throws IOException {
