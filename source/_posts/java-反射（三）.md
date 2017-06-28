@@ -15,9 +15,12 @@ date: 2017-05-12 17:48:00
 动态代理有很多用途，比如数据库连接，事务管理，单元测试的动态对象模拟，和其他的AOP类似的方法拦截等用途。
 
 <!-- more -->
-无论是代理类或者它们的实例，都是使用java.lang.reflect.Proxy的静态方法来创建的。
+无论是代理类或者它们的实例对象，都是使用java.lang.reflect.Proxy的静态方法来创建的。
 
-
+# 动态代理API
+- **动态代理类**：简称代理类，它是一个在JVM运行时期创建并实现了一系列接口的类。
+- **代理接口**：由代理类实现的接口
+- **代理实例**：代理类的实例
 
 # 创建代理类
 
@@ -25,7 +28,24 @@ date: 2017-05-12 17:48:00
  public static Class<?> getProxyClass(ClassLoader loader,Class<?>... interfaces)throws IllegalArgumentException
 
 ```
-Proxy.getProxyClass方法通过传入一个类加载器和一个接口数组返回一个代理的Class对象。这个代理类将会由指定的类加载器加载，并且实现所有我们提供的接口。如果在一个类加载内，已经存在了实现同样接口的代理类，那我们再创建时，则会直接返回该已经存在的代理类。需要注意的是，这需要给定的接口顺序一致，一个类加载器内，实现了相同的接口，但是顺序不同的话，产生的代理类并不不是同一个。
+Proxy.getProxyClass方法通过传入一个类加载器和一个接口数组,返回一个代理的Class对象。这个代理类将会由指定的类加载器加载，并且实现所有我们提供的接口。如果在一个类加载器内，已经存在了实现同样接口的代理类，那我们再创建时，则会直接返回该已经存在的代理类。需要注意的是，这需要给定的接口顺序一致，一个类加载器内，实现了相同的接口，但是顺序不同的话，产生的代理类并不不是同一个。
+
+此外，对传递给Proxy.getProxyClass的参数有几个限制：
+- 在interfaces数组中所有的Class对象都必须是代表接口，而不是类或者原始类型。
+- interfaces数组中的任意两个元素不能引用相同的Class对象。
+- 所有接口类型必须通过指定的类加载器的按照它们的名称可见。换句话说，对于类加载器cl和每个接口i，以下表达式必须为true：   
+    Class.forName(i.getName(), false, cl) == i
+-  所有的非公开接口必须在同一个包中，否则代理类将不可能实现所有的接口，无论它定义在哪个包中。
+- 对于具有相同签名的指定接口的任何成员方法：   
+	- 如果任何方法的返回类型是原始类型或void，那么所有方法必须具有相同的返回类型。
+	- 否则，其中一个方法必须具有可以分配给其余方法的所有返回值类型的返回值类型（是其他返回类型的基类）。
+- 生成的代理类不能超过虚拟机对类施加的任何限制。例如，VM可以将类可以实现的接口数量限制为65535;在这种情况下，interfaces数组的大小不能超过65535。
+
+如果以上任何一种限制被违反了，Proxy.getProxyClass都会抛出一个IllegalArgumentException异常。如果interfaces数组参数或它的任何元素为null的话，则抛出NullPointerException。
+
+请注意，指定的代理接口的顺序是重要的：对于创建具有两个相同组合的接口但以不同顺序的代理类的请求将导致两个不同的代理类。代理类通过其代理接口的顺序来区分，以便在两个或多个代理接口共享具有相同名称和参数签名的方法的情况下提供确定性方法调用编码;
+
+所以每次使用相同的类加载器和接口列表调用Proxy.getProxyClass时，不需要生成新的代理类，动态代理类API的实现应该保留生成的代理类的缓存，缓存中以它们对应的类加载器和接口列表为键。实现时应当小心引用类加载器，接口和代理类，在这种情况下它会阻止类加载器及其所有类在适当时被垃圾回收。
 
 ## 代理类属性
 
@@ -40,7 +60,7 @@ Proxy.getProxyClass方法通过传入一个类加载器和一个接口数组返�
 
 # 创建代理对象
 
-每一个代理类都有一个公开构造器，该构造器只有一个参数，为InvocationHandle接口的实现类。
+每一个代理类都有一个公开构造器，该构造器只有一个参数，是InvocationHandle接口的实现类。
 与其通过反射API来获取代理类的公开构造器去创建一个代理类实例，我们同样可以通过Proxy.newProxyInstance方法来新建一个代理实例。
 
 
@@ -57,7 +77,7 @@ newProxyInstance方法会创建一个代理类，并通过传入的InvocationHan
 - InvocationHandler h  代理对象的所有方法调用都会被转发到InvocationHandle中
 
 ## InvocationHandle
-每一个动态代理类都必须要实现InvocationHandler这个接口，并且每个代理类的实例都关联到了一个ivocation  handler，当我们通过代理对象调用一个方法的时候，这个方法的调用就会被转发为由InvocationHandler这个接口的 invoke 方法来进行调用。
+每一个动态代理类都必须要实现InvocationHandler这个接口，并且每个代理类的实例都关联到了一个invocation handler，当我们通过代理对象调用一个方法的时候，这个方法的调用就会被转发为由InvocationHandler这个接口的 invoke 方法来进行调用。
 ```java
 public Object invoke(Object proxy, Method method, Object[] args)throws Throwable;
 ```
@@ -68,7 +88,7 @@ public Object invoke(Object proxy, Method method, Object[] args)throws Throwable
 - Method 指我们要调用的真实对象方法的Mehthod对象
 - Object[] 调用方法的参数，**这里原始类型数据(int ,boolean...)会被包装为其对应的包装类(Integer,Boolean...)**
 
-invoke方法返回值会称为代理对象调用真实方法的返回值，如果该真实方法在接口中定义为原始类型，那么这个返回值通过invoke调用后，必须是该原始类型包装类的实例对象。**如果接口中方法定义返回值为原始类型，而invoke返回null,则会抛出NullPointerException异常**。如果接口中定义方法返回指与invoke返回指类型不兼容，则会抛出ClassCastException 异常。
+invoke方法返回值会成为代理对象调用真实方法的返回值，如果接口方法声明的返回值是原始类型，那么这个返回值通过invoke调用后，必须是该原始类型包装类的实例对象。**如果接口中方法定义返回值为原始类型，而invoke返回null,则会抛出NullPointerException异常**。如果接口中定义方法返回指与invoke返回指类型不兼容，则会抛出ClassCastException 异常。
 
 对于一个代理对象实例，如果我们想要获取和它关联的invocation handle,可以使用Proxy.getInvocationHandle(Object proxy)方法。该方法如果传入对象不是代理对象，则会抛出IllegalArgumentException异常。
 

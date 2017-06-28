@@ -1,13 +1,18 @@
 title: java Servlet
 id: 1498008859282
 author: 不识
-date: 2017-06-21 09:34:27
 tags:
+  - java
+categories:
+  - java web
+date: 2017-06-21 09:34:00
 ---
-　　Java Servlet技术使用请求 - 响应编程模型在Web应用程序中提供动态的面向用户的内容。
+Java Servlet技术使用请求 - 响应编程模型在Web应用程序中提供动态的面向用户的内容。
 # 什么是Servlet?
 　　servlet是一种Java编程语言类，用于扩展托管应用程序的服务器的功能，这些应用程序使用请求 - 响应编程模型来访问。虽然servlet可以响应任何类型的请求，但它们通常用于扩展由Web服务器托管的应用程序。对于这样的应用程序，Java Servlet技术定义了HTTP特定的servlet类。   
-　　javax.servlet和javax.servlet.http包提供用于编写servlet的接口和类。所有servlet都必须实现Servlet接口，它定义了生命周期方法。实现通用服务时，可以使用或扩展Java Servlet API提供的GenericServlet类。HttpServlet类提供了诸如doGet和doPost等方法来处理特定于HTTP的服务。   
+　　javax.servlet和javax.servlet.http包提供用于编写servlet的接口和类。所有servlet都必须实现Servlet接口，它定义了生命周期方法。实现通用服务时，可以使用或扩展Java Servlet API提供的GenericServlet类。HttpServlet类提供了诸如doGet和doPost等方法来处理特定于HTTP的服务。  
+<!-- more -->
+
 # Servlet生命周期
 servlet的生命周期由其部署在的容器来控制。当请求映射到servlet时，容器将执行以下步骤。
 1.	如果servlet的实例不存在，则Web容器：  

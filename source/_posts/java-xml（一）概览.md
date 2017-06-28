@@ -19,7 +19,7 @@ SAX和DOM API分别由XML-DEV组织和W3C定义。定义了这些API的库如下
 - **javax.xml.stream**: 提供StAX指定转换API。
 
 
-Simple API for XML(SAX)是一个事件驱动，序列访问的机制，它以一个元素接一个元素的方式进行处理。该级别的API将XML读取并写入数据存储库或Web中。对于服务器端和高性能应用程序，您需要充分了解此级别。但是对于大多数应用来说，简单的理解就足够了。 
+  Simple API for XML(SAX)是一个事件驱动，序列访问的机制，它以一个元素接一个元素的方式进行处理。该级别的API将XML读取并写入数据存储库或Web中。对于服务器端和高性能应用程序，您需要充分了解此级别。但是对于大多数应用来说，简单的理解就足够了。 
 　　DOM API是一个更容易使用的API。它提供了一个熟悉的对象树结构。您可以使用DOM API来操纵其封装的应用程序对象的层次结构。DOM API是交互式应用程序的理想选择，因为整个对象模型都存在于内存中，这样用户可以访问和操作DOM对象。   
 　　另一方面，构建DOM需要读取整个XML结构并将对象树保存在内存中，因此它是CPU和内存密集型的。基于这个原因，SAX API倾向用于服务器端应用程序和数据过滤器，它不需要在内存中表示数据。     
 　　在javax.xml.transform中定义的XSLT API可以将XML数据写入文件或将其转换为其他形式。如本教程的XSLT部分所示，您甚至可以将其与SAX API结合使用，将旧数据转换为XML。  
@@ -119,6 +119,3 @@ StAX是JAXP系列中最新的API，为希望能进行高性能流式过滤，处
 - 如果您需要从XML数据构建一个对象树，以便您可以在应用程序中进行操作，或将内存中的对象树转换为XML，使用Document Object Model.
 - 如果您需要将XML标签转换为其他形式，如果要生成XML输出，或者（与SAX API结合使用）想要将旧数据结构转换为XML，使用Extensible Stylesheet Language Transformations.
 - 如果您想要一种基于Java技术的流形式的，基于事件驱动的pull式解析API来读取和写入XML文档，或者想要创建快速，相对易于编程和轻量级内存占用的双向XML解析器，使用Streaming API for XML.
-
-
-
