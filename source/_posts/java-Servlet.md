@@ -5,6 +5,7 @@ tags:
   - java
 categories:
   - java web
+  - servlet
 date: 2017-06-21 09:34:00
 ---
 Java Servlet技术使用请求 - 响应编程模型在Web应用程序中提供动态的面向用户的内容。
