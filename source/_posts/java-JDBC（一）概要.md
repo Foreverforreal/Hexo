@@ -5,7 +5,7 @@ tags:
   - java
   - JDBC
 categories:
-  - java web
+  - java 基础
   - JDBC
 date: 2017-06-30 16:42:00
 ---
