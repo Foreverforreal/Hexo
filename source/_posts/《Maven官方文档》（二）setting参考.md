@@ -1,4 +1,4 @@
-title: 《Maven官方文档》（二）设置参考
+title: 《Maven官方文档》（二）setting参考
 id: 1499051073985
 author: 不识
 tags:
@@ -6,6 +6,7 @@ tags:
   - 构建工具
 categories:
   - Maven
+  - 参考
 date: 2017-07-03 11:04:00
 ---
 # 简介
@@ -203,11 +204,11 @@ Activations是profile的关键。像POM的profiles一样，profiles的功能来�
   ...
 </settings>
 ```
-当满足所有指定的标准时，Activation会开启，尽管不是一切都是必需的。
-- **jdk:**activation有一个内置的，以Java为中心的jdk元素的检查。如果测试在与给定的前缀匹配的jdk版本号下运行，它会激活。在上面的例子中，1.5.0\_06将匹配。
-- **os:**os元素可以定义上面显示的一些操作系统特定属性。有关操作系统值的更多详细信息，请参阅[maven-enforcer-plugin](https://maven.apache.org/plugins/maven-enforcer-plugin/rules/requireOS.html)。
-- **property:**如果Maven检测到对应的name=value对的属性（可以通过${name}在POM中取消引用的值），该profile将激活。
-- **file:**最后，给定的文件名可以通过文件的existence或missing而激活profile。
+当满足所有指定的标准时，Activation会开启，尽管不是所有的都是必需的。
+- **jdk：**activation有一个内置的，以Java为中心的jdk元素的检查。如果测试在与给定的前缀匹配的jdk版本号下运行，它会激活。在上面的例子中，1.5.0\_06将匹配。
+- **os：**os元素可以定义上面显示的一些操作系统特定属性。有关操作系统值的更多详细信息，请参阅[maven-enforcer-plugin](https://maven.apache.org/plugins/maven-enforcer-plugin/rules/requireOS.html)。
+- **property：**如果Maven检测到对应的name=value对的属性（可以通过${name}在POM中取消引用的值），该profile将激活。
+- **file：**最后，给定的文件名可以通过文件的existence或missing而激活profile。
 
 activation元素不是profile可以被激活的唯一方式。setting.xml文件的activeProfile元素可能包含profile的id。它们也可以通过命令行在-P标志后用一个逗号分割的列表（如 -P test）来显示激活。   
 要查看某个构建中将激活哪个配置文件，请使用maven-help-plugin。
@@ -217,11 +218,11 @@ mvn help:active-profiles
 ### Properties
 Maven属性是值占位符，如Ant中的属性。它们的值可以通过使用符号$ {X}在POM中的任何位置访问，其中X是属性。他们有五种不同的样式，都可以从settings.xml文件访问：
 
-1. env.X:使用“env.”替换变量将返回shell的环境变量。例如，$ {env.PATH}包含\ $ path环境变量（Windows中的％PATH％）。
-2. project.x:POM中的点（.）标记路径将包含相应元素的值。例如：可以通过$ {project.version}访问&lt;project> &lt;version> 1.0 &lt;/ version> </ project>。
-3. setting.x:settings.xml中的点（.）标记路径将包含相应元素的值。例如：可以通过 ${settings.offline}访问&lt;settings>&lt;offline>false&lt;/offline>&lt;/settings>。
+1. env.X：使用“env.”替换变量将返回shell的环境变量。例如，$ {env.PATH}包含\ $ path环境变量（Windows中的％PATH％）。
+2. project.x：POM中的点（.）标记路径将包含相应元素的值。例如：可以通过$ {project.version}访问&lt;project> &lt;version> 1.0 &lt;/ version> </ project>。
+3. setting.x：settings.xml中的点（.）标记路径将包含相应元素的值。例如：可以通过 ${settings.offline}访问&lt;settings>&lt;offline>false&lt;/offline>&lt;/settings>。
 4. Java系统属性：通过java.lang.System.getProperties()可访问的所有属性都可用作POM属性，例如$ {java.home}。
-5. x:在<properties />元素或外部文件中设置，该值可以用作$ {someVar}。
+5. x：在<properties />元素或外部文件中设置，该值可以用作$ {someVar}。
 
 ```xml
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
@@ -243,7 +244,7 @@ Maven属性是值占位符，如Ant中的属性。它们的值可以通过使用
 ```
 如果此配置文件处于活动状态，则可以从POM访问属性${user.install}。
 ### Repositories
-仓库是Maven用于填充构建系统的本地仓库的远程项目集合。从本地仓库中，Maven称它为插件和依赖。不同的远程仓库可能包含不同的项目，在开启的profile下，它们会搜索相匹配的发布版或者快照版的artifact。
+Repositories是Maven用于填充构建系统的本地仓库的远程项目集合。从本地仓库中，Maven称它为插件和依赖。不同的远程仓库可能包含不同的项目，在开启的profile下，它们会搜索相匹配的发布或者快照版的artifact。
 ```xml
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -280,10 +281,10 @@ Maven属性是值占位符，如Ant中的属性。它们的值可以通过使用
   ...
 </settings>
 ```
-- **releases, snapshots:**这是对不同类型的artifact的策略，发布版或者快照版。使用这两个设置，POM有权在一个仓库中修改每个类型的策略，而不管其他的类型。比如，出于开发的目的，一个可能只决定开启快照版本下载。
+- **releases, snapshots:**这是对不同类型的artifact的策略，发布版或者快照版。使用这两个设置，POM有权在一个仓库中修改每个类型的策略，而不管其他的类型。比如，出于开发的目的，可能只决定开启快照版本下载。
 - **enabled:**是否为相应的类型（发布版或快照版）启用了该存储库，为true还是false
 - **updatePolicy:**此元素指定应尝试更新发生的频率。Maven将将本地POM的时间戳记（存储在仓库中的maven-metadata文件中）与远程文件进行比较。选项是：always，daily（默认），interval：X（其中X是以分钟为单位的整数）或never。
-- **checksumPolicy:**当Maven将文件部署到仓库时，它还会部署相应的校验和文件。在确实或者不正确的检验和上你的选项是ignore，fail或者warn。
+- **checksumPolicy:**当Maven将文件部署到仓库时，它还会部署相应的校验和文件。在文件缺失或者校验和不正确时，你的选项是ignore，fail或者warn。
 - **layout:**在上述仓库的描述中，提到它们都遵循一个共同的布局。这大多数是正确的。 Maven 2为它的仓库有一个默认布局;然而，Maven 1.x有不同的布局。使用此元素来指定它是default还是legacy。
 
 
@@ -303,5 +304,3 @@ Maven属性是值占位符，如Ant中的属性。它们的值可以通过使用
 </settings>
 ```
 settings.xml难题的最后一块是activeProfiles元素。这包含一组activeProfile元素，每个元素都有一个profile id的值。任何profile id被定义为activeProfile都会被激活，而不管任何的环境设置。如果没有找到匹配的profile，则什么也不会发生。比如，如果env-test是一个activeProfile，一个在pom.xml（或profile.xml）中有相应id的profile会被激活。如果没有这样一个profile被找到，则依旧照常执行。
-
-
