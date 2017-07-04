@@ -1,7 +1,9 @@
-title: 《Maven官方文档》（四）POM
+title: 《Maven官方文档》（四）POM介绍
 id: 1499178787072
 author: 不识
-tags: []
+tags:
+  - Maven
+  - 构建工具
 categories:
   - Maven
   - 介绍
