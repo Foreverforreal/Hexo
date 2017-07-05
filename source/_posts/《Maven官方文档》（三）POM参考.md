@@ -574,7 +574,7 @@ build元素的另一个特征是指定项目中存在资源的位置。资源（
 - **extensions：**true或者false，是否加载此插件的扩展。默认为false。本文档稍后将介绍extensions。
 - **inherited：**true或者false，该插件配置是否应适用于继承自此插件的POM。默认值为true。
 - **configuration：**这是针对个别的插件。无需深入了解插件的工作原理，就可以在这里指定插件Mojo可能期望的任何属性（这些是Java Mojo bean中的getter和setter）。在上面的例子中，我们在maven-jar-plugin的Mojo中设置classifier的属性为test。可能要注意的是，所有configuration元素，无论它们在POM中的何处，都是将值传递给另一个底层系统，比如插件。换而言之：POM schema从不会明确要求cofiguration元素的值，但是一个插件目标有权要求这个配置值。
-	如果您的POM声明一个父级，它将从父级的build / plugins或pluginManagement部分继承插件配置。
+	如果您的POM声明一个父级，它将从父级的build/plugins或pluginManagement部分继承插件配置。
     
     为了说明，请考虑父POM中的以下片段：
     ```xml
@@ -749,7 +749,7 @@ build元素的另一个特征是指定项目中存在资源的位置。资源（
 </project>
 ```
 ### Builde元素集
-XSD中的Build类型表示这些元素仅用于“项目构建”。尽管有额外数目的元素（六个），实际只有两组元素是项目构建包含而配置文件构建缺失的：directories和 extensions.
+XSD中的Build类型表示这些元素仅用于“项目构建”。尽管还有更多数量的元素（六个），但实际只有两组元素是项目构建包含而配置文件构建没有的：**directories**和**extensions**.
 #### Directories
 directory元素集存在于build元素中，它为整个POM设置了各种目录结构。由于它们不存在于配置文件构建中，因此无法通过配置文件更改。
 ```xml
@@ -768,7 +768,7 @@ directory元素集存在于build元素中，它为整个POM设置了各种目录
   </build>
 </project>
 ```
-如果上述\*Directory元素的值设置为绝对路径（当其属性展开时）那么使用该目录。否则，它是相对于基础构建目录：$ {basedir}。
+如果上述\*Directory元素的值设置为绝对路径（当其属性展开时）那么使用该目录。否则，它是相对于基础构建目录：${basedir}。
 
 #### Extensions
 Extensions是在此构建中使用的artifact列表。它们将被包含在运行构建的classpath中。他们可以启用extensions给构建过程（例如为Wagon传输机制添加ftp提供程序）以及激活插件，从而对构建生命周期进行更改。简而言之，extensions是在构建期间激活的artifacts。extensions不需要实际执行任何操作，也不包含Mojo。因此，extensions对于指定一个通用插件接口的多个实现来说是非常好的。
