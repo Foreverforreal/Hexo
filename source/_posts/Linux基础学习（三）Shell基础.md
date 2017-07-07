@@ -17,7 +17,7 @@ Shell还是一个功能相当强大的编程语言，易编写，易调试，灵
 - **Bourne Shell**：从1979年起Unix就开始使用Bourne Shell，它的主文件名为sh
 - **C Shell**:C Shell主要在BSD版的Unix系统中使用，其语法和C语言类似而得名
 
-> Shell主要语法类型有上面两种，这两种语法彼此不兼容。Bourne家族主要包括sh,ksh,Bash，psh,zsh;C家族余姚包括csh,tcsh   
+> Shell主要语法类型有上面两种，这两种语法彼此不兼容。Bourne家族主要包括sh,ksh,Bash，psh,zsh;C家族主要包括csh,tcsh   
 > Linux就是使用Bash作为用户的基本Shell.Bash可以和sh互相兼容
 
 ***
@@ -176,4 +176,3 @@ history \[选项][历史命令保存文件]
 |**\`\`**|反引号先执行系统命令后，将结果赋值|
 |**$()**|和反引号作用一样|
 |**#**|表示注释|
-

@@ -128,9 +128,9 @@ POM的基石是它的依赖列表。大多数项目都依赖其他项目来正�
 ```
 mvn install:install-file -Dfile=non-maven-proj.jar -DgroupId=some.group -DartifactId=non-maven-proj -Dversion=1 -Dpackaging=jar
 ```
-注意这里依旧需要地址，只有这时使用命令行和安装插件会为你给定的地址创建一个POM。
+	注意这里依旧需要地址，只有这时使用命令行和安装插件会为你给定的地址创建一个POM。
 2. 创建自己的仓库并将其部署在那里。这是对于拥有内网并需要使每个人都能同步的公司最受欢迎的方法。这有一个Maven目标称作deploy:deploy-file，它与install:install-file目标相似（阅读插件的目标页面了解更多信息）。
-3. 设置依赖雨为system，并且定义一个systemPath。然而，并不建议这么做，但是它使我们要解释以下元素。
+3. 设置依赖范围为system，并且定义一个systemPath。然而，并不建议这么做，但是它使我们要解释以下元素。
 	- **classifier:**classifier允许我们区分从同一个POM构建但是内容不同的artifact。它是一些可选的和任意的字符串， - 如果存在的话 - 附加到artifact名称后，就是在版本号之后。     
 		此元素的用意是，考虑这样一个例子，一个项目提供一个针对JRE 1.5的artifact，但是同时也依然支持JRE 1.4。这样第一个artifact可以配备classifier jdk15，而第二个是jdk14，以便客户端选择一个使用。    
 		classifier的另一个常见用例是将辅助artifact附加到项目的主artifact上。如果你浏览Maven的中央仓库，你会注意到classifier source和javadoc经常和打包类文件一起用于部署项目源代码和API文档。   
@@ -142,8 +142,8 @@ mvn install:install-file -Dfile=non-maven-proj.jar -DgroupId=some.group -Dartifa
 		- **provided -**这很像compile，但是表示您期望JDK或容器在运行时提供它。它只适用于编译和测试类路径，不可传递。
 		- **runtime - **这个scope表示编译时不需要该依赖，但是执行时需要。它是在运行时和测试类路径，而不是编译类路径。
 		- **test -**这个scope表示应用程序正常使用的时候并不需要该依赖，只是适用于测试的编译和执行阶段。它不可传递。
-		- **system -**这个scope类似与provided只是你必须提供明确包含它的JAR。该artifact始终可用，但不是在存储库中查找。
-	- **systemPath:**只有在依赖scope是system时使用。否则的话，如果设置这个元素构建会失败。这个路径必须是绝对路径，因此建议使用属性来指定特定于机器的路径（关于属性以下更多），比如${java.home}/lib。由于假设先前安装了syste范围的依赖，Maven将不会为项目检查仓库，而是检查以确保这个文件存在。如果不存在的话，Maven会构建失败并且建议你手工下载安装它。
+		- **system -**这个scope与provided类似，只是你必须提供明确包含它的JAR。该artifact始终可用，但不是在存储库中查找。
+	- **systemPath:**只有在依赖scope是system时使用。否则的话，如果设置这个元素构建会失败。这个路径必须是绝对路径，因此建议使用属性来指定特定于机器的路径（关于属性以下更多），比如${java.home}/lib。由于假设先前安装了system范围的依赖，Maven将不会为项目检查仓库，而是检查该路径以确保这个文件存在。如果不存在的话，Maven会构建失败并且建议你手工下载安装它。
 	- **optional:**当项目本身是一个依赖的时候，标记项目的依赖为optional。困惑？比如，假设一个项目A依赖项目B来编译可能在运行时不使用的的一部分代码，则我们可能对于整个项目来说不需要项目B。所以如果项目X添加项目A作为它的依赖，那么Maven根本就不需要安装项目B。符号上，如果 =>表示所需的依赖关系，而 - >表示可选的，尽管A => B是在构建A时的情况，但是构建X时则是X=>A-->B 。
     简而言之，optional让其他项目知道，当你使用这个项目，你不需要该依赖也能正确运行。
 

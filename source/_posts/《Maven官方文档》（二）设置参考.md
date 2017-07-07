@@ -1,4 +1,4 @@
-title: 《Maven官方文档》（二）setting参考
+title: 《Maven官方文档》（二）设置参考
 id: 1499051073985
 author: 不识
 tags:
@@ -60,7 +60,7 @@ setting.xml的内容可以使用以下表达式进行插入值：
 ```
 - **localRepository**：这个值是构建系统本地仓库的路径。它的默认值是${user.home}/.m2/repository。该元素对主构建服务器允许所有登录用户从公共本地仓库构建非常有用。
 - **interactiveMode**：如果Maven应尝试与用户进行交互以进行输入，则为true。否则为false。默认是true。
-- **userPluginRegistry**：如果Maven应该使用 ${user.home}/.m2/plugin-registry.xml文件来管理插件版本，则为true。默认为false。注意当前的Maven 2.0版本，不应该依赖于plugin-registry.xml文件。目前认为它无效。
+- **userPluginRegistry**：如果Maven使用${user.home}/.m2/plugin-registry.xml文件来管理插件版本，则为true。默认为false。注意当前的Maven 2.0版本，不应该依赖于plugin-registry.xml文件。目前认为它无效。
 - **offline**：如果此构建系统应在离线模式下运行，则为true，默认为false。这个元素对于由于网络设置或者安全原因无法连接到远程仓库的构建服务器很有用。
 
 ## 插件组
@@ -83,7 +83,7 @@ setting.xml的内容可以使用以下表达式进行插入值：
 mvn jetty：run
 ```
 ## 服务器
-用于下载和部署的仓库由POM的repositories和distributionManagement元素定义。但是，某些设置（如用户名和密码）不应与pom.xml一起分发。这种类型的信息应该存在于settings.xml中的构建服务器上。
+用于下载和部署的仓库由POM的repositories和distributionManagement元素定义。但是，某些设置（如username和password）不应与pom.xml一起分发。这种类型的信息应该存在于的构建服务器的settings.xml中。
 ```xml
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -106,7 +106,7 @@ mvn jetty：run
 </settings>
 ```
 - **id** 这是服务器的ID（不是用户用来登录的），它与Maven尝试连接的仓库/镜像的id元素相匹配。
-- **username, password**：这些元素成对出现，它宝石向该服务器进行验证所需的登录名和密码。
+- **username, password**：这些元素成对出现，它表示向该服务器进行验证所需的登录名和密码。
 - **privateKey, passphrase**：像前面的两个元素，这对元素指定一个私钥的路径（默认是${user.home}/.ssh/id\_dsa）和一个密码，如果需要的话。passphrase和password元素在将来可能会外部化，但是现在他们必须在setting.xml中以纯文本设置。
 - **filePermissions, directoryPermissions**：当在部署时创建仓库文件或目录时，这些是使用的权限。每个的合法值是一个三位数的数字对应于\* nix文件的权限，即。 664或775。
 
@@ -133,7 +133,7 @@ mvn jetty：run
 ```
 - **id, name: **该镜像的唯一标识符和用户友好名称。该id用于区分mirror元素，并在连接到镜像时从&lt;servers>部分选择相应的凭据。
 - **url:**镜像的基础URL。构建系统会使用这个URL来连接到一个远程仓库，而不是使用原始的仓库URL。
-- **mirrorOf：**要镜像的仓库的id。比如，要指向Mavencentral仓库（https://repo.maven.apache.org/maven2）的镜像，设置这个元素值为central。更高级的映射，如repo1，repo2或\*，！inhouse也是可能的。但是这个不能匹配一个镜像的id。
+- **mirrorOf：**要镜像的仓库的id。比如，要指向Maven central仓库（https://repo.maven.apache.org/maven2） 的镜像，设置这个元素值为central。更高级的映射，如repo1，repo2或\*，！inhouse也是可能的。但是这个不能匹配一个镜像的id。
 
 要更深入地介绍镜像，请阅读[“镜像设置指南”](http://maven.apache.org/guides/mini/guide-mirror-settings.html)。
 

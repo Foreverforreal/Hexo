@@ -67,7 +67,7 @@ mvn -B archetype:generate \
 - **groupId** 此元素指示创建项目的组织或组的唯一标识符。groupId是项目的关键标识符之一，通常基于您组织的完全限定域名。例如，org.apache.maven.plugins是所有Maven插件的指定groupId。
 - **artifactId**此元素指示此项目正在生成的主要artifact的唯一基础名称。项目的主要artifact通常是一个JAR文件。诸如源码包之类的辅助artifacts也使用artifactId作为其最终名称的一部分。由Maven生成的典型artifacts将具有&lt;artifactId> - &lt;version>.&lt;extension>（例如myapp-1.0.jar）的形式。
 - **packaging** 此元素指示此artifact 使用的包类型（例如JAR，WAR，EAR等）。这不仅意味着如果生成的artifact是JAR,WAR,或者EAR，同时也指示了用作构建过程一部分的特定生命周期。（生命周期是我们将在指南中进一步讲解的一个话题。现在只需要记住，一个项目指示的packaging可以在定制构建生命周期中发挥作用。）packaging元素的默认值是JAR，所以你不必为大多数项目指定。
-- **version** 该元素指示项目生成的artifact的版本。Maven在帮助您进行版本管理方面有很长的路要走，并且您会经常在version中看到SNAPSHOT指示符，这表明一个项目还处于开发状态。我们将在本指南中讨论[snapshots]()的使用及其进一步工作。
+- **version** 该元素指示项目生成的artifact的版本。Maven在帮助您进行版本管理方面有很长的路要走，并且您会经常在version中看到SNAPSHOT指示符，这表明一个项目还处于开发状态。我们将在本指南中讨论[snapshots](#什么是SNAPSHOT版本？)的使用及其进一步工作。
 - **name** 此元素指示用于项目的显示名称。这通常用在Maven生成的文档中。
 - **url** 这个元素指示可以在哪里找到该项目的地址。这通常用在Maven生成的文档中。
 - **description** 该元素提供了您的项目的基本描述。这通常用在Maven生成的文档中。
@@ -250,7 +250,7 @@ mvn clean
 ```
 mvn idea:idea
 ```
-这可以运行在以前的IDEA项目的顶部 - 它会更新设置，而不是重新开始。   
+这可以运行在以前的IDEA项目的根目录 - 它会更新原来的项目设置，而不是新建一个。   
 如果您正在使用Eclipse IDE，只需调用：
 
 ```
@@ -277,7 +277,7 @@ mvn eclipse:eclipse
 ```
 　　SNAPSHOT值是指开发分支的“最新”代码，它并不保证代码稳定或不再改变。相反，“release”版本中的代码（任何没有SNAPSHOT后缀的版本值）都是不再变更的。 
 　　换句话说，SNAPSHOT版本是最终“发布”版本之前的“开发”版本。SNAPSHOT要比它的发布版本老。    
-　　在发布过程中，x.y-SNAPSHOT的版本更改为x.y.发布过程还将开发版本增加到x.(y + 1)-SNAPSHOT。例如，版本1.0-SNAPSHOT被发布为版本1.0，新的开发版本是版本1.1-SNAPSHOT。
+　　在发布过程中，**x.y-SNAPSHOT**的版本更改为**x.y**.发布过程还将开发版本增加到**x.(y + 1)-SNAPSHOT**。例如，版本**1.0-SNAPSHOT**被发布为**1.0**版本，新的开发版本是**1.1-SNAPSHOT**版本。
 
 # 如何使用插件
 
