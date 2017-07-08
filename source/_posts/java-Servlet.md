@@ -4,7 +4,7 @@ author: 不识
 tags:
   - java
 categories:
-  - java web
+  - javaEE
   - servlet
 date: 2017-06-21 09:34:00
 ---

@@ -1,4 +1,4 @@
-title: java 反射（三）
+title: java 反射（三）动态代理
 id: 1494582516337
 author: 不识
 tags:
