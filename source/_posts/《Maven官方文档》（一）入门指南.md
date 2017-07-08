@@ -588,8 +588,8 @@ command.line.prop=${command.line.prop}
   </dependencies>
 </project>
 ```
-　　其他地方的依赖怎么使用呢？如果将它们获取到我的本地仓库？每当项目引用本地仓库中不可用的依赖项时，Maven将从远程仓库下载依赖项到本地仓库。当您构建您的第一个项目时，您可能已经注意到Maven下载了很多东西（这些下载是用于构建项目的各种插件的依赖）。默认情况下，Maven使用的远程仓库可以在http://repo.maven.apache.org/maven2/中找到（并浏览）。您还可以设置自己的远程仓库（可能是您公司的中央仓库），来代替或补充默认的远程仓库。有关仓库的更多信息，请参阅[“仓库简介”](http://maven.apache.org/guides/introduction/introduction-to-repositories.html)。    
-　　让我们在我们的项目中添加其他的依赖项。假设我们添加了一些日志记录到代码中，需要添加log4j作为依赖。首先，我们需要知道log4j的groupId，artifactId和version是什么。我们可以浏览ibiblio并寻找它，或者通过使用Google来帮助搜索“site：www.ibiblio.org maven2 log4j”。搜索显示一个名为/maven2/log4j/log4j（或/pub/packages/maven2/log4j/log4j）的目录。该目录有一个名为maven-metadata.xml的文件。以下是log4j的maven-metadata.xml的内容：
+　　其他地方的依赖怎么使用呢？如果将它们获取到我的本地仓库？每当项目引用本地仓库中不可用的依赖项时，Maven将从远程仓库下载依赖项到本地仓库。当您构建您的第一个项目时，您可能已经注意到Maven下载了很多东西（这些下载是用于构建项目的各种插件的依赖）。默认情况下，Maven使用的远程仓库可以在http://repo.maven.apache.org/maven2/ 中找到（并浏览）。您还可以设置自己的远程仓库（可能是您公司的中央仓库），来代替或补充默认的远程仓库。有关仓库的更多信息，请参阅[“仓库简介”](http://maven.apache.org/guides/introduction/introduction-to-repositories.html)。    
+　　让我们在我们的项目中添加其他的依赖项。假设我们添加了一些日志记录到代码中，需要添加log4j作为依赖。首先，我们需要知道log4j的groupId，artifactId和version是什么。我们可以浏览ibiblio并寻找它，或者通过使用Google来帮助搜索“site:ww.ibiblio.org maven2 log4j”。搜索显示一个名为/maven2/log4j/log4j （或/pub/packages/maven2/log4j/log4j）的目录。该目录有一个名为maven-metadata.xml的文件。以下是log4j的maven-metadata.xml的内容：
 ```xml
 <metadata>
   <groupId>log4j</groupId>

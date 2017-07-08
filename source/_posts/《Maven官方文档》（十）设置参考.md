@@ -1,4 +1,4 @@
-title: 《Maven官方文档》（二）设置参考
+title: 《Maven官方文档》（十）设置参考
 id: 1499051073985
 author: 不识
 tags:
@@ -40,7 +40,7 @@ setting.xml的内容可以使用以下表达式进行插入值：
 1. ${user.home}和其他的系统属性（自从Maven 3.0）
 2. ${env.HOME}等环境变量
 
-注意，setting.xml中定义在profiles中的属性不可以用来插入值。
+注意，setting.xml中定义在profiles中的属性不可以用来当作插值。
 
 # 设置详细信息
 

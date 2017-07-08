@@ -1,4 +1,4 @@
-title: 《Maven官方文档》（三）POM参考
+title: 《Maven官方文档》（十一）POM参考
 id: 1499068218254
 author: 不识
 tags:
@@ -457,8 +457,8 @@ Maven带来的一个强大的附加功能就是项目继承的概念。虽然在
 
 1. env.X:在变量前加上前缀“env.”。会返回shell的环境变量。比如${env.PATH}包含PATH环境变量。
 	注意：虽然环境变量本身在Windows上不区分大小写，但查找属性区分大小写。换而言之，虽然Windows shell为%PATH%和%path%返回相同的值，但Maven还是会区分${env.PATH}和${env.Path}。对于Maven 2.1.0，为了可靠性，环境变量的名称被标准化为全部大写。
-2. project.x:在POM中一个点（.）标记的路径会包含对应的元素的值。比如&lt;project> &lt;version> 1.0 </ version> </ project>可以通过$ {project.version}访问。
-3. setting.x:在setting.xml中一个点（.）标记的路径会包含对应的元素值。比如：&lt;settings> &lt;offline> false </ offline> </ settings>可通过$ {settings.offline}访问。
+2. project.x:在POM中一个以点（.）标记的路径会包含对应的元素的值。比如&lt;project>&lt;version> 1.0</ version></ project>可以通过${project.version}访问。
+3. setting.x:在setting.xml中一个以点（.）标记的路径会包含对应的元素值。比如：&lt;settings>&lt;offline>false</ offline></ settings>可通过${settings.offline}访问。
 4. Java系统属性：所有的可以通过java.lang.System.getProperties()访问的属性都可以用作POM属性，比如${java.home}。
 5. x:在POM中的<properties />元素中设置。&lt;properties> &lt;someVar>value</ someVar> </ properties>可以当作$ {someVar}使用。
 
@@ -538,7 +538,7 @@ build元素的另一个特征是指定项目中存在资源的位置。资源（
 
 - **resources：**是一个resource元素列表，每个resource元素都描述与此项目相关联的有哪些文件，以及这些文件的位置。
 - **targetPath：**指定放置从构建生成的资源集的目录结构。目标路径默认为基本目录。一个会被打包在JAR中资源通用指定目标路径是META-INF。
-- **filtering：**是它true或false，表示是否要为此资源启用过滤。注意，该过滤\*.properties文件不必。资源也可以使用默认定义在POM中的（比如${project.version}），使用"-D"标志传递给命令行的（比如"-Dname=valuse"）或者明确使用properties元素定义的属性。过滤文件覆盖上面的这些属性。
+- **filtering：**它是true或false，表示是否要为此资源启用过滤。注意，\*.properties过滤文件不必被定义用于进行过滤-因为资源可以使用默认定义在POM中的（比如${project.version}），使用"-D"标志传递给命令行的（比如"-Dname=valuse"）或者明确使用properties元素定义的属性。过滤文件覆盖上面的这些属性。
 - **directory：**这个元素的值定义了可以在哪里找到资源。构建默认的目录是${basedir}/src/main/resources。
 - **includes：**一组文件模式，指定要作为资源包含在该指定目录下的文件，使用\*作为通配符。
 - **excludes：**和includes相同的结构，但是指定的文件是要忽略掉的。在inlcude与exclude发生冲突时，exclude生效。
@@ -771,7 +771,7 @@ directory元素集存在于build元素中，它为整个POM设置了各种目录
 如果上述\*Directory元素的值设置为绝对路径（当其属性展开时）那么使用该目录。否则，它是相对于基础构建目录：${basedir}。
 
 #### Extensions
-Extensions是在此构建中使用的artifact列表。它们将被包含在运行构建的classpath中。他们可以启用extensions给构建过程（例如为Wagon传输机制添加ftp提供程序）以及激活插件，从而对构建生命周期进行更改。简而言之，extensions是在构建期间激活的artifacts。extensions不需要实际执行任何操作，也不包含Mojo。因此，extensions对于指定一个通用插件接口的多个实现来说是非常好的。
+Extensions是在此构建中使用的artifact列表。它们将被包含在运行构建的classpath中。他们可以启用extensions给构建过程（例如为Wagon传输机制添加一个ftp提供程序）以及激活插件，从而对构建生命周期进行更改。简而言之，extensions是在构建期间激活的artifacts。extensions不需要实际执行任何操作，也不包含Mojo。因此，extensions对于指定一个通用插件接口的多个实现来说是非常好的。
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -792,6 +792,9 @@ Extensions是在此构建中使用的artifact列表。它们将被包含在运�
 </project>
 ```
 ## 报告
+报告包含特定于站点生成阶段的元素。
+某些Maven插件可以生成reporting 元素下定义和配置的报告，例如：生成Javadoc报告。就像build元素配置插件，报告命令的功能相同。但明显的区别是，报告使用reportSet元素配置目标，而不是在executions块中插件目标的细粒度控制。而且微妙的区别在于reporting元素下的插件configuration如build插件下的configuration一样工作，尽管这是不正确的（一个build插件的configuration不会影响reporting的插件）。      
+
 ### 报告设置
 
 # 更多项目信息

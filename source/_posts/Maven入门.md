@@ -1,8 +1,12 @@
 title: Maven入门
 id: 1499308062301
 author: 不识
-date: 2017-07-06 10:27:46
 tags:
+  - Maven
+categories:
+  - Maven
+  - 入门
+date: 2017-07-06 10:27:00
 ---
 # Maven概览-核心概念
 
