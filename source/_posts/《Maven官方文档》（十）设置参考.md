@@ -59,7 +59,7 @@ setting.xml的内容可以使用以下表达式进行插入值：
 </settings>
 ```
 - **localRepository**：这个值是构建系统本地仓库的路径。它的默认值是${user.home}/.m2/repository。该元素对主构建服务器允许所有登录用户从公共本地仓库构建非常有用。
-- **interactiveMode**：如果Maven应尝试与用户进行交互以进行输入，则为true。否则为false。默认是true。
+- **interactiveMode**：如果Maven应尝试与用户输入进行交互，则为true。否则为false。默认是true。
 - **userPluginRegistry**：如果Maven使用${user.home}/.m2/plugin-registry.xml文件来管理插件版本，则为true。默认为false。注意当前的Maven 2.0版本，不应该依赖于plugin-registry.xml文件。目前认为它无效。
 - **offline**：如果此构建系统应在离线模式下运行，则为true，默认为false。这个元素对于由于网络设置或者安全原因无法连接到远程仓库的构建服务器很有用。
 

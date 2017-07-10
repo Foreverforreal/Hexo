@@ -386,9 +386,9 @@ InputStream is = getClass().getResourceAsStream( "/test.properties" );
  
 ...
 ```
-# 如何筛选资源文件？
+# 如何过滤资源文件？
 　　有时一个资源文件会需要包含一个只能在构建时提供的值。要在Maven中完成此操作，请使用语法${&lt;property name>}将包含该值的属性引用到你的资源文件中。该属性可以是您的pom.xml中定义的值之一，一个定义在用户的settings.xml中的值，一个定义在外部属性文件的值，或者一个系统属性。   
-　　要在复制时让Maven筛选资源，只需将pom.xml中的资源目录的filtering设置为true即可：
+　　要在复制时让Maven过滤资源，只需将pom.xml中的资源目录的filtering设置为true即可：
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
