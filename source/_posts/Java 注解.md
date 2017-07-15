@@ -18,8 +18,11 @@ date: 2017-07-08 13:04:00
 
 本课介绍了可以使用注解的位置，如何应用注解，有哪些预定义注解类型在Java平台标准版（Java SE API）中可用，如何将类型注解与可插拔型系统结合使用，以更强类型检查来编写代码，以及如何实现重复注解。
 <!-- more -->
+***
 # 注解基础
+***
 ## 注解的格式
+***
 在其最简单的形式中，注解如下所示：
 ```java
 @Entity
@@ -65,6 +68,7 @@ class MyClass { ... }
 注解类型可以是Java SE API的java.lang或java.lang.annotation包中定义的类型之一。在前面的示例中，Override和SuppressWarning是Java预定义注解。而前面示例中Author和Ebook是自定义注解。
 
 ## 注解可以在哪里使用
+***
 注解可以应用于声明：类，字段，方法以及其他程序元素的声明。在声明中使用时，每个注解通常按照惯例出现在它的行上。
 
 
@@ -87,9 +91,9 @@ void monitorTemperature() throws @Critical TemperatureException { ... }
 ```
 
 这种形式的注解叫做类型注解。更多信息请参阅[类型注解与可插拔型系统](http://docs.oracle.com/javase/tutorial/java/annotations/type_annotations.html)
-
+***
 # 声明一个注解类型
-
+***
 许多注解取代了代码内的注释。
 
 假设一个软件组传统上在每个类体的开始使用注释来提供一些重要信息。
@@ -152,10 +156,13 @@ import java.lang.annotation.*;
    
 }
 ```
+***
 # 预定义注解类型
+***
 一组注解释类型是在Java SE API中预定义的。一些注解类型由Java编译器使用，一些注解类型也用于其他注解。
 
 ## Java语言使用的注解类型
+***
 java.lang中定义的预定义注解类型为@Deprecated，@Override和@SuppressWarnings。
 
 
@@ -198,7 +205,7 @@ java.lang中定义的预定义注解类型为@Deprecated，@Override和@Suppress
 **@FunctionallInterface**注解在Java8中被引入，它表示类型声明旨在作为一个Java语言规范定义的函数式接口。
 
 ## 应用于其他注解的注解
-
+***
 一个应用于其他注解的注解被称为元注解（meta-annotations）。这有几个定义在java.lang.annotation中的元注解类型。
 
 **@Retention**注解指示被标记的注解如何储存：
@@ -220,8 +227,9 @@ java.lang中定义的预定义注解类型为@Deprecated，@Override和@Suppress
 **@Inherited**注解表示这个注解类型可以从超类继承（默认下是不可以的）。当用户查询注解类型，而类没有此类型注解时，会在类的超类进行查询。这个注解只能应用于类声明。
 
 **@Repeatable**注解，在JavaSE 8中引入，表示被标记的注解可以被多次应用于相同的声明或类型使用。更多信息请看[重复注解](#重复注解)
-
+***
 # 类型注解和可插拔类型系统
+***
 在Java SE 8发布之前，注解只能应用于声明。从Java SE 8版本开始，注解也可以应用于任何的类型使用。这意味着注解可以在你使用类型的任何位置使用。使用类型的几个例子是类实例创建表达式（new），类型转换。implements语句，以及throws语句。这个形式的注解被称为一个类型注解，并且在[注解基础](#注解基础)中提供了几个示例。类型注解被创建是用来支持提升Java语言的分析方式，以确保更强大的类型坚持。JavaSe 8没有提供一个类型检查框架，但是它运行你编写（或下载）一个类型检查框架，该框架实现为与Java编译器结合使用的一个或多个可插拔模块。
 
 比如，你需要确保一个在你的程序中的特定的变量永远不会被赋值为null；因为想要避免一个NullPointerException。您可以编写一个自定义插件来检查。然后你会修改你的代码来注解该变量，指示它永远不会被赋值为null。这个变量声明可能看起来是这个样子：
@@ -235,8 +243,9 @@ java.lang中定义的预定义注解类型为@Deprecated，@Override和@Suppress
 在恰当的使用类型注解和可插拔类型检查的存在下，你可以编写更加健壮和更不容易出错的代码。
 
 以在很多情况下，你不需要编写你自己的类型检查模块。这是第三方已经为你做过的工作。比如，例如，您可能希望利用华盛顿大学创建的Checker Framework 。这个框架包含了NonNull模块，以及一个正则表达式模块和一个互斥锁模块。更多信息查看[Checker Framework](http://types.cs.washington.edu/checker-framework/)。
-
+***
 # 重复注解
+***
 很多情景下你想要应用相同的注解到一个声明或类型使用上。从Java SE 8版本开始，重复注解使你能够做到这一点。
 
 比如，你正在编写代码使用了一个时间服务，使你可以在给定时间或者在某个时间表上运行一个方法，这类似于UNIX的cron服务。现在你想要设置一个定时器来运行一个方法-doPeriodicCleanup，在这个月的最后一天和每个星期五晚上11点。要设置这个定时器运行，创建一个@Schedule注解并且在doPeriodicCleanup方法上应用两次。第一次使用指定这个月的最后一天，第二次指定周五的下午11点，如下代码所示
@@ -254,6 +263,7 @@ public class UnauthorizedAccessException extends SecurityException { ... }
 ```
 出于兼容性原因，重复注解存储在由Java编译器自动生成的容器注解中。为了使编译器执行此操作，您的代码中需要两个声明。
 ## 步骤1:声明一个重复注解类型
+***
 这个注解类型必须使用@Repeatable元注解标记。下面示例定义了一个自定义@Schedule重复注解类型：
 ```java
 import java.lang.annotation.Repeatable;
@@ -270,6 +280,7 @@ public @interface Schedule {
 没有声明注解是重复注解就应用相同的该注解到一个声明上会导致编译时期错误。
 
 ## 步骤2:声明容器注解类型
+***
 容器注解类型必须有一个数组类型的value元素。数组类型的组件类型必须是重复注解类型。Schedules容器注解类型的声明如下所示：
 ```java
 public @interface Schedules {
@@ -277,8 +288,9 @@ public @interface Schedules {
 }
 ```
 ## 检索注解
-Reflection API中有几种可用于检索注释的方法。有的方法可以返回单个注解，比如AnnotatedElement.getAnnotationByType(Class&lt;T>),如果一个请求的注解类型存在的话，它们只返回一个单独的注解。如果请求类型的注解超过一个的话，你可以通过首先获取它们的容器注解来获取它们。以这种方式，遗留代码可以继续运行。在Java SE 8中引入了其他方法，扫描容器注解以一次返回多个注解，比如AnnotatedElement.getAnnotations(Class&lt;T>),有关所有可用方法的信息，请参阅AnnotatedElement()类规范。
+***
+Reflection API中有几种可用于检索注解的方法。有的方法可以返回单个注解，比如AnnotatedElement.getAnnotationByType(Class&lt;T>),如果一个请求的注解类型存在的话，它们只返回一个单独的注解。如果请求类型的注解超过一个的话，你可以通过首先获取它们的容器注解来获取它们。以这种方式，遗留代码可以继续运行。在Java SE 8中引入了其他方法，扫描容器注解以一次返回多个注解，比如AnnotatedElement.getAnnotations(Class&lt;T>),有关所有可用方法的信息，请参阅AnnotatedElement()类规范。
 
 ## 设计注意事项
+***
 在设计注解类型时，必须考虑一个注解类型的基数。如果注解的类型被标记为@Repeatable，则可以使用一个注解零次，一次或多次。也可以通过使用@Target元注解来限制注解类型的使用位置。比如你可以创建一个注解，只能用在方法和字段上。重要的是设计注解的时候要仔细确保程序员使用注解时发现它尽可能灵活和强大。
-
