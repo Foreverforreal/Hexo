@@ -13,7 +13,7 @@ Date-Time API的核心是java.time包。定义在java.time中的类的它们的�
 ***
 # 概述
 ***
-本节比较人类时间和机器时间的概念，提供了java.time包中主要的基于时间的类的表。
+>本节比较人类时间和机器时间的概念，提供了java.time包中主要的基于时间的类的表。
      
 代表时间有两种基本方式。一种是以人为本代表时间的方式，称为人类时间，如年，月，日，时，分，秒。另一种方式是机器时间，以一个毫秒的分辨率，从一个起源的时间线不断地测量时间，被称为时代。Date-Time包提供了丰富的类来代表日期和时间。在Date-Time API中一些类旨在表示机器时间，而另一些则更适合代表人类时间。
 
@@ -69,7 +69,7 @@ DayOfWeek枚举包含七个常数，用于描述星期几：从MONDAY到SUNDAY�
 ```java
 System.out.printf("%s%n", DayOfWeek.MONDAY.plus(3));
 ```
-通过使用*getDisplayName(TextStyle, Locale) *方法，你可以以用户区域来检索标识一周中星期几的字符串。TextStyle枚举使您能够指定要显示的字符串类型：FULL,NARROW（通常是单个字母），或者SHORT（一个缩写）。STANDALONE TextStyle常量在某些语言中使用，其输出在用作日期的一部分时不同于自身使用时的输出。以下示例打印“Monday”的TextStyle的三个主要形式：
+通过使用getDisplayName(TextStyle, Locale)方法，你可以以用户区域来检索标识一周中星期几的字符串。TextStyle枚举使您能够指定要显示的字符串类型：FULL,NARROW（通常是单个字母），或者SHORT（一个缩写）。STANDALONE TextStyle常量在某些语言中使用，其输出在用作日期的一部分时不同于自身使用时的输出。以下示例打印“Monday”的TextStyle的三个主要形式：
 ```java
 DayOfWeek dow = DayOfWeek.MONDAY;
 Locale locale = Locale.getDefault();
@@ -108,18 +108,22 @@ Aug
 ***
 # Date类
 ***
-> 本节显示只处理日期的基于时间类，不包括时间和时区。这四个类是Localdate，YearMonthMonthDay和Year。
+> 本节显示只处理日期的基于时间类，不包括时间和时区。这四个类是Localdate，YearMonth，MonthDay和Year。
 
 Date-Time API提供四个专门处理日期信息的类，而不考虑时间或时区。这些类由类名称来建议使用：LocalDate，YearMonth，MonthDay和Year。
 
 ## LocalDate
 ***
-LocalDate表示ISO日历中的一个年-月-日，对于无时间表示日期很有用。您可以使用LocalDate来跟踪重大事件，例如出生日期或婚礼日期。以下示例使用of和with方法创建LocalDate的实例：
+LocalDate表示ISO日历中的一个年-月-日，对于无时间表示日期很有用。您可以使用LocalDate来跟踪重大事件，例如出生日期或婚礼日期。
+
+“本地”，这个术语，我们对它的熟悉来自于Joda-Time。它原本出自ISO-8061的时间和日期标准，它和时区无关。实际上，本地日期只是日期的描述，例如“2014年4月5日”。特定的本地时间，因你在地球上的不同位置，开始于不同的时间线。所以，澳大利亚的本地时间开始的比伦敦早10小时，比旧金山早18小时。
+
+以下示例使用of和with方法创建LocalDate的实例：
 ```java
 LocalDate date = LocalDate.of(2000, Month.NOVEMBER, 20);
 LocalDate nextWed = date.with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
 ```
-有关TemporalAdjuster接口的更多信息，请参阅[时间调整器]()。  
+有关TemporalAdjuster接口的更多信息，请参阅[时间修改器]()。  
 
 除了常用的方法之外，LocalDate类还提供了获取有关给定日期信息的getter方法。getDayOfWeek方法返回特定日期所在的星期几。例如，以下代码行返回“MONDAY”：
 ```java
@@ -374,7 +378,7 @@ OffsetTime类在与OffsetDateTime类相同的情况下使用，但不需要跟�
 ***
 > 本节讨论了Instant类，它代表了时间轴上的瞬间时刻。
 
-Date-Time API的核心类之一是Instant类，它表示在时间轴上的毫秒的开始。此类可用于生成时间戳来表示机器时间。
+Date-Time API的核心类之一是Instant类，它表示在时间轴上的纳秒的开始。此类可用于生成时间戳来表示机器时间。
 ```java
 import java.time.Instant;
 
@@ -417,13 +421,22 @@ ZonedDateTime或OffsetTimeZone对象都可以转换为Instant对象，每个都�
 ***
 > 本节提供了如何使用预定义的formatter来格式和解析日期和时间值的概述。
 
+java.time.format包是专门用来格式化输出时间/日期的。这个包围绕DateTimeFormatter类和它的辅助创建类DateTimeFormatterBuilder展开。
+
 Date-Time API中的基于时间的类提供了用于解析包含日期和时间信息的字符串的parse方法。这些类还提供了format方法用于格式化显示基于时间的对象。在这两个情景中，处理是类似的：你提供一个模式给DateTimeFormatter来创建一个formatter对象。然后这个formatter被传递给parse和format方法。
 
 DateTimeFormatter类提供了许多预定义的formatter，也可以定义自己的formatter。
 
 如果在转换过程中出现问题，则parse和format方法会抛出异常。因此，您的解析代码应该捕获DateTimeParseException错误，您的格式化代码应该捕获DateTimeException错误。
 
+静态方法加上DateTimeFormatter中的常量，是最通用的创建格式化器的方式。包括：
+
+- 常用ISO格式常量，如ISO_LOCAL_DATE
+- 字母模式，如ofPattern(“dd/MM/uuuu”)
+- 本地化样式，如ofLocalizedDate(FormatStyle.MEDIUM)
+
 DateTimeFormatter类是不可变的和线程安全的;它可以（并且应该）适当地分配给静态常量。
+
 > 版本注意:java.time中的date-time对象可以通过使用的基于模式的格式化形式，直接与java.util.Formatter和String.format一起使用，这是旧的java.util.Date和java.util.Calendar类所使用的方式。。
 
 ## 解析
@@ -512,11 +525,11 @@ boolean isSupported = instant.isSupported(ChronoUnit.DAYS);
 ```
 ## Temporal Adjuster
 ***
-在java.time.temporal包中的TemporalAdjuster接口提供了接收一个Temporal值，并且返回一个调整值。这个调节器可以与任何基于时间的类型一起使用。
+在java.time.temporal包中的TemporalAdjuster接口提供了接收一个Temporal值，并且返回一个修改值。这个修改器可以与任何基于时间的类型一起使用。
 
-如果调节器与ZonedDateTime一起使用，则会计算新的日期，保留原始时间和时区值。
-### 预定义调节器
-TemporalAdjusters类（注意复数）提供一组预定义的调节器，用于查找本月的第一天或最后一天，一年中的最后一天，每月的最后一个星期三，或特定日期之后的第一个星期二，举几个例子。预定义的调整器被定义为静态方法，并被设计为与静态导入语句一起使用。
+如果修改器与ZonedDateTime一起使用，则会计算新的日期，保留原始时间和时区值。
+### 预定义修改器
+TemporalAdjusters类（注意复数）提供一组预定义的修改器，用于查找本月的第一天或最后一天，一年中的最后一天，每月的最后一个星期三，或特定日期之后的第一个星期二，举几个例子。预定义的调整器被定义为静态方法，并被设计为与静态导入语句一起使用。
 
 下面的示例使用了几个TemporalAdjusters方法，并且与基于时间类中定义的with方法结合使用，根据2000年10月15日这个原始日期来计算新的日期：
 ```java
@@ -547,8 +560,8 @@ first day of next Month: 2000-11-01
 first day of next Year: 2001-01-01
 first day of Year: 2000-01-01
 ```
-### 自定义调节器
-你也可以创建自己的自定义调节器。为此，你要创建一个实现了TemporalAdjuster接口和它的adjustInto(Temporal)方法的类。NextPayday示例中的PaydayAdjuster类是一个自定义调节器。PaydayAdjuster评估传入日期并返回下一个发薪日，假设发薪日每月发生两次：第一次在第15日，再次在当月的最后一天。如果计算的日期发生在周末，则使用上一个星期五。假定当前的日历年。
+### 自定义修改器
+你也可以创建自己的自定义修改器。为此，你要创建一个实现了TemporalAdjuster接口和它的adjustInto(Temporal)方法的类。NextPayday示例中的PaydayAdjuster类是一个自定义修改器。PaydayAdjuster评估传入日期并返回下一个发薪日，假设发薪日每月发生两次：第一次在第15日，再次在当月的最后一天。如果计算的日期发生在周末，则使用上一个星期五。假定当前的日历年。
 ```java
 /**
  * adjustInto方法接收一个Temporal实例
@@ -572,7 +585,7 @@ public Temporal adjustInto(Temporal input) {
     return input.with(date);
 }
 ```
-这个调节器和预定义的调节器有相同的调用方式，与with方法一起使用。下面的一行代码来自NextPayday示例：
+这个修改器和预定义的修改器有相同的调用方式，与with方法一起使用。下面的一行代码来自NextPayday示例：
 ```java
 LocalDate nextPayday = date.with(new PaydayAdjuster());
 ```
@@ -588,7 +601,7 @@ the next payday: 2013 Jun 28
 ***
 TemporalQuery可以用于从基于时间的对象中检索信息。
 ### 预定义查询
-TemporalQueries类（注意复数）提供了几个预定义的查询，包括当应用程序无法识别基于时间的对象的类型时有用的方法。与调节器一样，预定义的查询被定义为静态方法，并被设计为与静态导入语句一起使用。
+TemporalQueries类（注意复数）提供了几个预定义的查询，包括当应用程序无法识别基于时间的对象的类型时有用的方法。与修改器一样，预定义的查询被定义为静态方法，并被设计为与静态导入语句一起使用。
 
 例如，precision查询返回由特定的基于时间的对象最小的ChronoUnit。以下示例对几种类型的基于时间的对象使用precision查询：
 ```java
@@ -776,7 +789,7 @@ Clock类是抽象的，所以你不能创建一个它的实例。以下工厂方
 ***
 > 本节解释如果将一个ISO日历系统中的日期转换为一个非ISO日历系统日期，比如JapaneseDate或ThaiBuddhistDate。
 
-本教程没有讨论关于java.time.chrono包的任何细节。但是，知道这个包可以提供几种不是基于ISO的预定义年表，比如日本，伊历，民国和泰国佛教。您还可以使用此包来创建自己的年表。
+本教程没有讨论关于java.time.chrono包的任何细节。但是，知道这个包可以提供几种不是基于ISO的预定义年表，比如日本历，伊斯兰历，中华民国历和泰国佛教历。您还可以使用此包来创建自己的年表。
 
 本部分介绍如果将基于ISO和其他预定义日历日期之间的相互转换。
 ## 转换为非基于ISO日期
@@ -974,4 +987,12 @@ LocalTime time = zdt.toLocalTime();
 ***
 java.time包中包含许多您的程序可用于表示时间和日期的类。这是一个非常丰富的API。基于ISO的日期的关键入口点如下：
 - Instant类提供时间线的机器视角。
-- LocalDate，LocalTime和LocalDateTime类提供了一个与时区
+- LocalDate，LocalTime和LocalDateTime类提供了一个不涉及时区的时间与日期的人类视角。
+- ZoneId，ZoneRules和ZoneOffset类描述时区，时区偏移和时区规则。
+- ZonedDateTime类表示一个带有时区的日期和时间。OffsetDateTime和OffsetTime类分别表示日期与时间，或时间。这些类考虑到时区偏移。
+- Duration类以秒和毫秒为单位测量的时间量。
+- Period类使用年，月和日测量一段时间。
+
+其他的非ISO日历系统使用java.time.chrono包表示。尽管“非ISO日期转换”页面提供了有关将基于ISO的日期转换为其他日历系统的信息，但此包超出了本教程的范围。
+
+Date Time API是以JSR 310的名义开发的Java社区进程的一部分。有关更多信息，请参阅[ JSR 310: Date and Time API](http://jcp.org/en/jsr/detail?id=310)。
