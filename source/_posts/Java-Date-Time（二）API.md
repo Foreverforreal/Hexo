@@ -15,7 +15,7 @@ Date-Time API的核心是java.time包。定义在java.time中的类的它们的�
 ***
 >本节比较人类时间和机器时间的概念，提供了java.time包中主要的基于时间的类的表。
      
-代表时间有两种基本方式。一种是以人为本代表时间的方式，称为人类时间，如年，月，日，时，分，秒。另一种方式是机器时间，以一个毫秒的分辨率，从一个起源的时间线不断地测量时间，被称为时代。Date-Time包提供了丰富的类来代表日期和时间。在Date-Time API中一些类旨在表示机器时间，而另一些则更适合代表人类时间。
+代表时间有两种基本方式。一种是以人为本代表时间的方式，称为人类时间，如年，月，日，时，分，秒。另一种方式是机器时间，以一个纳秒的分辨率，从一个起源的时间线不断地测量时间，被称为时代。Date-Time包提供了丰富的类来代表日期和时间。在Date-Time API中一些类旨在表示机器时间，而另一些则更适合代表人类时间。
 
 首先确定您需要哪些方面的日期和时间，然后选择满足这些需求的类。当你选择基于时间的类后，你首先决定是否需要代表人类时间还是机器时间。然后，您将确定您需要代表时间的哪些方面。你是需要一个时区？日期和时间？只是日期？如果你需要一个日期，你是需要月，天，年，还是子集？
 > 术语：在Date-Time API中捕获并使用日期或时间的值的类，比如Instant，LocalDateTime和ZonedDateTime，在本教程中被称为基于时间的类（或类型）。支持类型，如TemporalAdjuster接口或DayOfWeek枚举，不包括在此定义中。
@@ -25,13 +25,13 @@ Date-Time API的核心是java.time包。定义在java.time中的类的它们的�
 下面的表格总结了java.time包中的基于时间的类，它们存储了日期与/或时间的信息，或者可以用来衡量一段时间。在列中的对号指示该类使用该特定类型的数据，并且toString Output列显示使用toString方法打印的实例。Where Discussed列链接到本教程相应的位置。
 
 <style>
-table th:first-of-type {
-    width: 95px;
+table:first-of-type th:first-of-type {
+    width: 98px;
 }
-table th:nth-of-type(2),table th:nth-of-type(3),table th:nth-of-type(4),table th:nth-of-type(5),table th:nth-of-type(6),table th:nth-of-type(7),table th:nth-of-type(8),table th:nth-of-type(9){
+table:first-of-type th:nth-of-type(2),table:first-of-type th:nth-of-type(3),table:first-of-type th:nth-of-type(4),table:first-of-type th:nth-of-type(5),table:first-of-type th:nth-of-type(6),table:first-of-type th:nth-of-type(7),table:first-of-type th:nth-of-type(8),table:first-of-type th:nth-of-type(9){
     width: 20px;
 }
-table th:nth-of-type(10) {
+table:first-of-type th:nth-of-type(10) {
     width:250px;
 }
 </style>
@@ -198,7 +198,7 @@ LocalTime类不存储时区或夏令时时间信息。
 
 ## LocalDateTime
 ***
-用于同时处理日期和时间，而不处理时区的类是LocalDateTime,它是Date-Time API的一个核心类。该类用于表示日期（月 - 日 - 年）和时间（小时 - 分钟 - 秒 - 毫秒），实际上是LocalDate与LocalTime的组合。这个类可以用来代表一个特定的事件，比如在美国杯挑战者系列赛的路易威登杯决赛的第一场比赛，比赛开始于下午1:10在 2013年8月17日。请注意，这意味着下午1点10分在当地时间。要包括时区，您必须使用ZonedDateTime或OffsetDateTime，如Time Zone和Offset类中所述。
+用于同时处理日期和时间，而不处理时区的类是LocalDateTime,它是Date-Time API的一个核心类。该类用于表示日期（月 - 日 - 年）和时间（小时 - 分钟 - 秒 - 纳秒），实际上是LocalDate与LocalTime的组合。这个类可以用来代表一个特定的事件，比如在美国杯挑战者系列赛的路易威登杯决赛的第一场比赛，比赛开始于下午1:10在 2013年8月17日。请注意，这意味着下午1点10分在当地时间。要包括时区，您必须使用ZonedDateTime或OffsetDateTime，如Time Zone和Offset类中所述。
 
 除了每个基于时间类都提供的now方法之外，LocalDateTime类都有各种创建LocalDateTime实例的of方法（或者前缀为of方法）。还有一个from方法，它将一个实例从另一个时间格式转换为LocalDateTime实例。还有一些方法可以用来加减小时，分中，天，周，月数。以下示例显示了这些方法中的一些。日期时间表达式为粗体：
 ```java
@@ -303,7 +303,7 @@ Date-Time API提供了三个使用时区的基于时间的类：
 虽然所有三类都维持一个与Greenwich/UTC 时间的偏移，但是只有ZonedDateTime使用ZoneRules，它是java.time.zone包的一部分，用来决定确定偏移对于特定时区如何变化。例如，当将时钟向前移动到夏令时间时，大多数时区经历一个间隙（通常为1小时），以及一个时间重叠，当将时钟调回标准时间，重复转换前的最后一小时。ZonedDateTime类适应这种情况，而没有访问ZoneRules的OffsetDateTime和OffsetTime类则没有。
 
 ### ZonedDateTime
-实际上，ZonedDateTime类是将LocalDateTime类与ZoneId类组合。它用于表示具有时区（区域/城市，如 Europe/Paris）的完整日期（年，月，日）和时间（小时，分，秒，毫秒）。
+实际上，ZonedDateTime类是将LocalDateTime类与ZoneId类组合。它用于表示具有时区（区域/城市，如 Europe/Paris）的完整日期（年，月，日）和时间（小时，分，秒，纳秒）。
 
  Flight示例中的以下代码定义了一个从洛杉矶到东京的航班起飞时间为ZonedDateTime，在 America/Los Angeles时区。withZoneSameInstant和plusMinutes方法用于创建一个ZonedDateTime的实例，它表示在650分钟飞行后在东京的预计到达时间。ZoneRules.isDaylightSavings方法决定飞机在东京到达时是否是夏令时。
  
@@ -351,7 +351,7 @@ ARRIVING: Jul 21 2013  10:20 PM (Asia/Tokyo)
   (Asia/Tokyo standard time will be in effect.)
 ```
 ### OffsetDateTime
-OffsetDateTime类实际上是将LocalDateTime类与ZoneOffset类组合在一起。它用于表示具有与Greenwich/UTC时间偏移（+/-小时:分钟，如+06:00或 - 08:00）的完整日期（年，月，日）和时间（小时，分，秒，毫秒）。
+OffsetDateTime类实际上是将LocalDateTime类与ZoneOffset类组合在一起。它用于表示具有与Greenwich/UTC时间偏移（+/-小时:分钟，如+06:00或 - 08:00）的完整日期（年，月，日）和时间（小时，分，秒，纳秒）。
 
 以下示例使用TemporalAdjuster.lastDay方法的OffsetDateTime来查找2013年7月的最后一个星期四。
 ```java
@@ -370,7 +370,7 @@ System.out.printf("The last Thursday in July 2013 is the %sth.%n",
 The last Thursday in July 2013 is the 25th.
 ```
 ### OffsetTime
-OffsetTime类实际上是将LocalTime类与ZoneOffset类组合在一起。它用于表示具有与Greenwich/UTC时间偏移（+/-小时:分钟，如+06:00或 - 08:00）的时间（小时，分，秒，毫秒）。
+OffsetTime类实际上是将LocalTime类与ZoneOffset类组合在一起。它用于表示具有与Greenwich/UTC时间偏移（+/-小时:分钟，如+06:00或 - 08:00）的时间（小时，分，秒，纳秒）。
 
 OffsetTime类在与OffsetDateTime类相同的情况下使用，但不需要跟踪日期时。
 ***
@@ -688,14 +688,14 @@ else
 ***
 > 本节介绍如何使用Period和Duration类以及ChronoUnit.between方法来计算一段时间。
 
-当您编写代码以指定一段时间时，请使用最符合您需求的类或方法：Duration类，Period类，或者ChronoUnit.between方法。Duration使用基于时间的值（秒，毫秒）测量一段时间。而Period使用基于日期的值（年，月，日）。
+当您编写代码以指定一段时间时，请使用最符合您需求的类或方法：Duration类，Period类，或者ChronoUnit.between方法。Duration使用基于时间的值（秒，纳秒）测量一段时间。而Period使用基于日期的值（年，月，日）。
 > 注意：表示一天的Duration是精确的24小时。而表示一天的Period添加到ZonedDateTime时，可能会更具时区而有所不同。例如，如果发生在夏令时的第一天或最后一天。
 
 ## Duration
 ***
-Duration 最适合于测量基于机器的时间的情况，例如使用Instant对象的代码。一个Duration对象以秒或毫秒为单位测量时间，而不是使用基于日期的结构，比如年，月，日，尽管这个类提供了转换为天，小时和分钟的方法。如果一个Duration终点创建在起点之前，那么它可以有一个负值。
+Duration 最适合于测量基于机器的时间的情况，例如使用Instant对象的代码。一个Duration对象以秒或纳秒为单位测量时间，而不是使用基于日期的结构，比如年，月，日，尽管这个类提供了转换为天，小时和分钟的方法。如果一个Duration终点创建在起点之前，那么它可以有一个负值。
 
-下面代码以毫秒计算两个时间点之间的持续时间：
+下面代码以纳秒计算两个时间点之间的持续时间：
 ```java
 Instant t1, t2;
 ...
@@ -990,7 +990,7 @@ java.time包中包含许多您的程序可用于表示时间和日期的类。�
 - LocalDate，LocalTime和LocalDateTime类提供了一个不涉及时区的时间与日期的人类视角。
 - ZoneId，ZoneRules和ZoneOffset类描述时区，时区偏移和时区规则。
 - ZonedDateTime类表示一个带有时区的日期和时间。OffsetDateTime和OffsetTime类分别表示日期与时间，或时间。这些类考虑到时区偏移。
-- Duration类以秒和毫秒为单位测量的时间量。
+- Duration类以秒和纳秒为单位测量的时间量。
 - Period类使用年，月和日测量一段时间。
 
 其他的非ISO日历系统使用java.time.chrono包表示。尽管“非ISO日期转换”页面提供了有关将基于ISO的日期转换为其他日历系统的信息，但此包超出了本教程的范围。
