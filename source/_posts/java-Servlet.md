@@ -162,8 +162,8 @@ HTTP response对象javax.servlet.http.HttpServletResponse具有表示HTTP标头�
 - 修改响应头和数据。您可以通过提供自定义版本的响应来实现。
 - 与外部资源交互。
 
-　　过滤器的应用包括验证，日志，图像转换，数据压缩，加密，分解字符串，XML转换等。  
-你可以配置一个web资源，由特定顺序的零个，一个或者多个过滤器组成的过滤链来过滤。当包含组件的Web应用程序被部署时，该过滤链被指定，并且低昂web容器加载组件时，它被实例化。  
+过滤器的应用包括验证，日志，图像转换，数据压缩，加密，分解字符串，XML转换等。  
+你可以配置一个web资源，由特定顺序的零个，一个或者多个过滤器组成的过滤链来过滤。当包含组件的Web应用程序被部署时，该过滤链被指定，并且当web容器加载组件时，它被实例化。  
 ## 过滤器编程
 　　过滤API由javax.servlet包中的Filter，FilterChain和FilterConfig接口定义。您可以通过实现Filter接口定义一个过滤器。   
 　　使用@WebFilter注解来定义Web应用程序中的过滤器。此注解在类上指定，并包含有关正在声明的过滤器的元数据。注解的过滤器必须至少指定一个URL模式。这可以通过在注解上使用urlPatterns或value属性来完成。所有其他属性都是可选的，都有一个默认设置。当注解上唯一的属性是URL模式时，使用value属性;当其他属性也被使用时，使用urlPatterns属性。
@@ -192,7 +192,7 @@ public class TimeOfDayFilter implements Filter {
 　　除了doFilter，你还必须实现init和destroy方法。当过滤器被实例化时，容器调用init方法。如果你想将初始化参数传递给过滤器，则可以从传递给init的FilterConfig对象中检索它们。
 ## 自定义请求和响应编程  
 　　过滤器有许多方法来修改请求或响应。例如，过滤器可以向请求添加属性，或者可以在响应中插入数据。     
-　　过滤器要修改一个响应，那么它通常必须在响应返回客户端前前捕获它。为此，您将一个备用流传递给生成响应的servlet。备用流阻止servlet在完成时关闭原始响应流，并允许过滤器修改servlet的响应。    
+　　过滤器要修改一个响应，那么它通常必须在响应返回客户端前捕获它。为此，您将一个备用流传递给生成响应的servlet。备用流阻止servlet在完成时关闭原始响应流，并允许过滤器修改servlet的响应。    
 　　要将这个备用流传递给servlet，过滤器将创建一个响应包装器，它重写getWriter或getOutputStream方法以返回此备用流。包装器被传递给过滤器链的doFilter方法。包装方法默认调用到包装的请求或响应对象。     
 　　要重写请求方法，将请求包装在一个继承ServletRequestWrapper或HttpServletRequestWrapper的对象中。要重写响应方法，将响应包装在一个继承了ServletResponseWrapper 或者HttpServletResponseWrapper的对象中.
 ## 指定过滤器映射
