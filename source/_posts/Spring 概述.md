@@ -1,4 +1,4 @@
-title: Spring（一）概述
+title: Spring 概述
 id: 1500863364622
 author: 不识
 tags:
@@ -41,7 +41,7 @@ Spring使您能够从“plain old Java objects”（POJO）构建应用程序，
 Spring框架控制反转-Inversion of Control（IoC）组件通过提供一种形式化的方式，将不同的组件组合成一个可以随用完全工作的应用程序，来解决这个问题。Spring框架将形式化的设计模式作为头等对象进行编写，这样你可以集成到你自己的应用程序中。许多组织和机构以这种方式使用Spring框架来设计强大的，可维护的应用程序。
 
 > **背景知识**  
-"问题是，哪一方面的控制（他们）反转了？"Martin Fowler在2004年在他的网站上提出了关于控制反转（IoC）的问题.Fowler建议重新命名，使其更加自明，并提出了*依赖注入*这个名称。
+"问题是，哪一方面的控制（他们）反转了？"Martin Fowler在2004年在他的网站上提出了关于控制反转（IoC）的问题.Fowler建议重新命名这个原理，使其更加自明，并提出了*依赖注入*这个名称。
 
 ## 框架模块
 ***
@@ -362,7 +362,7 @@ log4j.category.org.springframework.beans.factory=DEBUG
 1. 从spring-core模块中排除依赖（因为它是明确依赖于commons-logging的唯一模块）
 2. 依赖一个特殊的commons-logging依赖，用一个空的jar取代这个库（更多细节可以在[SLF4J FAQ](http://slf4j.org/faq.html#excludingJCL)中找到）
 
-要想排除commos-logging，在你的dependencyManagement部分添加一下内容：
+要想排除commos-logging，在你的**dependencyManagement**部分添加一下内容：
 ```xml
 <dependencies>
     <dependency>
@@ -378,3 +378,68 @@ log4j.category.org.springframework.beans.factory=DEBUG
     </dependency>
 </dependencies>
 ```
+现在这个应用程序目前被打破了，因为在类路径上没有JCL API实现，所以要解决它，必须提供一个新的。在下一节，我们向你展示如何使用SLF4J提供一个JCL的替代实现。
+
+**使用SLF4J与Log4j或Logback**
+Simple Logging Facade for Java (SLF4J) 是Spring常用的其他库使用的流行API。它通常和Logback一起使用，Logback是SLF4J API的本地实现。
+
+SLF4J提供绑定到许多常见的日志记录框架，包括Log4j，反过来也是在其他日志框架和它自身之间桥接。所以要在Spring使用SLF4J，你需要使用SLF4J-JCL桥接来替换commos-logging依赖。一旦你这么做，那么来自Spring内的日志记录调用将会被转换为SLF4J API的日志调用，所以如果在你的应用程序中的其他库使用这个API，那么您有一个地方来配置和管理日志记录。
+
+一个常见的选择可能是将Spring桥接到SLF4J，，然后提供一个从SLF4J到Log4j的明确绑定绑定。你需要提供几个个依赖（并且排除现有的commons-logging）：JCL桥，绑定到Log4j的SLF4j，和Log4j本身。在Maven你会这样做。
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>4.3.10.RELEASE</version>
+        <exclusions>
+            <exclusion>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>1.7.21</version>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.7.21</version>
+    </dependency>
+    <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
+    </dependency>
+</dependencies>
+```
+在SLF4J用户中一个更为常见的选择是，直接绑定到Logback，这使用了更少的步骤，生成更少的依赖。这样消除了额外的绑定步骤，因为Logback直接实现了SLF4J，所以你只需要依赖两个库，名字为jcl-over-slf4j和logback。
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>1.7.21</version>
+    </dependency>
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.1.7</version>
+    </dependency>
+</dependencies>
+```
+
+**使用JUL（java.util.logging）**
+默认情况下Commons Logging会被委托给java.util.logging,前提是在类路径中没有检测到Log4j。所以这里没有特别的依赖需要设置：只需在独立应用程序（具有JDK级别的自定义或默认JUL设置）或应用程序服务器的日志系统（以及其全系统的JUL设置）中使用不带有外部依赖关系的日志输出到java.util.logging ）。
+
+**Commons Logging在WebSphere上**
+Spring应用程序可以在本身提供JCL实现的容器上运行，例如IBM的WebSphere Application Server（WAS）。这本身并不引起问题，但是它导致有两个不同的场景需要理解：
+
+在“parent first”ClassLoader委托模型（WAS中的默认值）中，应用程序将始终拾取服务器提供的Commons Logging版本，委托给WAS记录子系统（实际上基于JUL）。JCL的应用程序提供的变体，无论是标准的Commons Logging还是JCL-over-SLF4J桥，都将被有效地被忽略，以及任何本地包含的日志提供程序。
+
+在你的应用程序中，使用“parent last”委托模式（这是常规Servlet容器中的默认值，但在WAS上明确配置了选项），应用程序提供的Commons Logging变体会被拾取，使您能够设置本地包含的日志提供程序，例如Log4j或Logback。在没有本地日志提供程序的情况下，常规Commons Logging将默认委托给JUL，有效地记录到WebSphere的日志记录子系统，像在“parent first”场景中。
+
+总而言之，我们建议将“Spring”应用程序部署在“parent last”模型中，因为它实际地允许本地提供程序以及服务器的日志子系统。
