@@ -9,9 +9,7 @@ categories:
   - 介绍
 date: 2017-07-04 22:33:00
 ---
-
-
-
+[原文链接](http://maven.apache.org/guides/introduction/introduction-to-the-pom.html)    
 # POM是什么
 一个项目对象模型或者POM是Maven的基本工作单元。它是一个XML文件，其中包含有关Maven用于构建项目的所有项目和配置详细信息。它包含了大多数项目的默认值。比如target是构建的目录；src/main/java是源代码目录；src/test/java是测试源代码目录。等等。    
 POM从Maven 1中的project.xml重命名为Maven 2中的pom.xml。相比于有一个mave.xml文件包含可以执行的目标，现在目标或插件都配置在pom.xml中。当执行一个任务或目标，Maven查找当前目录的POM。它读取POM，获得需要的配置信息，然后执行目标。 
@@ -363,7 +361,7 @@ POM中的元素按以下合并
 ## 示例1
 
 **情景**
-例如，让我们重新使用我们以前的工件com.mycompany.app:my-app:1。让我们再来介绍一下另外的工件，com.mycompany.app:my-module:1：
+例如，让我们重新使用我们以前的工件com.mycompany.app:my-app:1。让我们再来介绍一个另外的工件，com.mycompany.app:my-module:1：
 ```xml
 <project>
   <modelVersion>4.0.0</modelVersion>
@@ -384,7 +382,7 @@ POM中的元素按以下合并
 **解决方案**
 现在，如果我们将com.mycompany.app:my-app:1转换成com.mycompany.app:my-module:1的父工件，我们需要按以下配置来修改com.mycompany.app:my-module:1的POM：
 
-**com.mycompany.app:my-module:1's POM**
+**com.mycompany.app:my-module:1的POM**
 ```xml
 <project>
   <parent>
@@ -492,7 +490,7 @@ POM中的元素按以下合并
   </modules>
 </project>
 ```
-在修订的com.mycompany.app:my-app:1中，添加了packaging部分和modules部分。对于packaging，其值设置为“pom”，对于modules部分，我们有元素&lt;module> my-module </ module>。&lt;module>的值是从com.mycompany.app:my-app:1到com.mycompany.app:my-module:1的POM的相对路径(通过实践，我们使用模块的artifactId作为模块目录的名称)。
+在修订的com.mycompany.app:my-app:1中，添加了packaging部分和modules部分。对于packaging，其值设置为“pom”，对于modules部分，我们有元素&lt;module>my-module&lt;/module>。&lt;module>的值是从com.mycompany.app:my-app:1到com.mycompany.app:my-module:1的POM的相对路径(通过实践，我们使用模块的artifactId作为模块目录的名称)。
 
 现在，每当Maven命令处理com.mycompany.app:my-app:1时，同样的Maven命令也将针对com.mycompany.app:my-module:1运行。此外，一些命令（具体目标）不同地处理项目聚合。
 
@@ -612,7 +610,7 @@ Maven鼓励的做法之一是不要重复。但是，在某些情况下，您需
 模型的任何字段都是一个单值元素，可以作为一个变量引用。例如${project.groupId}，${project.version}，${project.build.sourceDirectory}等等。请参阅{% post_link 《Maven官方文档》（三）POM参考 %}_以查看属性的完整列表。   
 这些变量全部由前缀“project”引用。你也可能看到使用"pom."作为前缀引用，或者前缀全部省略-这些形式现在被弃用，并且也不应该再被使用。
 
-**特使变量**
+**特殊变量**
 
 |||
 |--|--|

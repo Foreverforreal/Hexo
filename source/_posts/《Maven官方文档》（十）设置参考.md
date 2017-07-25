@@ -9,6 +9,7 @@ categories:
   - 参考
 date: 2017-07-03 11:04:00
 ---
+[原文链接](http://maven.apache.org/settings.html)    
 # 简介
 ## 快速概览
 setting.xml文件中的setting元素包含了用于定义以各种方式配置Maven执行的值的元素，比如pom.xml，但是不应该捆绑到任何具体的项目或分发给用户。它包含一些值，比如本地仓库的位置，可选的远程仓库服务器，以及验证信息。    

@@ -7,9 +7,10 @@ categories:
   - Spring
 date: 2017-07-24 10:29:00
 ---
-Spring Framework是一个轻量级解决方案，也是构建企业级应用程序的潜在一站式服务。但是，Spring是模块化的，允许你只使用你所需的部分，而无需引用其他的部分。你可以在任何web框架的顶层使用IOC容器，但也可以仅使用 Hibernate integration code或 JDBC abstraction layer。Spring框架支持声明式事务管理，通过RMI或web service远程访问您的业务逻辑，以及用于数据持久化的各种选项。它提供了一个全功能的MVC框架，使您能够将AOP透明地集成到您的软件中。
+[原文链接:](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#dependency-management) Spring Framework是一个轻量级解决方案，也是构建企业级应用程序的潜在一站式服务。但是，Spring是模块化的，允许你只使用你所需的部分，而无需引用其他的部分。你可以在任何web框架的顶层使用IOC容器，但也可以仅使用 Hibernate integration code或 JDBC abstraction layer。Spring框架支持声明式事务管理，通过RMI或web service远程访问您的业务逻辑，以及用于数据持久化的各种选项。它提供了一个全功能的MVC框架，使您能够将AOP透明地集成到您的软件中。
 
 Spring被设计为非侵入式的，这意味着你的域逻辑代码通常不需要依赖框架本身。在你的集成层（比如数据访问层）中，将存在对数据访问技术和Spring库的一些依赖。但是，应该很容易将这些依赖关系与您的代码库的其余部分隔离开来。
+<!-- more -->
 ***
 # Spring入门
 ***
@@ -115,13 +116,13 @@ Web层由spring-web，spring-webmvc,spring-websocket和spring-webmvc-portlet模�
 Spring Framework还为Enterprise JavaBeans提供了一个访问和抽象层，使您能够重用现有的POJO，并将其包装在无状态会话bean中，以便在可能需要声明式安全性的可扩展的，故障安全的Web应用程序中使用。
 
 ### 依赖管理和命名惯例
-依赖管理和依赖注入是不同的事情。为了将Spring的这些不错的功能（如依赖注入）引入到应用程序中，你需要组合所有必须的库（jar文件），并且在运行时期将它们导入你的类路径中，也可能在编译时期。这些依赖不是注入的虚拟组件，而是文件系统中的物理资源（通常为）。依赖管理的过程包括定位这些资源，存储并添加它们到类路径。依赖可以是直接依赖（如我的程序在运行时期依赖Spring），或简介依赖（如我的程序依赖commons-dbcp，而它又依赖commons-pool）。间接依赖关系也被称为“传递性”，它们是最难识别和管理的依赖关系。
+依赖管理和依赖注入是不同的事情。为了将Spring的这些不错的功能（如依赖注入）引入到应用程序中，你需要组合所有必须的库（jar文件），并且在运行时期将它们导入你的类路径中，也可能在编译时期。这些依赖不是注入的虚拟组件，而是文件系统中的物理资源（通常为）。依赖管理的过程包括定位这些资源，存储并添加它们到类路径。依赖可以是直接依赖（如我的程序在运行时期依赖Spring），或间接依赖（如我的程序依赖commons-dbcp，而它又依赖commons-pool）。间接依赖关系也被称为“传递性”，它们是最难识别和管理的依赖关系。
 
 如果你要使用Spring，你需要获得一个包含你所需要的Spring部分的jar库的副本。为了使这更容易，Spring被打包成一系列的模块，这样可以尽可能地分离依赖关系，因此，例如如果您不想编写Web应用程序，则不需要spring-web模块。要在本指南中引用Spring库模块，我们使用一个简写命名约定spring-\*或spring-\*.jar，这里\*代表模块的简称（如spring-core, spring-webmvc, spring-jms，等等）。而实际你使用的jar文件名称通常是模块名后面连接着版本号（比如spring-core-4.3.10.RELEASE.jar）。
 
 Spring Framework的每个版本都会将artifacts发布到以下位置：
 - Maven Central，这是Maven查询的默认仓库，并且不需要任何特殊配置来使用。Spring的许多常见的库也可以从Maven Central获得，Spring社区的大部分使用Maven进行依赖关系管理，所以这对他们来说很方便。这里jar的名称是 spring-\*-&lt;version>.jar的形式，Maven groupId是*org.springframework*.
-- 在专门用于Spring的公共Maven仓库。除了最终的GA版本，这个仓库还托管这开发快照版和里程碑版。jar文件名称与Maven Central中使用同样的形式，所以这是一个有用的地方，可以让开发版本的Spring与在Maven Central中部署的其他库一起使用。该存储库还包含捆绑分发zip文件，其中包含所有Spring jar，捆绑在一起以便于下载。
+- 在专门用于Spring的公共Maven仓库。除了最终的GA版本，这个仓库还托管这开发快照版和里程碑版。jar文件名称与Maven Central中使用同样的形式，所以这是一个对开发者有用的地方，可以让开发版本的Spring与在Maven Central中部署的其他库一起使用。该存储库还包含捆绑分发zip文件，其中包含所有Spring jar，捆绑在一起以便于下载。
 
 所以你需要决定的第一件事是如何管理你的依赖：我们通常建议使用像Maven，Gradle或Ivy这样的自动化系统，但您也可以通过自己下载所有的jar来手动进行操作。
 
@@ -149,3 +150,231 @@ Spring Framework的每个版本都会将artifacts发布到以下位置：
 |org.springframework|spring-webmvc|基于HTTP的Model-View-Controller和REST端点，用于Servlet堆栈|
 |org.springframework|spring-webmvc-portlet|在Portlet环境中使用MVC实现|
 |org.springframework|spring-websocket|的WebSocket和SockJS基础框架，包括STOMP消息支持|
+
+**Spring依赖和依赖Spring**   
+虽然Spring为大型企业和其他外部工具提供集成和支持，它有意将它的强制依赖保持在最小：您不必为了简单的案例使用Spring而去定位和下载（甚至自动）大量的jar库。对于基本依赖注入，只有一个强制性的外部依赖关系，也就是用于日志记录（有关日志记录选项的更详细描述，请参阅下文）。
+
+接下来我们概述需要配置一个依赖Spring的应用程序，首先是使用Maven，然后是Gradle，最后是Ivy。在这些所有情况下，如果哪些不清楚，请参阅你的依赖管理系统的文档，或者看些简单代码-Spring它自己在构建的时候使用Gradle来管理依赖，并且我们的示例大多使用Gradle或Maven。
+
+**Maven依赖管理**
+如果你使用Maven作为依赖管理，那么你甚至不必明确的提供日志依赖。比如，要创建应用程序上下文并使用依赖注入来配置应用程序，您的Maven依赖项将如下所示：
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>4.3.10.RELEASE</version>
+        <scope>runtime</scope>
+    </dependency>
+</dependencies>
+```
+就是这样。注意，如果你不需要针对Spring APIs进行编译，那么scope可以被声明为runtime，通常情况下这是基本依赖注入用例的情况。
+
+上面的例子适用于Maven中央仓库。要想使用Spring的Maven仓库（如为了使用里程碑和开发快照版），你需要在你的Maven配置中指定仓库的位置。对于全部版本：
+```xml
+<repositories>
+    <repository>
+        <id>io.spring.repo.maven.release</id>
+        <url>http://repo.spring.io/release/</url>
+        <snapshots><enabled>false</enabled></snapshots>
+    </repository>
+</repositories>
+```
+对于里程碑版：
+```xml
+<repositories>
+    <repository>
+        <id>io.spring.repo.maven.milestone</id>
+        <url>http://repo.spring.io/milestone/</url>
+        <snapshots><enabled>false</enabled></snapshots>
+    </repository>
+</repositories>
+```
+对于快照版：
+```xml
+<repositories>
+    <repository>
+        <id>io.spring.repo.maven.snapshot</id>
+        <url>http://repo.spring.io/snapshot/</url>
+        <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+</repositories>
+```
+
+**Maven“物料清单”依赖**
+使用Maven时，可能会意外混合不同版本的Spring JAR。比如，你可能发现一个第三方库或者另一个Spring项目，将传递依赖传递给了旧的版本。如果你忘记自己明确声明一个直接依赖，可能会出现各种意外问题。
+
+为了克服这些问题，Maven支持“物料单”（BOM）依赖的概念。您可以在dependencyManagement部分中导入spring-framework-bom，以确保所有的spring 依赖（直接和传递）都是相同的版本。
+```xml
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-framework-bom</artifactId>
+            <version>4.3.10.RELEASE</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+使用BOM的另外一个好处是，您不再需要在依赖于Spring框架的artifact时指定&lt;version>属性：
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+    </dependency>
+<dependencies>
+```
+
+**Gradle依赖管理**
+要使用具有Gradle构建系统的Spring存储库，请在存储库部分中包含适当的URL：
+```
+repositories {
+    mavenCentral()
+    // and optionally...
+    maven { url "http://repo.spring.io/release" }
+}
+```
+您可以根据需要将存储库URL从/ release更改为/ milestone或/ snapshot。一旦存储库被配置，你可以通常使用Gradle方式来声明依赖：
+```
+dependencies {
+    compile("org.springframework:spring-context:4.3.10.RELEASE")
+    testCompile("org.springframework:spring-test:4.3.10.RELEASE")
+}
+```
+**Ivy依赖管理**
+如果您喜欢使用Ivy来管理依赖关系，那么还有类似的配置选项。
+
+要配置Ivy指向Spring存储库，请将以下解析器添加到您的ivysettings.xml中：
+```xml
+<resolvers>
+    <ibiblio name="io.spring.repo.maven.release"
+            m2compatible="true"
+            root="http://repo.spring.io/release/"/>
+</resolvers>
+```
+您可以根据需要将根URL从/ release /更改为/ milestone /或/ snapshot /。 配置完成后，您可以按通常的方式添加依赖项。例如（在ivy.xml中）：
+```xml
+<dependency org="org.springframework"
+    name="spring-core" rev="4.3.10.RELEASE" conf="compile->runtime"/>
+```
+**分发Zip文件**
+虽然使用支持依赖关系管理的构建系统是推荐的获取Spring框架的方法，但仍然可以下载分发zip文件。
+
+分发zip被发布到Spring Maven仓库中（这只是为了我们的方便，你不需要Maven或任何其他构建系统来下载它们）。
+
+要下载分发zip打开Web浏览器到http://repo.spring.io/release/org/springframework/spring ，并为所需的版本选择适当的子文件夹。分发文件以-dist.zip结尾，例如spring-framework- {spring-version} -RELEASE-dist.zip。发行版还会发布里程碑和快照。
+
+### 日志
+对于Spring来说，日志记录是非常重要的依赖因为：
+- 它是唯一的强制依赖
+- 每个人都喜欢从他们使用的工具中看到一些输出
+- Spring与许多其他工具集成，这些工具都可以选择日志记录依赖关系。
+
+应用程序开发人员的目标之一通常是将统一的日志记录配置在整个应用程序的中央位置，包括所有外部组件。自从有了这么多的日志框架可以选择，这项工作比以前困难很多。
+
+Spring中的强制性日志依赖是Jakarta Commons Logging API（JCL）。我们针对JCL进行编译，并且我们还使JCL的Log对象对所有继承自Spring框架的类可见。对用户来说，所有版本的Spring都使用相同的日志库很重要：这样迁移很容易，因为即使拓展自Spring的应用程序仍然保留向后兼容性。我们这样做的方式是使Spring中的一个模块明确地依赖于commons-logging（JCL的规范实现），然后在编译时使所有其他模块依赖于它。例如，如果您使用Maven，并且想知道在哪里可以获取对commons-logging的依赖，那么它来自Spring，明确来说是来自名为spring-core的中央模块。
+
+commons-logging的好处在于，您不需要任何其他操作来使您的应用程序正常工作。它有一个运行时期发现算法，可以在classpath中的众所周知的地方查找其他的日志框架，并且使用一个它认为合适的使用（或者你可以可以告诉它你需要哪一个）。如果没有其他可用的，你可以从JDK（java.util.logging或者简称JUL）中看到非常漂亮的日志。您应该发现，在大多数情况下，您的Spring应用程序可以快乐地登录到控制台，这很重要。
+
+**使用Log4j 1.2或2.X**
+> Log4j 1.2在此期间已经终止。此外，Log4j 2.3是最新的Java 6兼容版本，较新的Log4j 2.x版本需要Java 7+版本。
+
+为了配置和管理的目的，许多人使用Log4j作为日志框架。它是高效和成熟的，实际上它是我们在构建Spring时在运行时使用的。Spring还提供了一些用于配置和初始化Log4j的工具，所以它在一些模块中它有一个对Log4j的可选的编译时期依赖。
+
+要使Log4j 1.2与默认的JCL依赖（commons-logging）一起使用，所有你需要做的是将Log4j放入到classpath下，并且提供给它一个配置文件（log4j.properties或log4j.xml在classpath根下）。所以对于Maven用户来说，这是你的依赖声明：
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>4.3.10.RELEASE</version>
+    </dependency>
+    <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
+    </dependency>
+</dependencies>
+```
+这还有一个简单的用于记录日志到控制台的log4j.properties：
+```
+log4j.rootCategory=INFO, stdout
+
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d{ABSOLUTE} %5p %t %c{2}:%L - %m%n
+
+log4j.category.org.springframework.beans.factory=DEBUG
+```
+要和JCL一起私用Log4j 2.x，所有你需要做的是将Log4j放入到类路径，并且提供给它一个配置文件（log4j2.xml, log4j2.properties,或者其他支持的配置格式）。对于Maven用户，需要的最小依赖是：
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.6.2</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-jcl</artifactId>
+        <version>2.6.2</version>
+    </dependency>
+</dependencies>
+```
+如果您还希望启用SLF4J委托给Log4j，例如对于默认使用SLF4J的其他库，还需要以下依赖关系：
+```xml
+<dependencies>
+  <dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-slf4j-impl</artifactId>
+    <version>2.6.2</version>
+  </dependency>
+</dependencies>
+```
+这有一个记录日志到控制台的log4j2.xml示例：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="org.springframework.beans.factory" level="DEBUG"/>
+    <Root level="error">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>
+```
+
+**避免使用Commons Logging**
+不幸的是，在标准commons-logging API中的运行时期发现算法，方便终端用户的同时，也会带来问题。如果你想避免JCL的标准查找，基本上有两种方法来关闭它：
+1. 从spring-core模块中排除依赖（因为它是明确依赖于commons-logging的唯一模块）
+2. 依赖一个特殊的commons-logging依赖，用一个空的jar取代这个库（更多细节可以在[SLF4J FAQ](http://slf4j.org/faq.html#excludingJCL)中找到）
+
+要想排除commos-logging，在你的dependencyManagement部分添加一下内容：
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>4.3.10.RELEASE</version>
+        <exclusions>
+            <exclusion>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+</dependencies>
+```

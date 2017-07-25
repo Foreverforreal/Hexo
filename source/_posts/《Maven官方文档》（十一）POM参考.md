@@ -8,10 +8,11 @@ categories:
   - 参考
 date: 2017-07-03 15:50:00
 ---
+[原文链接](http://maven.apache.org/pom.html)    
 # 介绍
 
 ## 什么是POM
-POM表示项目对象模型（"Project Object Model）。它是在一个名为pom.xml的文件中代表Maven项目的XML。在Maven用户前，说到一个项目是在哲学的意义上说的，而不只是包含代码的文件的集合。一个项目包含配置文件，以及涉及的开发人员和它们所扮演的角色，缺陷追逐系统，组织和许可证，项目存在的URL，项目的依赖，以及其他给代码生命的小的部分。这是一个一站式的所有关于项目的事情。事实上，在Maven世界中，项目根本不需要包含任何代码，仅仅只需一个pom.xml。
+POM表示项目对象模型（Project Object Model）。它是在一个名为pom.xml的文件中代表Maven项目的XML。在Maven用户前，说到一个项目是在哲学的意义上说的，而不只是包含代码的文件的集合。一个项目包含配置文件，以及涉及的开发人员和它们所扮演的角色，缺陷追逐系统，组织和许可证，项目存在的URL，项目的依赖，以及其他给代码生命的小的部分。这是一个关于所有关于项目的事情的一站式服务。事实上，在Maven世界中，项目根本不需要包含任何代码，仅仅只需一个pom.xml。
 <!-- more -->
 ## 快速概览
 这是POM项目元素下的元素列表。请注意，modelVersion包含4.0.0。这是目前唯一支持Maven 2和3的POM版本，并且始终是必需的。
@@ -96,9 +97,9 @@ POM包含关于项目的所有必要信息，以及在构建过程中要使用�
 - **classifier:**你可能在坐标上偶尔发现第五个元素，那就是classifier。我们稍后会查看classifier，但现在只要知道这些项目可以显示为groupId:artifactId:packaging:classifier:version就足够了。
 
 ## POM关系
-Maven的一个强大方面是它对项目关系的处理;这包含依赖（以及传递依赖），继承和聚合（多模块项目）。依赖管理有一个很长的传统，那就是对一切都复杂而混乱，但是对项目最微不足道。随着依赖树变得庞大而复杂，"Jarmageddon（Jar末日）" 很快随之而来。接着就是“Jar Hell（Jar 地狱）”，一个系统依赖的版本和开发的版本并不等同，要么是给定了错误的版本，要么类似命名的jar之间的版本冲突。Maven通过通用的本地仓库来解决这两个问题，从而正确地链接到项目，版本以及所有。
+Maven的一个强大方面是它对项目关系的处理;这包含依赖（以及传递依赖），继承和聚合（多模块项目）。依赖管理有一个很长的传统，那就一切都变得复杂而混乱，但是对项目来说又最微不足道。随着依赖树变得庞大而复杂，"Jarmageddon（Jar末日）" 很快随之而来。接着就是“Jar Hell（Jar 地狱）”，一个系统依赖的版本和开发的版本并不等同，要么是给定了错误的版本，要么类似命名的jar之间的版本冲突。Maven通过通用的本地仓库来解决这两个问题，从而正确地链接到项目，版本以及所有。
 ### 依赖
-POM的基石是它的依赖列表。大多数项目都依赖其他项目来正确构建和运行，如果Maven所做的所有是为你管理这个列表，那么你已经得益良多。Maven在汇编或者执行其他需要它们的goal时，为你下载并链接这些依赖。作为额外的好处，Maven还引入了这些依赖的依赖（传递依赖），允许您的列表专注于项目所需的依赖项。
+POM的基石是它的依赖列表。大多数项目都依赖其他项目来正确构建和运行，如果Maven所做的所有只是为你管理这个列表，那么你已经获益良多。Maven在编译或者其他需要依赖的goal时，为你下载并链接到这些依赖。作为额外的好处，Maven还引入了这些依赖的依赖（传递依赖），允许您的列表专注于项目所需的依赖项。
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -123,8 +124,8 @@ POM的基石是它的依赖列表。大多数项目都依赖其他项目来正�
 	- **groupId, artifactId: **依赖的直接对应坐标。
 	- **version: **一个依赖的版本说明规范，这将用来计算依赖的有效版本。
   
-自从依赖由Maven坐标来描述，你可能会想：“这意味着我的项目只能依靠Maven artifact”，而答案是“当然，但这是一件好时期”。这迫使您完全依靠于Maven可以管理的依赖关系。有时候，不幸的是，当一个项目无法从Maven中央库中下载时。例如，一个项目可能依赖于具有封闭源许可证的jar，该jar禁止它在中央存储库中。处理这种情况有三种方法。
-1. 使用安装插件本地安装依赖。该方法是最简单的推荐方法。比如
+自从依赖由Maven坐标来描述，你可能会想：“这意味着我的项目只能依靠Maven artifact”，而答案是“当然，但这是一件好时期”。这迫使您完全依靠于Maven可以管理的依赖关系。有时候，不幸的是，当一个项目无法从Maven中央库中下载时。例如，一个项目可能依赖于具有封闭源许可证的jar，该jar禁止它在中央仓库中。处理这种情况有三种方法。
+1. 使用install插件本地安装依赖。该方法是最简单的推荐方法。比如
 ```
 mvn install:install-file -Dfile=non-maven-proj.jar -DgroupId=some.group -DartifactId=non-maven-proj -Dversion=1 -Dpackaging=jar
 ```
@@ -140,7 +141,7 @@ mvn install:install-file -Dfile=non-maven-proj.jar -DgroupId=some.group -Dartifa
     该元素指的是当前任务的类路径（编译和运行，测试等）以及如何限制依赖关系的传递性。这又五个scope可用。      
 		- **compile - **这是默认的scope，如果没有指定的话，默认使用它。编译范围依赖在所有classpath中都可用。此外，这些依赖关系被传播到依赖项目。
 		- **provided -**这很像compile，但是表示您期望JDK或容器在运行时提供它。它只适用于编译和测试类路径，不可传递。
-		- **runtime - **这个scope表示编译时不需要该依赖，但是执行时需要。它是在运行时和测试类路径，而不是编译类路径。
+		- **runtime - **这个scope表示编译时不需要该依赖，但是执行时需要。它是在运行时和测试时的类路径，而不是编译时类路径。
 		- **test -**这个scope表示应用程序正常使用的时候并不需要该依赖，只是适用于测试的编译和执行阶段。它不可传递。
 		- **system -**这个scope与provided类似，只是你必须提供明确包含它的JAR。该artifact始终可用，但不是在存储库中查找。
 	- **systemPath:**只有在依赖scope是system时使用。否则的话，如果设置这个元素构建会失败。这个路径必须是绝对路径，因此建议使用属性来指定特定于机器的路径（关于属性以下更多），比如${java.home}/lib。由于假设先前安装了system范围的依赖，Maven将不会为项目检查仓库，而是检查该路径以确保这个文件存在。如果不存在的话，Maven会构建失败并且建议你手工下载安装它。
@@ -212,7 +213,7 @@ Exclusions明确的告诉Mave，你不想包含这个指定的项目是这个依
 
 
 ### 继承
-Maven带来的一个强大的附加功能就是项目继承的概念。虽然在构建系统比如Ant，继承确实可以模拟继承，但是Maven更进一步的明确了项目对象模型的继承关系。
+Maven带来的一个强大的附加功能就是项目继承的概念。虽然在构建系统比如Ant中，确实可以模拟继承，但是Maven更进一步的明确了项目对象模型的继承关系。
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -274,7 +275,7 @@ Maven带来的一个强大的附加功能就是项目继承的概念。虽然在
   <artifactId>my-project</artifactId>
 </project>
 ```
-注意relativePath元素。它不是必需的，但可以用作Maven的指示符用来首先搜索给定该项目父级的路径，然后再搜索本地和远程存储库。   
+注意relativePath元素。它不是必需的，但可以用作Maven的指示符，用来首先搜索给定该项目父级的路径，然后再搜索本地和远程仓库。   
 要想实际查看继承，可以看一下[ASF](https://svn.apache.org/viewvc/maven/pom/trunk/asf/pom.xml?view=markup)和[Maven](https://svn.apache.org/viewvc/maven/pom/trunk/maven/pom.xml?view=markup)的父POM。
 #### 超级POM
 类似于面向对象编程中对象的继承，POM拓展自一个父POM，并从它的父级继承某些值。而且，就像Java对象最终从java.lang.Object继承而来，所有项目对象模型都从基础超级POM继承而来。下面的代码片段是Maven 3.0.4的超级POM。
@@ -409,12 +410,12 @@ Maven带来的一个强大的附加功能就是项目继承的概念。虽然在
 ```
 您可以通过创建一个最小的pom.xml并在命令行中执行：mvn help:effective-pom来查看超级POM如何影响你的项目对象模型。
 #### 依赖管理
-除了继承某些顶级元素之外，父级有一个元素可以为子级POM或传递依赖配置值。其中一个元素就是dependencyManagement。
-- **dependencyManagement:**是POM用来帮助管理所有子项的依赖信息。如果my-parent项目使用dependencyManagement来定义对junit：junit：4.0的依赖关系，那么继承自它的POM可以只给定groupId=junit和artifactId=junit来设置依赖。这种方法的好处很明显。依赖关系细节可以设置在一个中心位置，这将传播到所有继承的POM。
+除了继承某些顶级元素之外，父级有一个元素可以为子级POM和传递的依赖配置值。其中一个元素就是dependencyManagement。
+- **dependencyManagement:**是POM用来帮助管理所有子项的依赖信息。如果my-parent项目使用dependencyManagement来定义对junit：junit：4.0的依赖关系，那么继承自它的POM可以只需要给出groupId=junit和artifactId=junit就能设置它们的依赖，Maven将填充由父级设置的version。这种方法的好处很明显。依赖关系细节可以在一个统一位置设置，这将传播到所有继承的POM。
 	注意，从传递依赖并入的artifact的version和scope在依赖管理部分同样由版本说明控制。这可能会导致意想不到的后果。考虑这样一个情况，你的项目中有两个依赖，dep1和dep2。dep2也使用dep1，并且需要一个特定最低版本才能运行。然后如果使用dependencyManagement指定一个较旧的版本，dep2将被迫使用旧版本，并且失败。所以，你必须小心检查整个依赖关系树来避免这个问题; mvn dependency:tree会有帮助的。
     
 ### 聚合（或多模块）
-具有模块的项目被称为多模块或聚合项目。模块是该POM列出并作为一组执行的项目。一个pom打包的项目可以通过将它们列为模块来聚合一组项目的构建，它们是这些项目的相对目录。
+具有模块的项目被称为多模块或聚合项目。模块是该POM列出并作为一组执行的项目。一个以pom打包的项目可以通过列举这些项目为模块，来聚合一组项目的构建，模块是指这些项目的相对目录。
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -438,7 +439,7 @@ Maven带来的一个强大的附加功能就是项目继承的概念。虽然在
 
 要想实际查看聚合，可以看一下[Maven](https://svn.apache.org/viewvc/maven/maven-3/trunk/pom.xml?view=markup)和[Maven Core Plugins](https://svn.apache.org/viewvc/maven/plugins/trunk/pom.xml?view=markup)的父POM。
 #### 继承v.聚合
-继承和依赖通过单个高级的POM创建了一个很好的动态构建控制。你会经常同时是父级和聚合的项目。比如，整个maven核心通过一个基本的POM org.apache.maven:maven运行，所以构建Maven项目可以通过单个命令：mvn compile来执行。然和，尽管POM项目，聚合项目和父项目都不是同一个项目，也不应该被混淆。一个POM项目可以被它聚合的任何模块所继承，但这不是必须的。相反，一个POM项目可能会聚合一个不继承它的项目。
+继承和依赖通过单个高级的POM创建了一个很好的动态构建控制。你会经常看到同时是父级和聚合的项目。比如，整个maven核心通过一个基本的POM org.apache.maven:maven运行，所以构建Maven项目可以通过单个命令：mvn compile来执行。然和，尽管POM项目，聚合项目和父项目都不是同一个项目，也不应该被混淆。一个POM项目可以被它聚合的任何模块所继承，但这不是必须的。相反，一个POM项目可能会聚合一个不继承它的项目。
 ## 属性
 属性是了解POM基础知识的最后一个要素。Maven属性是值占位符，就像Ant中的属性一样。在POM中它们的值可以通过符号${X}在任何地方访问，这里X是属性。或者它们可以被插件用作默认值，比如
 ```xml

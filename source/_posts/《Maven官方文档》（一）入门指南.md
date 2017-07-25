@@ -9,6 +9,7 @@ categories:
   - 入门
 date: 2017-07-01 22:13:00
 ---
+[原文链接](http://maven.apache.org/guides/getting-started/index.html)  
 # Maven是什么
 　　乍一看Maven有很多东西，但简而言之，Maven是一个通过在最佳实践的使用中提供一个明确的路径，将模式应用于项目的基础构建，用于促进理解和生产力的尝试。Maven实质上是一个项目管理与理解工具，它提供了一种帮助管理的方法：
 - 构建（Builds）
