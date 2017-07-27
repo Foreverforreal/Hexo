@@ -968,8 +968,28 @@ Spring使用命名空间支持可扩展的配置格式，这是基于XML Schema 
 在实践中，构造函数解析机制在匹配参数方面非常有效，除非真的需要，我们建议你在你的配置宗始终使用名称符号。
 
 ### 复合属性名称
-当您设置bean属性时，可以使用复合或嵌套属性名称，只要除了最终属性名称之外的路径的所有组件都不为null。
+当您设置bean属性时，可以使用复合或嵌套属性名称，只要除了最后属性名称之外的路径的所有组件都不为null。 考虑下面的bean定义。
+```xml
+<bean id="foo" class="foo.Bar">
+    <property name="fred.bob.sammy" value="123" />
+</bean>
+```
+foo bean有一个fred属性，fred属性又有一个bob属性，bob属性又有一个sammy属性，最后的sammy属性被设置值为123。为了这个工作，在bean被构建之后，foo的fred属性，fred的bob属性必须不是null，否则抛出一个NullPointerException 。
+   
+## 使用depends-on
+如果一个bean是另一个的依赖，通常意味着一个bean被设置为另一个bean的属性。通常，您可以使用基于XML的配置元数据中的<ref />元素来完成此任务。但是，有时bean之间的依赖关系较不直接;比如，在一个类中的静态初始化器需要被触发，例如数据库驱动注册。depends-on属性可以明确强制一个或多个bean在使用此元素的bean被初始化前先初始化。下面示例使用depends-on熟悉来表示一个单例bean上的依赖：
+```xml
+<bean id="beanOne" class="ExampleBean" depends-on="manager"/>
+<bean id="manager" class="ManagerBean" />
+```
+为了表达对多个bean的依赖，提供bean名称列表作为depends-on属性的值，使用逗号，空白或者分号作为有效分隔符。
+```xml
+<bean id="beanOne" class="ExampleBean" depends-on="manager,accountDao">
+    <property name="manager" ref="manager" />
+</bean>
 
-
-
+<bean id="manager" class="ManagerBean" />
+<bean id="accountDao" class="x.y.jdbc.JdbcAccountDao" />
+```
+> 在bean定义中的depends-on属性可以同时指定初始化时依赖，而在单例Bean的情况下，可以指定相应的销毁时依赖。
 
