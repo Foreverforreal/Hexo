@@ -215,13 +215,13 @@ Spring IoC容器管理一个或多个bean。这些bean是使用您提供给容�
 
 |属性|解释...|
 |----|-------|
-|class|[“实例化bean”](#实例化bean)
-|name|[“命名bean”](#命名bean)
-|scope|Section 7.5, “Bean scopes”
-|constructor arguments|Section 7.4.1, “Dependency Injection”
-|properties|Section 7.4.1, “Dependency Injection”
-|autowiring mode|Section 7.4.5, “Autowiring collaborators”
-|lazy-initialization mode|Section 7.4.4, “Lazy-initialized beans”
+|class|3.2[“实例化bean”](#实例化bean)
+|name|3.1[“命名bean”](#命名bean)
+|scope|5 [“Bean域”](#Bean域)
+|constructor arguments|4.1[“依赖注入”](#依赖注入)
+|properties|3.1[“依赖注入”](#依赖注入)
+|autowiring mode|4.5[“自动装配协作者”](#自动装配协作者)
+|lazy-initialization mode|4.4[“懒加载bean”](#懒加载bean)
 |initialization method|the section called “Initialization callbacks”
 |destruction method|the section called “Destruction callbacks”
 
@@ -977,6 +977,7 @@ Spring使用命名空间支持可扩展的配置格式，这是基于XML Schema 
 foo bean有一个fred属性，fred属性又有一个bob属性，bob属性又有一个sammy属性，最后的sammy属性被设置值为123。为了这个工作，在bean被构建之后，foo的fred属性，fred的bob属性必须不是null，否则抛出一个NullPointerException 。
    
 ## 使用depends-on
+***
 如果一个bean是另一个的依赖，通常意味着一个bean被设置为另一个bean的属性。通常，您可以使用基于XML的配置元数据中的<ref />元素来完成此任务。但是，有时bean之间的依赖关系较不直接;比如，在一个类中的静态初始化器需要被触发，例如数据库驱动注册。depends-on属性可以明确强制一个或多个bean在使用此元素的bean被初始化前先初始化。下面示例使用depends-on熟悉来表示一个单例bean上的依赖：
 ```xml
 <bean id="beanOne" class="ExampleBean" depends-on="manager"/>
@@ -991,5 +992,582 @@ foo bean有一个fred属性，fred属性又有一个bob属性，bob属性又有�
 <bean id="manager" class="ManagerBean" />
 <bean id="accountDao" class="x.y.jdbc.JdbcAccountDao" />
 ```
-> 在bean定义中的depends-on属性可以同时指定初始化时依赖，而在单例Bean的情况下，可以指定相应的销毁时依赖。
+> 在bean定义中的depends-on属性可以同时指定初始化时依赖，而在单例Bean的情况下，可以指定相应的销毁时依赖。在给定的bean本身被销毁之前，定义与给定bean的依赖关系的依赖bean首先被销毁。因此depends-on也可以控制关机顺序。
+
+## 懒加载bean
+***
+默认情况下，ApplicationContext实现在初始化过程中急切创建和配置所有单例bean。一般来说，这种预实例化是可取的，因为配置或周围环境中的错误会被立即发现，而不是在几个小时甚至几天之后。当不希望这种行为的时候，你通过可以标记bean定义为懒加载来组织单例bean的预实例化。一个懒加载的bean告诉IoC容器当它被第一次请求的时候才创建bean实例，而不是在启动时就实例化。
+
+在XML中，这种行为由在&lt;bean/>元素上的lazy-init属性控制；例如：
+```xml
+<bean id="lazy" class="com.foo.ExpensiveToCreateBean" lazy-init="true"/>
+<bean name="not.lazy" class="com.foo.AnotherBean"/>
+```
+当上述配置被ApplicationContext使用时，ApplicationContext启动时，名为lazy的bean不会立即被预实例化，而not.lazy bean会被立即预实例化。
+
+然而，当一个懒加载的bean是一个单例bean的依赖的时候，它不是懒加载的，ApplicationContext在启动时就创建该懒加载bean，因为它必须满足该单例的依赖。懒加载bean被注入到其他不是懒加载的单例bean中。
+
+你也可以通过使用&lt;beans/>元素上的default-lazy-init属性在容器级别上控制懒加载；例如：
+```xml
+<beans default-lazy-init="true">
+    <!-- 没有beans会被预实例化... -->
+</beans>
+```
+## 自动装配协作者
+***
+Spring容器可以自动关联协作bean。你可以通过检查ApplicationContext的内容来允许Spring为你的bean自动解析协作者（其他bean）。自动装配有以下的优点：
+- 自动装配可以显著减少指定属性或构造函数参数的需要。（其他机制，如本章其他地方讨论的bean模板在这方面也很有价值。）
+- 自动装配可以随着对象的发展而更新配置。例如，如果你需要给一个类添加一个依赖，则可以自动满足该依赖关系，而无需修改配置。因此，自动装配在开发过程中特别有用，而在代码库变得更加稳定时，无需切换到显式装配。
+
+当使用基于XML的配置元数据时，你使用&lt;bean/>元素上的autowire属性为bean定义指定自动装配模式。自动装配功能有四种模式。您可以指定自动装配每一个bean并且因此可以选择哪一个来自动装配。
+
+|模式|解释|
+|----|----|
+|no|(默认)不自动装配。必须通过ref元素定义bean引用。对于大规模的部署不推荐改变此默认设置，因为明确指定协作者将给予更大的控制和清晰度。在某种程度上，它记录了系统的结构。|
+|byName|通过属性名自动装配。Spring会找到一个与需要自动装配的属性名称相同的bean。例如，如果bean定义被设置为通过名称自动装配，并且它包含一个master属性（也就是，它有一个setMaster(..)方法），Spring会查找一个名称为master的bean定义，并且使用它来设置属性|
+|byType|如果确实容器中存在该属性类型的一个bean，则允许该属性被自动装配。如果有超过一个的bean存在，会抛出一个致命异常，这表示您可能不会为该bean使用*byType*自动装配。如果这里没有匹配的bean存在，则什么也不会发生；属性没有被设置。|
+|constructor|类似与*byType*，不但是只提供给构造函数参数。如果在容器中没有一个构造函数参数类型的bean，则会引起一个致命错误。|
+
+
+在*byType* 或*constructor*模式下，你可以装配数组和类型集合。在这种情况下，容器中所有在匹配预期类型的自动装配候选者，都被提供来满足依赖。如果期望的key类型是String，你可以自动装配强类型的Map。一个自动装配Map值会由匹配预期类型的所有bean实例组成，并且Map的key会包含相应的bean名称。
+
+您可以将autowire行为与依赖检查相结合，检查会在自动装配完成后执行。
+
+### 自动装配的限制和缺点
+在项目中贯穿始终的使用自动装配是效果最好的。如果自动装配没有被一贯使用，只是自动装配一两个bean定义可能会迷惑开发者。
+
+考虑下面自动装配的限制和缺点：
+- 在property和constructor-arg中显示设置的依赖总是覆盖自动装配。您不能自动装配所谓的简单属性，例如原始类型，String和Class（以及这些简单属性的数组）。这种限制是设计的。
+- 自动装配不如显示写明精确。尽管，如上表所示，Spring小心避免在歧义的情况下猜测，这可能会有一个意想不到的结果，你的Spring管理对象之间的关系不再被明确记录。
+- 对于可能从Spring容器生成文档的工具可能无法使用装配信息。
+- 容器中的多个bean定义可能与由setter方法或构造函数参数指定的类型相匹配，从而进行自动装配。对于数组，集合或Map，这不一定是问题。然而，对于期望单个值的依赖，这种歧义不是任意解决的。如果没有唯一的bean定义可用，则抛出异常。
+
+在后一种情况下，您有几个选项：
+- 放弃自动装配，明确写明依赖。
+- 通过设置一个bean的autowire-candidate属性为false（如下一节描述），避免该bean被自动装配。
+- 通过将其&lt;bean/>元素的primary属性设置为true，将单个bean定义指定为主要候选。
+- 使用基于注解的配置实现更细粒度的控制，如[“基于注解的容器配置”]()中所描述的。
+
+### 从自动装配中排除一个bean
+在每个bean的基础上，您可以将bean从自动装配中排除。在Spring的XML格式中，将&lt;bean/>元素上的autowire-candidate属性设置为false;容器使这个指定的bean定义不可用于自动装配基础架构（包括注解样式配置，例如@Autowired）。
+
+> autowire-candidate属性被设计为仅影响基于类型的自动装配。它不会影响通过名称的明确引用，即使指定的bean没有被标记为一个自动装配候选，它也会被解析。因此，如果名称匹配的话，通过名称的自动装配依旧会注入这个bean。
+
+你也可以基于模式匹配而不是bean名称来限制自动装配的候选者。顶级&lt;beans/>元素在它的default-autowire-candidates属性中接收一个或多个模式。例如，要将自动装配候选者状态限制为任何名称以Repository结尾的bean，提供一个 \*Repository的值。要提供多个模式，在一个以逗号分割的列表中定义它们。对一个bean明确定义autowire-candidate属性的值为true或false的，这种设置始终有些，对于这样的bean，模式匹配不适用。
+
+这些技术对于您不想通过自动装配注入其他bean的bean很有用。这并不意味着被排除的bean本身不能使用自动装配来配置。而是，这个bean它本身不是其他bean自动装配的候选者。
+
+## 方法注入
+***
+在大多数应用程序场景中，在容器中大多数的bean都是 [单例]() 的。当一个单例bean需要和其他单例bean相协作时，或者一个非单例bean需要和其他非单例bean相协作时，你通常通过定义一个bean作为其他bean的属性来处理依赖关系。当bean的生命周期不同的时候，会发生一个问题。假设单例bean A需要使用非单例（原型）bean B，也许每个方法在A上调用。容器只会创建单例bean A一次，因此只有一次设置属性的机会。容器不能在每次需要时，向bean A提供一个新的bean B实例。
+
+解决方案是放弃一些控制反转。你可以通过实现ApplicationContextAware接口使bean A对容器敏感，并且在每次bean A需要bean B的时候通过对容器调用getBean("B")来获取（通常是新的）bean B实例。以下是这种方法的一个例子：
+```java
+// 一个使用状态命令行样式类的类执行一些处理
+package fiona.apple;
+
+// Spring-API导入
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+public class CommandManager implements ApplicationContextAware {
+
+    private ApplicationContext applicationContext;
+
+    public Object process(Map commandState) {
+        // 抓取相应Command的新实例
+        Command command = createCommand();
+        // 设置（希望全新）Command实例的状态
+        command.setState(commandState);
+        return command.execute();
+    }
+
+    protected Command createCommand() {
+        // 注意Spring API依赖!
+        return this.applicationContext.getBean("command", Command.class);
+    }
+
+    public void setApplicationContext(
+            ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+}
+```
+上述是不可取的，因为业务代码接触并耦合到Spring框架上。方法注入，一个Spring IoC容器的先进的功能，可以以干净的方式处理这种用例。
+
+> 您可以在此 [博客条目](https://spring.io/blog/2004/08/06/method-injection/) 中阅读更多关于方法注入的动机。
+
+### Lookup方法注入
+Lookup方法注入是容器重写容器管理bean上方法的能力，用来返回容器中另一个命名bean的lookup结果。lookup通常涉及前一部分中描述的场景中的原型bean。Spring框架通过使用CGLIB库中的字节码生成来动态生成覆盖该方法的子类来实现此方法注入。
+> - 为了使这个动态子类工作起来，Spring将子类化的类不能是final，并且被重写的方法也不能是final。
+- 单元测试具有抽象方法的类需要您自己对类进行子类化，并提供抽象方法的存根实现。
+- 组件扫描也需要具体的方法，这需要具体的类来进行。
+- 另一个关键的限制是，lookup方法不能和工厂方法一起使用，并且特别是不能和配置类中的带有@Bean方法一起使用，因为在该情况下容器不负责创建实例，因此无法动态创建一个运行时生成的子类。
+
+看前面的代码片段中的CommandManager类，你会看到Spring容器将动态地覆盖createCommand()方法的实现。您的CommandManager类将不会对Spring有任何依赖关系，在重做示例中可以看到：
+```java
+package fiona.apple;
+
+// 不再有Spring导包!
+
+public abstract class CommandManager {
+
+    public Object process(Object commandState) {
+        // 抓取相应Command接口的新实例
+        Command command = createCommand();
+        // 设置（希望全新）Command实例的状态
+        command.setState(commandState);
+        return command.execute();
+    }
+
+    // 好吧...但是这个方法的实现在哪里？
+    protected abstract Command createCommand();
+}
+```
+在客户端类包含要被注入的方法（在这个例子中是CommandManager），要注入的方法需要以下形式的签名：
+```
+<public|protected> [abstract] <return-type> theMethodName(no-arguments);
+```
+如果这个方法是抽象的，动态生成子类实现了这个方法。否则，动态生成子类覆盖这个定义在原始类中的具体方法。比如：
+```xml
+<!-- 被部署为一个原型（非单例）的有状态的类 -->
+<bean id="myCommand" class="fiona.apple.AsyncCommand" scope="prototype">
+    <!-- 按需在这里注入依赖 -->
+</bean>
+
+<!-- commandProcessor 使用statefulCommandHelper -->
+<bean id="commandManager" class="fiona.apple.CommandManager">
+    <lookup-method name="createCommand" bean="myCommand"/>
+</bean>
+```
+标识为commandManager的bean无论什么时候需要myCommand bean的一个新实例，就调用自己的creatCommond()方法。您必须小心以原型部署myCommand bean，如果它实际需要。如果它是以单例部署，则每次myCommand bean返回的是同一个实例。
+
+或者，在基于注解的组件模型中，您可以通过@Lookup注释声明一个lookup 方法：
+```java
+public abstract class CommandManager {
+
+    public Object process(Object commandState) {
+        Command command = createCommand();
+        command.setState(commandState);
+        return command.execute();
+    }
+
+    @Lookup("myCommand")
+    protected abstract Command createCommand();
+}
+```
+或者，更为惯用的是，你可能依赖针对lookup方法声明返回类型的解析来获取目标bean：
+```java
+public abstract class CommandManager {
+
+    public Object process(Object commandState) {
+        MyCommand command = createCommand();
+        command.setState(commandState);
+        return command.execute();
+    }
+
+    @Lookup
+    protected abstract MyCommand createCommand();
+}
+```
+请注意，您通常会使用具体的存根实现来声明这种带注解的lookup方法，为了使它们与Spring的组件扫描规则兼容，默认情况下抽象类被忽略。此限制不适用于明确注册或明确导入的bean类的情况。
+
+> 另一种访问不同域的目标bean的方法是ObjectFactory/Provider注入点。查看[“作用域bean作为依赖”](#作用域bean作为依赖)一节。   
+感兴趣的读者还可以找到ServiceLocatorFactoryBean（在org.springframework.beans.factory.config包中）来使用。
+
+### 任意方法替换
+比lookup方法注入更少用的一种方法注入形式是可以使用另一个方法实现来替换被管理bean中的任意方法。用户可以安全地跳过本节的剩余部分，直到实际需要该功能。
+
+使用基于XML的配置元数据，对于已部署的bean你可以使用replacement-method元素将现有的方法实现替换为另一个。考虑下面的类，使用一个我们要重写的方法computeValue：
+```java
+public class MyValueCalculator {
+
+    public String computeValue(String input) {
+        // 一些真实代码...
+    }
+
+    // 一些其他方法...
+
+}
+```
+实现org.springframework.beans.factory.support.MethodReplacer接口的类提供了新的方法定义。
+```java
+/**
+ * 意在用于重写在MyValueCalculator
+ * 中现有的computeValue(String)实现
+ */
+public class ReplacementComputeValue implements MethodReplacer {
+
+    public Object reimplement(Object o, Method m, Object[] args) throws Throwable {
+        // 获取输入值，使用它，并返回一个计算结果
+        String input = (String) args[0];
+        ...
+        return ...;
+    }
+}
+```
+部署原始类并指定方法重写的bean定义如下所示：
+```xml
+<bean id="myValueCalculator" class="x.y.z.MyValueCalculator">
+    <!-- 任意方法替换 -->
+    <replaced-method name="computeValue" replacer="replacementComputeValue">
+        <arg-type>String</arg-type>
+    </replaced-method>
+</bean>
+
+<bean id="replacementComputeValue" class="a.b.c.ReplacementComputeValue"/>
+```
+您可以在&lt;replaced-method/>元素中使用一个或多个包含的&lt;arg-type/>元素来指示被重写的方法的方法签名。只有当方法重载并且类中存在多个变体时，参数的签名才是必需的。为方便起见，参数的类型字符串可能是完全限定类型名称的子字符串。例如，以下全部匹配java.lang.String：
+```
+java.lang.String
+String
+Str
+```
+由于参数的数量通常足以区分每个可能的选择，所以此快捷方式可以节省大量的打字，只需键入与参数类型匹配的最短字符串即可。
+
+***
+# Bean域
+***
+当你创建一个bean定义的时候，你创建了一个用于创建了一个由bean定义所定义的类的实际实例配方。bean定义是一个配方的思想很重要，因为这意味着，与类一样，您可以从单个配方创建许多对象实例。
+
+你不仅可以控制要插入到由一个特殊bean定义创建的对象中的各种依赖和配置值，也可以控制这个对象的域。这种方法是强大和灵活的，您可以通过配置来选择您创建的对象的域，而不必在Java类级别上设置对象的域。bean可以被定义为部署在多个域之一中：开箱即用，Spring Framework支持七个域，其中五个域只在你使用Web感知的ApplicationContext时可用。
+
+以下域支持开箱即用。您还可以创建自定义域。
+
+|域|描述|
+|--|----|
+|[singleton](#singleton域)|（默认）每个Spring IoC容器将单个bean定义作为单个对象实例。|
+|[prototype](#prototype域)|将单个bean定义范围适用于任何数量的对象实例。|
+|[request](#request域)|将单个bean定义范围适用于单个HTTP请求的生命周期;也就是，每个HTTP请求都有一个它自己的bean实例，该实例是由背后的单个bean定义创建的。只有在一个Web感知的Spring ApplicationContext的上下文中才有效。|
+|[session](#session域)|将单个bean定义范围适用于一个HTTP Session生命周期中。只有在一个Web感知的Spring ApplicationContext的上下文中才有效。|
+|[globalSession](#globalSession域)|将单个bean定义范围适用于一个HTTP Session生命周期中。通常仅在Portlet上下文中使用时才有效。只有在一个Web感知的Spring ApplicationContext的上下文中才有效。|
+|[application](#application域)|将单个bean定义范围适用于一个ServletContext生命周期中。只有在一个Web感知的Spring ApplicationContext的上下文中才有效。|
+|[websocket](#websocket域)|将单个bean定义范围适用于一个WebSocket生命周期中。只有在一个Web感知的Spring ApplicationContext的上下文中才有效。|
+
+> 从Spring 3.0开始，一个thread域是可用的，但默认情况下未注册。有关更多信息，请参阅SimpleThreadScope的文档。有关如何注册此或任何其他自定义域的说明，请参阅[“使用自定义范围”](#使用自定义范围)一节。
+
+## singleton域
+***
+只有一个单例bean的一个共享实例被管理，并且所有对具有该id的bean或匹配到id的bean的请求都会使Spring容器返回一个指定的bean实例。
+
+换句话说，当你定义一个bean定义以及它的域为singleton时，Spring IoC容器只会创建一个由该bean定义定义的对象的实例。这个单例实例被储存在一个这样的单例bean的缓存中，并且所有对这个命名bean的后续请求和引用都会返回缓存对象。
+![单例bean](/images/spring/singleton.png.pagespeed.ce.U0lSEQUK39.png)
+Spring的单例bean概念不同于定义在Gang of Four (GoF)模式书中的单例模式（Singleton pattern）. GoF单例硬编码了对象的域范围，使得每个ClassLoader只会创建一个且只有一个特定类的实例。Spring单例域是描述为一个容器一个bean。这意味着如果在单个Spring容器为一个特殊类定义了一个bean，那么Spring容器只会创建一个且只有一个由该bean定义的类的实例。单例域是Spring默认的域。在XML中要定义一个bean为单例，你应该这么写，如下：
+```xml
+<bean id="accountService" class="com.foo.DefaultAccountService"/>
+
+<!-- 下面是等效的，尽管有些多余（单例域是默认设置）) -->
+<bean id="accountService" class="com.foo.DefaultAccountService" scope="singleton"/>
+```
+## prototype域
+***
+部署非单例，原型域的bean使每次对该特定bean进行请求时创建一个新的bean实例。也就是，在容器中这个bean被注入到其他bean或者你通过getBean()方法调用请求它。一般来说，为所有有状态的bean使用原型域，为无状态的bean使用单例域。
+
+下面图表说明了Spring原型域。一个数据访问对象（DAO）通常不被配置为原型，因为一个典型DAO不保持任何会话状态；这只是作者简单的重用单例域的图。
+![原型bean](/images/spring/prototype.png)
+下面示例在XML中定义一个bean为原型：
+```xml
+<bean id="accountService" class="com.foo.DefaultAccountService" scope="prototype"/>
+```
+与其他域相反，Spring不管理原型bean的完整生命周期：容器实例化，配置或以其他方式组装原型对象，并将其交给客户端，并不再记录该原型实例。因此，尽管不管是什么域，初始化生命周期回调方法在所有的对象上被调用，在原型的情况下，配置的销毁生命周期不被调用。客户端代码必须清理原型域对象并且是方法这个原型bean持有的昂贵资源。要使Spring容器释放原型bean持有的资源，尝试使用一个自定义的bean [post-processor](), 它涉及需要清理的bean。
+
+在某些方面，Spring容器对原型域bean的作用是Java new操作符的替代。所有这之后的生命周期管理都必须由客户端处理。（有关Spring容器中bean的生命周期的详细信息，请参见第6.1节[“生命周期回调”](#生命周期回调)。）
+
+## 依赖原型bean的单例bean
+***
+当你使用依赖原型bean的单例bean的时候，要意识到依赖关系是在实例化时解析的。因此，如果你依赖注入一个原型域bean到一个单例域的bean，一个新的原型bean被实例化，然后被依赖注入到这个单例bean中。这个原型实例是曾经提供给单例域实例的唯一实例。
+
+然而，假设你想要这个单例域bean在运行时期，重复去获得这个原型bean的新实例。你不能依赖注入一个原型域bean到你的单例域bean中，因为这个注入只发生一次，在Spring容器实例化这个单例bean并且解析和注入它的依赖时。如果在运行时多次需要一个原型bean的新实例，请参见第4.6节 [“方法注入”](#方法注入)
+
+##  Request, session, global session, application和 WebSocket域
+***
+只有使用Web感知的Spring **ApplicationContext**实现（如XmlWebApplicationContext），**request**, **session**, **globalSession**, **application**和 **webSocket**域才可用。如果你在常规Spring Ioc容器，如**ClassPathXmlApplicationContext**中见到这些域，那么会抛出一个**IllegalStateException**异常来抱怨一个未知的bean范围。
+
+### 初始web配置
+要支持在**request**, **session**, **globalSession**, **application**和 **webSocket**级别（web域bean）bean的域，在你定义你的bean之前，需要一些次要的初始配置。（对于标准域，单例和原型不需要这些初始设置。）
+
+如何完成此初始设置取决于您的特定Servlet环境。
+
+如果在Spring Web MVC中访问作用域bean，实际上，其中请求由Spring的 DispatcherServlet或DispatcherPortlet来处理，这样不需要特殊的设置：DispatcherServlet和DispatcherPortlet已经显示所有相关状态。
+
+如果你使用Servlet 2.5 web容器，请求在Spring的DispatcherServlet之外处理（例如，当使用JSF或Struts），你需要注册**org.springframework.web.context.request.RequestContextListener** **ServletRequestListener**。对于Servlet 3.0+,可以通过WebApplicationInitializer接口以编程方式完成。或者，对于较旧的容器，请将以下声明添加到Web应用程序的web.xml文件中：
+```xml
+<web-app>
+    ...
+    <listener>
+        <listener-class>
+            org.springframework.web.context.request.RequestContextListener
+        </listener-class>
+    </listener>
+    ...
+</web-app>
+```
+或者，如果您的监听器设置有问题，请考虑使用Spring的RequestContextFilter。过滤器映射取决于周围的Web应用程序配置，因此必须根据需要进行更改。
+```xml
+<web-app>
+    ...
+    <filter>
+        <filter-name>requestContextFilter</filter-name>
+        <filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>requestContextFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    ...
+</web-app>
+```
+**DispatcherServlet**，**RequestContextListener**和**RequestContextFilter**都完成相同的事情，即将HTTP请求对象绑定到为该请求提供服务的线程上。这使得request-和session域的bean在调用链上进一步可用。
+
+### Request域
+考虑以下用于bean定义的XML配置：
+```xml
+<bean id="loginAction" class="com.foo.LoginAction" scope="request"/>
+```
+Spring容器通过使用loginAction 的bean定义为每个HTTP请求创建一个新的LoginAction bean实例。也就是说，loginAction bean的作用域在HTTP request级别上。你可以根据需要更改创建的实例的内部状态，因为从同一个loginAction bean定义创建的其他实例将不会在状态中看到这些更改;它们是特定于单独请求的。当请求完成处理时，作用于该请求的bean将被丢弃。
+
+使用注解驱动组件或Java Config时，可以使用@RequestScope注解指定组件为request域。
+```java
+@RequestScope
+@Component
+public class LoginAction {
+    // ...
+}
+```
+### Session域
+考虑以下用于bean定义的XML配置：
+```xml
+<bean id="userPreferences" class="com.foo.UserPreferences" scope="session"/>
+```
+Spring容器通过使用UserPreferences的bean定义为每个HTTP会话的生命周期创建一个新的UserPreferences bean实例。换而言之，userPreferences bean的作用域在HTTP Session级别上有效。和request域的bean一样，你可以根据需要更改创建的实例的内部状态，其他HTTP Session实例使用从相同userPreferences bean定义创建的实例看不到这些状态修改，因为它们是特定于单个HTTP会话的。当HTTP Session最终被丢弃时，范围限定于该特定HTTP Session的bean也被丢弃。
+
+使用注解驱动组件或Java Config时，可以使用@SessionScope注解指定组件为session域。
+```java
+@SessionScope
+@Component
+public class UserPreferences {
+    // ...
+}
+```
+### globalSession域
+考虑以下bean定义：
+```xml
+<bean id="userPreferences" class="com.foo.UserPreferences" scope="globalSession"/>
+```
+globalSession域类似于标准的HTTP Session域（如上描述），并且仅适用于基于Portlet的Web应用程序的上下文。portlet规范定义了构成单个Portlet Web应用程序的所有portlet之间共享的全局会话的概念。定义在globalSession域上的Bean被限定（或绑定）到全局portlet Session的生命周期上。
+
+如果你编写一个标准的基于Servlet的web应用程序，并且你定义一个或多个bean具有gloablSession域，那么使用的是标准HTTP Session域，并且不会发生错误。
+### Application域
+考虑以下用于bean定义的XML配置：
+```xml
+<bean id="appPreferences" class="com.foo.AppPreferences" scope="application"/>
+```
+Spring容器通过使用AppPreferences的bean定义为整个web程序创建一个新的AppPreferences bean实例。换而言之，appPreferences bean的作用域在HTTP ServletContext级别上有效，作为一个常规的ServletContext属性存储。这有些类似域Spring单例bean，但是在两个重要方式上不同：它是每一个ServletContext一个单例，而不是每一个Springd的'ApplicationContext'（在任何给定的Web应用程序中可能有几个），并且它实际上是暴露的，因此可视为ServletContext属性。
+使用注解驱动组件或Java Config时，可以使用@ApplicationScope注解指定组件为application域。
+```java
+@ApplicationScope
+@Component
+public class AppPreferences {
+    // ...
+}
+```
+### 作用域bean作为依赖
+Spring IoC容器不仅管理对象（bean）的实例化，还管理协作者（或依赖）的装配。如果要将HTTP request域的bean（比如）注入到另一个更长生命域的bean中，您可以选择注入AOP代理来代替作用域bean。也就是说，您需要注入一个代理对象，该对象暴露与作用域对象相同的公共接口，但也可以从相关域（例如HTTP请求）中检索真实目标对象，并将方法调用委托给真实对象。
+
+> 您还可以在域为单例的bean之间使用&lt;aop：scoped-proxy />，然后该引用经过可序列化的中间代理，因此能够在反序列化上重新获得目标单例bean。当针对原型域的bean声明&lt;aop:scoped-proxy/>，共享代理上的每个方法调用将导致创建一个新的目标实例，然后调用被转发到该目标实例。  
+此外，域代理不是以生命周期安全方式从较较小域访问bean的唯一方法。你也可以简单只声明你的注入点（即构造器/setter参数或者自动装配字段）为 ObjectFactory&lt;MyTargetBean>, 允许getObject()调用在每次需要时根据需要检索当前实例，而不必保留实例或分别存储它。JSR-330变体称为Provider，与Provider&lt;MyTargetBean>声明一起使用，并为每次检索尝试使用相应的get()调用。有关JSR-330的更多详细信息，请参阅此处。
+
+以下示例中的配置只有一行，但是了解“为什么”以及它背后的“如何”是很重要的。
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 一个HTTP Session域bean以一个代理暴露出来 -->
+    <bean id="userPreferences" class="com.foo.UserPreferences" scope="session">
+        <!-- 指示容器代理包围的bean -->
+        <aop:scoped-proxy/>
+    </bean>
+
+    <!-- 一个使用上述代理注入到的单例域bean -->
+    <bean id="userService" class="com.foo.SimpleUserService">
+        <!-- 对代理的userPreferences bean的引用 -->
+        <property name="userPreferences" ref="userPreferences"/>
+    </bean>
+</beans>
+```
+要创建这样一个代理，您将一个子&lt;aop：scoped-proxy/>元素插入作用域bean定义中(请参阅 [“选择要创建的代理类型”]() 一节和第41章 [基于XML架构的配置]())。为什么作用域在request, session, globalSession和自定义域级别上bean定义需要&lt;aop：scoped-proxy/>元素？让我们来检查下下面的单例bean定义并且与上述域所需要的定义的进行对比（注意下面userPreferences bean定义是不完整的）
+```xml
+<bean id="userPreferences" class="com.foo.UserPreferences" scope="session"/>
+
+<bean id="userManager" class="com.foo.UserManager">
+    <property name="userPreferences" ref="userPreferences"/>
+</bean>
+```
+在上面的示例中，单例beanuserManager被注入进这个HTTP-Session域bean userPreferences的引用。这里的重点是userManager bean是单例：它只会被每个容器实例化一次，并且它的依赖（这里只有一个，userPreferences bean）同样只会被注入进一次。这意味着userManager bean将只对完全相同的userPreferences对象进行操作，也就是最初注入的那个。
+
+当将一个短生存域bean注入到一个长生存域bean的时候，这不是你想要的行为，比如将一个HTTP Session域的协作bean作为依赖注入到一个单例bean中。相反，你需要一个单例userManager对象，并且对于HTTP Session的整个生命周期，你需要一个特定于所述HTTP Session的userPreferences对象。因此，容器创建一个对象，该对象暴露与UserPreferences类（理想情况下是UserPreferences实例的对象）完全相同的公共接口，该对象可从域机制（HTTP request，Session等）中获取真实的UserPreferences对象。这个容器将这个代理对象注入到userManager bean中，该bean不会意识到这个UserPreferences引用是一个代理。在这个例子中，当UserManager实例调用一个依赖注入的UserPreferences对象的方法时，它实际是调用代理上的方法。然后这个代理从（这个例子中）HTTP Session中获取真实UserPreferences对象，并且将方法调用委托给这个获取的真实UserPreferences对象上。
+
+因此当将request-，session-和globalSession-域的bean注入到协作bean上时，你需要下面正确并且完整的配置：
+```xml
+<bean id="userPreferences" class="com.foo.UserPreferences" scope="session">
+    <aop:scoped-proxy/>
+</bean>
+
+<bean id="userManager" class="com.foo.UserManager">
+    <property name="userPreferences" ref="userPreferences"/>
+</bean>
+```
+#### 选择要创建的代理类型
+默认情况下，当Spring容器为使用&lt;aop：scoped-proxy/>元素标记的bean创建代理时，将创建一个基于CGLIB的类代理。
+> CGLIB代理只拦截公共方法调用！不要在这样的代理上调用非公开方法;它们不会被委派给实际的作用域目标对象。
+
+或者，您可以通过为&lt;aop：scoped-proxy/>元素的proxy-target-class属性的值指定为false，来配置Spring容器为这些作用域bean创建基于标准的JDK基于接口的代理。使用JDK基于接口的代理意味着你的应用程序类路径不需要额外的库来实现这种代理。然而，这也意味着作用域bean的类必须实现至少一个接口，并且所有被注入协作者的作用域bean必须通过它的一个接口引用该bean。
+```xml
+<!-- DefaultUserPreferences实现了 the UserPreferences接口 -->
+<bean id="userPreferences" class="com.foo.DefaultUserPreferences" scope="session">
+    <aop:scoped-proxy proxy-target-class="false"/>
+</bean>
+
+<bean id="userManager" class="com.foo.UserManager">
+    <property name="userPreferences" ref="userPreferences"/>
+</bean>
+```
+有关选择基于类或基于接口的代理的更多详细信息，请参见第11.6节[“代理机制”]()。
+
+## 自定义域
+***
+bean域机制是可以拓展的；你可以定义你自己的域，或者甚至可以重定义现有的bean，虽然后者被认为是不好的做法，你不能覆盖内置的单例和原型域。
+### 创建自定义域
+要将自定义域集成到Spring容器中，需要实现org.springframework.beans.factory.config.Scope接口，它将在本节讲述。有关如何实现自己的范围的想法，请参阅随Spring框架本身提供的Scope实现和Scope javadocs，它更详细地解释了需要实现的方法。
+
+Scope接口有四个从域中获取，移除，并且销毁对象的方法。
+
+以下方法从底层域返回对象。例如，session域实现返回会话域中的bean（如果不存在，则该方法返回一个新bean实例，并将其绑定到会话以供将来引用）。
+```java
+Object get(String name, ObjectFactory objectFactory)
+```
+以下方法从底层域中删除该对象。例如，session域实现从底层会话中移除该会话域bean。应该返回对象，但如果没有找到指定名称的对象，则可以返回null。
+```java
+Object remove(String name)
+```
+以下方法注册域应当执行的回调，当它被销毁或者当这个域中指定的对象被销毁的时候。关销毁回调的更多信息，请参阅javadocs或Spring scope实现。
+```java
+void registerDestructionCallback(String name, Runnable destructionCallback)
+```
+以下方法获取底层域的对话标识符。该标识符对于每个域是不同的。对于会话域的实现，该标识符可以是session标识符。
+```java
+String getConversationId()
+```
+### 使用自定义域
+
+在编写和测试一个或多个自定义Scope实现之后，您需要使Spring容器了解您的新作用域。以下方法是使用Spring容器注册新的Scope的中心方法：
+```java
+void registerScope(String scopeName, Scope scope);
+```
+此方法在ConfigurableBeanFactory接口上声明，它通过BeanFactory属性与Spring配合在大多数的ApplicationContext具体实现可用。
+
+registerScope(..)方法的第一个参数是与域关联的唯一名称;Spring容器中这样的名字的例子就是singleton和prototype。registerScope(..)方法的第二个参数是你希望注册使用的自定义Scope实现的实际实例。
+
+假设您编写了自定义的Scope实现，然后像下面一样将它注册。
+> 下面的例子使用Spring中包含的SimpleThreadScope，但它默认情况下未注册。对于您自己的自定义Scope实现，示例将是一样的。
+
+```java
+Scope threadScope = new SimpleThreadScope();
+beanFactory.registerScope("thread", threadScope);
+```
+然后，您创建遵循自定义域域规则的bean定义：
+```xml
+<bean id="..." class="..." scope="thread">
+```
+通过自定义域实现，你不限于只使用域的编程式注册。您还可以声明地使用CustomScopeConfigurer类来执行Scope注册：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+        <property name="scopes">
+            <map>
+                <entry key="thread">
+                    <bean class="org.springframework.context.support.SimpleThreadScope"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="bar" class="x.y.Bar" scope="thread">
+        <property name="name" value="Rick"/>
+        <aop:scoped-proxy/>
+    </bean>
+
+    <bean id="foo" class="x.y.Foo">
+        <property name="bar" ref="bar"/>
+    </bean>
+
+</beans>
+```
+> 在FactoryBean实现中放置&lt;aop：scoped-proxy/>时，工厂bean本身是范围限定的，而不是从getObject()返回的对象。
+
+***
+# 定制bean性质
+***
+## 生命周期回调
+***
+要与容器的bean生命周期管理进行交互，可以实现Spring InitializingBean和DisposableBean接口。容器为前者调用afterPropertiesSet()，并为后者调用destroy()，以允许bean在初始化和销毁bean时执行某些操作。
+
+>
+
+
+
+***
+# Bean定义继承
+***
+一个bean定义可以包含很多配置信息，包括构造函数参数，属性值和容器特定信息，如初始化方法，静态工厂方法名称等。子bean定义从父定义继承配置数据。子定义可以根据需要覆盖某些值，或者添加其他值。使用父和子bean定义可以节省大量的输入。有效地，这是模板的一种形式。
+
+如果以编程方式使用ApplicationContext接口，则子Bean定义由ChildBeanDefinition类表示。大多数用户不能在这个级别上使用它们，而是以类似于ClassPathXmlApplicationContext的方式声明地配置bean定义。当您使用基于XML的配置元数据时，通过使用parent属性指定一个子bean的定义，指定父bean作为此属性的值。
+```xml
+<bean id="inheritedTestBean" abstract="true"
+        class="org.springframework.beans.TestBean">
+    <property name="name" value="parent"/>
+    <property name="age" value="1"/>
+</bean>
+
+<bean id="inheritsWithDifferentClass"
+        class="org.springframework.beans.DerivedTestBean"
+        parent="inheritedTestBean" init-method="initialize">
+    <property name="name" value="override"/>
+    <!-- the age property value of 1 will be inherited from parent -->
+</bean>
+```
+
+
+
+
+
+***
+# 容器扩展点
+***
+***
+# 基于注解的容器配置
+***
+<div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">**注解比XML更适合配置Spring吗？**   
+
+</div> 
+
+
+
+
+
 
