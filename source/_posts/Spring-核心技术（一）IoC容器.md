@@ -1527,10 +1527,261 @@ beanFactory.registerScope("thread", threadScope);
 ***
 要与容器的bean生命周期管理进行交互，可以实现Spring InitializingBean和DisposableBean接口。容器为前者调用afterPropertiesSet()，并为后者调用destroy()，以允许bean在初始化和销毁bean时执行某些操作。
 
->
+> JSR-250 @PostConstruct和@PreDestroy注解通常被认为是在现代Spring应用程序中接收生命周期回调的最佳做法。使用这些注解意味着你的bean没有和Spring特定接口耦合。有关详细信息，请参见第7.9.8节[“@PostConstruct和@PreDestroy”]()。如果您不想使用JSR-250注解，但您仍然希望移除耦合，请考虑使用init-method和destroy-method对象定义元数据。
+
+在内部，Spring 框架使用BeanPostProcessor实现来处理它可以找到的任何回调接口，并调用适当的方法。如果你需要自定义功能或者其他生命周期行为这些Spring没有提供开箱即用的，你可以实现一个自己的BeanPostProcessor。更多信息，请参阅[容器扩展点](# 容器扩展点)。
+
+除了初始化和销毁回调之外，Spring管理的对象可能还实现Lifecycle接口，这样这些对象可以参与由容器自己的生命周期驱动的启动和关闭过程。
+
+在本节描述生命周期回调接口。
+
+### 初始化回调
+**org.springframework.beans.factory.InitializingBean**接口允许在bean上所有必须属性已经被容器设置好后，执行初始化工作。**InitializingBean**接口指定了一个单一方法：
+```java
+void afterPropertiesSet() throws Exception;
+```
+建议你不要使用**InitializingBean**接口，因为它不必要地将代码耦合到Spring上。作为选择，使用**@PostConstruct**注解或指定一个POJO初始化方法。在基于XML配置元数据中，你使用**init-method**属性来指定具有void no-argument签名的方法的名称。在Java Config中，你可以使用**@Bean**的**initMethod**属性，请参阅[“接收生命周期回调”]()一节。例如，以下内容：
+```xml
+<bean id="exampleInitBean" class="examples.ExampleBean" init-method="init"/>
+```
+```java
+public class ExampleBean {
+
+    public void init() {
+        // 做一些初始化工作
+    }
+
+}
+```
+这与下面完全一样
+```xml
+<bean id="exampleInitBean" class="examples.AnotherExampleBean"/>
+```
+```java
+public class AnotherExampleBean implements InitializingBean {
+
+    public void afterPropertiesSet() {
+        // 做一些初始化工作
+    }
+
+}
+```
+但是第一种没有将代码与Spring耦合在一起。
+
+### 销毁回调
+实现**org.springframework.beans.factory.DisposableBean**接口允许bean在包含它的容器销毁时获取一个回调。**DisposableBean**接口指定单个方法：
+```java
+void destroy() throws Exception;
+```
+建议你不要使用**DisposableBean**接口，因为它不必要地将代码耦合到Spring上。作为选择，使用**@PreDestroy**注解或指定一个由bean定义支持的通用方法。在基于XML配置元数据中，你使用&lt;bean/>上的**destroy-method**属性。在Java Config中，你可以使用**@Bean**的**destroyMethod**属性，请参阅[“接收生命周期回调”]()一节。例如，以下定义：
+```xml
+<bean id="exampleInitBean" class="examples.ExampleBean" destroy-method="cleanup"/>
+```
+```java
+public class ExampleBean {
+
+    public void cleanup() {
+        // 做一些销毁工作(比如释放池连接)
+    }
+
+}
+```
+它域下面完成一样
+```xml
+<bean id="exampleInitBean" class="examples.AnotherExampleBean"/>
+```
+```java
+public class AnotherExampleBean implements DisposableBean {
+
+    public void destroy() {
+        // 做一些销毁工作(比如释放池连接)
+    }
+
+}
+```
+但是第一种没有将代码与Spring耦合在一起。
+
+> 一个&lt;bean>元素的destroy-method属性可以被赋予一个特殊的（推断的）值，该值指示Spring在特定的bean类上自动检测公共的close或shutdown方法。（任何实现java.lang.AutoCloseable或java.io.Closeable的类会因此匹配）。这个特殊的（推测的）值也可以在&lt;beans>元素的default-destroy-method属性上设置，以将此行为应用于一整套bean（请参阅[“默认初始化和销毁方法”](#默认初始化和销毁方法)一节）。注意这是Java cofig的默认行为。
+
+### 默认初始化和销毁方法
+当您编写不使用Spring指定的InitializingBean和DisposableBean回调接口的初始化和销毁​​方法回调时，你通常用init(), initialize(), dispose()等这些名称。理想情况下，这些生命周期回调方法的名称贯穿整个项目，以便所有的开发者使用相同的方法名称和确保一致性。
+
+你可以配置Spring容器去查找在每个bean上的命名初始化和销毁回调方法名称。这意味着你作为一个程序开发者，可以编写你的应用程序类，并且使用一个名为init()的初始化回调，而不用必在每个bean定义上配置init-method=“init”属性。Spring IoC容器在bean被创建的时候调用这个方法（并按照前面描述的标准生命周期回调契约）。这个功能同样为初始化和销毁方法回调执行一致的命名约定。
+
+假设你的初始化回调方法名为init()并且销毁回调方法名为destory()。你的类将类似于下面例子中的类。
+```java
+public class DefaultBlogService implements BlogService {
+
+    private BlogDao blogDao;
+
+    public void setBlogDao(BlogDao blogDao) {
+        this.blogDao = blogDao;
+    }
+
+    // 这是（不出意料的）初始化回调方法
+    public void init() {
+        if (this.blogDao == null) {
+            throw new IllegalStateException("The [blogDao] property must be set.");
+        }
+    }
+
+}
+```
+```xml
+<beans default-init-method="init">
+
+    <bean id="blogService" class="com.foo.DefaultBlogService">
+        <property name="blogDao" ref="blogDao" />
+    </bean>
+
+</beans>
+```
+由于顶级&lt;beans />元素属性中default-init-method属性的存在，导致Spring IoC容器将bean上名为init的方法识别为初始化方法回调。当bean被创建和组装，如果这个bean类上有这样一个方法，它会在合适的时间被调用。
+
+你通过使用顶级&lt;beans />元素上default-init-method属性类似的配置销毁方法回调（在XML上是这样）。
+
+现有的bean类已经具有与约定不符的回调方法，您可以通过使用&lt;bean />的init-method和destroy-method属性来指定（在XML中，是这样）方法名称来覆盖默认值。
+
+Spring容器保证在bean所有的依赖被提供后，立即调用配置的初始化回调。因此这个初始化回调是在原始bean上被调用，这意味着AOP拦截器等尚未应用于该bean。目标bean首先被完全创建，然后才应用AOP代理（例如）和它的拦截器链。如果目标bean和代理被分开定义，您的代码甚至可以绕过代理，与原始目标bean进行交互。因此，将拦截器应用到init方法将会变得不一致，因为这样做会将目标bean的生命周期和它的代理/拦截器耦合在一起，并在代码直接与原始目标bean进行交互时留下奇怪的语义。
 
 
+### 组合生命周期机制
+从Spring 2.5开始，您有三种控制bean生命周期行为的选项：InitializingBean和DisposableBean回调接口;自定义init()和destroy()方法;和@PostConstruct和@PreDestroy注解。您可以组合这些机制来控制给定的bean。
 
+> 如果为一个bean配置了多个生命周期机制，并且每个机制都配置了不同的方法名称，那么每个配置的方法都按照下面列出的顺序执行。但是，如果为超过一个这些生命周期机制配置了相同的方法名称，例如初始化方法init() ，该方法将如上一节所述的只执行一次。
+
+使用了不同的初始化方法，为同一个bean配置的多个生命周期机制，如下被调用：
+- 被@PostConstruct注解的方法
+- 由InitializingBean回调接口定义的afterPropertiesSet()
+- 自定义配置的init()方法
+
+销毁方法以相同的顺序被调用
+
+- 被@PreDestroy注解的方法
+- 由DisposableBean 回调接口定义的destroy()
+- 自定义配置的destroy()方法
+
+### 启动和关闭回调
+Lifecycle接口为任何具有自身生命周期需求的对象定义了必需方法（例如启动和停止一些后台进程）：
+```java
+public interface Lifecycle {
+
+    void start();
+
+    void stop();
+
+    boolean isRunning();
+
+}
+```
+任何Spring管理的对象都可以实现这个接口。然后，当ApplicationContext本身接收到启动和停止信号时，例如，对于运行时的停止/重新启动情况，它会将这些调用级联到在该上下文中定义的所有Lifecycle实现。它通过委托给LifecycleProcessor来执行此操作
+```java
+public interface LifecycleProcessor extends Lifecycle {
+
+    void onRefresh();
+
+    void onClose();
+
+}
+```
+请注意，**LifecycleProcessor**本身是Lifecycle接口的扩展。它还增加了另外两种方法来对正在刷新和关闭的上下文进行反应。
+
+> 请注意，常规的**org.springframework.context.Lifecycle**接口只是对明确的启动/停止通知的简单合同，并不意味着在上下文刷新时自动启动。考虑实现**org.springframework.context.SmartLifecycle**来代替，以便对特定bean的自动启动（包括启动阶段）进行细粒度的控制。此外，请注意，停止通知不能保证在销毁之前发生：在常规关机时，所有Lifecycle bean将在广泛的销毁回调传播之前首先收到停止通知;然而，在上下文生命周期的热刷新或中止刷新尝试时，只会调用destroy方法。
+
+启动和关闭调用的顺序可能很重要。如果任何两个对象之间存在“depends-on”关系，则依赖方将在其依赖之后启动，并在其依赖之前停止。然而，有时直接依赖是未知的。您可能只知道某种类型的对象应该在另一种类型的对象之前开始。在这些情况下，**SmartLifecycle**接口定义了另一个选项，即在其父接口**Phased**上定义的getPhase()方法。
+```java
+public interface Phased {
+
+    int getPhase();
+
+}
+```
+```java
+public interface SmartLifecycle extends Lifecycle, Phased {
+
+    boolean isAutoStartup();
+
+    void stop(Runnable callback);
+
+}
+```
+当启动时，相位最低的对象首先启动，停止时则按照相反的顺序进行。因此，实现SmartLifecycle的对象，并且它的getPhase()方法返回值为Integer.MIN\_VALUE的，将是第一个启动和最后停止的对象（可能是因为它依赖于其他进程运行）。当考虑相位值时，知道任何没有实现**SmartLifecycle **的“正常”**Lifecycle**对象的相位值为0是很重要的。因此，任何负相位值都表示一个对象应该在这些标准组件之前开始（并在它们之后停止），反之亦然。
+
+您可以看到**SmartLifecycle**定义的stop方法接受回调。任何实现必须在该实现的关闭过程完成后调用该回调的run（）方法。这可以在必要时进行异步关闭，因为**LifecycleProcessor**接口的默认**DefaultLifecycleProcessor**，会对每个阶段中的对象组等待它们的超时值，以此来调用这个回调。每个相位默认超时值是30秒。您可以通过在上下文中定义名为“lifecycleProcessor”的bean来覆盖默认的生命周期处理器实例。如果您只想修改超时值，则定义以下内容就足够了：
+```xml
+<bean id="lifecycleProcessor" class="org.springframework.context.support.DefaultLifecycleProcessor">
+    <!-- 以毫秒为单位的超时值 -->
+    <property name="timeoutPerShutdownPhase" value="10000"/>
+</bean>
+```
+如前所述，LifecycleProcessor接口定义了用于刷新和关闭上下文的回调方法。后者将简单地驱动关闭过程，就像已经明确调用了stop()一样，但是它是在上下文关闭时发生。另一方面，“refresh”回调启用了SmartLifecycle bean的另一个功能。当上下文被刷新（在所有对象被实例化和初始化之后）时，该回调将被调用，并且在这个点上，默认生命周期处理器将检查每个SmartLifecycle对象的isAutoStartup()方法返回的布尔值。如果为“true”，则该对象将在该点启动，而不是等待上下文或它自己的start()方法的显式调用（与上下文刷新不同，对于标准的上下文实现上下文启动不会自动发生）。“phase”值以及任何“depends-on”关系将以与上述相同的方式决定来启动顺序。
+
+
+### 在非Web应用程序中优雅的正常Spring IoC容器
+> 本节仅适用于非Web应用程序。 Spring的基于Web的ApplicationContext实现已经有代码在关闭相关Web应用程序时，正常关闭Spring IoC容器。
+
+如果在非Web应用程序环境中使用Spring的IoC容器;例如，在富客户端桌面环境中;你为JVM注册一个关闭钩子。这样做可以确保正常关机，并在单例Bean上调用相关的destroy方法，以便释放所有资源。当然，您仍然必须正确配置和实现这些销毁回调。
+
+要注册一个关闭钩子，你调用ConfigurableApplicationContext接口上声明的registerShutdownHook()方法：
+```java
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public final class Boot {
+
+    public static void main(final String[] args) throws Exception {
+
+        ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+                new String []{"beans.xml"});
+
+        // 为上述上下文添加一个关闭钩子...
+        ctx.registerShutdownHook();
+
+        // app在这里运行...
+
+        // 主要方法退出，钩子在应用程序关闭之前被调用......
+
+    }
+}
+```
+
+## ApplicationContextAware和BeanNameAware
+***
+当**ApplicationContex**t创建一个实现**org.springframework.context.ApplicationContextAware**接口的对象实例时，会提供给实例该**ApplicationContext**的引用。
+```java
+public interface ApplicationContextAware {
+
+    void setApplicationContext(ApplicationContext applicationContext) throws BeansException;
+
+}
+```
+因此bean可以编程式操作创建它们的ApplicationContext ，通过**ApplicationContext**接口或者将个引用转换为这个接口的一个已知子类，例如**ConfigurableApplicationContext**，它暴露了一些额外功能。这样做的一个用途是可以编程式检索其他的bean。有时这种能力是有用的;然而，一般你应该避免这样做，因为它将代码和Spring耦合在一起，并且没有遵循将协作者作为属性提供给bean的控制反转风格。**ApplicationContext**的其他方法提供对文件资源的访问，发布应用程序事件和访问**MessageSource**。这些附加功能在第7.15节[“ApplicationContext的附加功能”]()中描述。
+
+从Spring2.5开始，自动装配是另一种获取**ApplicationContext**引用的可选方法。“传统”的**constructor**和**byType**自动装配模式（如第4.5节[“自动装配协作者”](#自动装配协作者)中所述）可以分别为构造函数参数或setter方法参数提供**ApplicationContext**类型的依赖。为了更多的灵活性，包括自动装配字段和多参数方法的能力，请使用新的基于注解的自动装配功能。如果你这样做，**ApplicationContext**被自动装配到一个字段，构造函数参数或者方法参数上，如果相关期望**ApplicationContext**类型的字段，构造方法或方法带有@Autowired注解的话。更多信息，请参阅第9.2节[“@Autowired”](#@Autowired)。
+
+当**ApplicationContext**创建一个实现**org.springframework.beans.factory.BeanNameAware**接口的类时，该类将被提供一个对其关联对象定义中定义名称的引用。
+```java
+public interface BeanNameAware {
+
+    void setBeanName(String name) throws BeansException;
+
+}
+```
+这个回调在普通bean属性被填充后，但是在一个初始化回调（如InitializingBean的afterPropertiesSet 或一个自定义init方法）前调用。
+
+## 其他Aware接口
+除了上面讨论的**ApplicationContextAware**和**BeanNameAware**之外，Spring还提供了一系列Aware接口，允许bean指示容器他们需要某个基础框架依赖。最重要的Aware接口总结如下-作为通用规则，它们的名称很好的指示了依赖类型：
+
+|名称|注入的依赖|在...解释|
+|----|-----------|---------|
+|**ApplicationContextAware**|声明ApplicationContext|[第6.2节“ApplicationContextAware和BeanNameAware”](#ApplicationContextAware和BeanNameAware)|
+|****||[](#)|
+|****||[](#)|
+|****||[](#)|
+|****||[](#)|
+|****||[](#)|
+|****||[](#)|
+|****||[](#)|
 ***
 # Bean定义继承
 ***

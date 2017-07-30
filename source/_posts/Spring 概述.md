@@ -60,7 +60,7 @@ Context(***spring-context*** )模块在Core and Beans模块提供的实体基础
 
 ### AOP和Instrumentation
 
-***spring-aop*** 模块提供了符合AOP联盟的面向方面的编程实现，允许您定义方法拦截器和切入点，来将应分离的功能代码完全解耦。使用源代码级元数据功能，您还可以以类似于.NET属性的方式将行为信息合并到代码中。
+***spring-aop*** 模块提供了符合AOP联盟的面向切面的编程实现，允许您定义方法拦截器和切入点，来将应分离的功能代码完全解耦。使用源代码级元数据功能，您还可以以类似于.NET属性的方式将行为信息合并到代码中。
 
 单独的***spring-aspects*** 模块提供与AspectJ的集成。
 
@@ -100,18 +100,18 @@ Web层由spring-web，spring-webmvc,spring-websocket和spring-webmvc-portlet模�
 ***
 前面描述的构建块使Spring在许多场景中可以合理选择，从在资源有限的设备上运行的嵌入式应用程序到使用Spring的事务管理功能和web框架集成的全面企业应用程序。
 
-*典型的完整Spring Web应用程序*
+***典型的完整Spring Web应用程序***
 ![典型的完整Spring Web应用程序](/images/spring/overview-full.png.pagespeed.ce.sC26wirtWB.png)Spring的声明式事务管理功能使Web应用程序完全事务性，就像使用EJB容器管理的事务一样。所有您的自定义业务逻辑都可以使用简单的POJO实现，并由Spring的IoC容器进行管理。其他的服务包括对发送邮件的支持和独立于web层验证，可让您选择执行验证规则的位置。Spring的ORM支持是与JPA，Hibernate和JDO集成;比如，当你使用Hibernate，你可以继续使用已有的映射文件和标准的Hibernate SessionFactory配置。表单控制器将Web层与域模型无缝集成，从而无需ActionForms或将HTTP参数转换为你的域模型值的其他类。
 
-*使用第三方web框架的Spring中间层*
+***使用第三方web框架的Spring中间层***
 ![使用第三方web框架的Spring中间层](/images/spring/overview-thirdparty-web.png.pagespeed.ce.1lJso2G8WP.png)
 有时一些情况不允许你完全切换到不同的框架。Spring框架并不强制您使用它的一切;它不是一个要么全部采用要么全不采用的解决方案。使用Struts，Tapestry，JSF或其他UI框架构建的现有前端可以与基于Spring的中间层集成，这允许您使用Spring事务功能。您只需要使用ApplicationContext连接您的业务逻辑，并使用WebApplicationContext来集成您的Web层。
 
-*远程使用场景*
+***远程使用场景***
 ![远程使用场景](/images/spring/overview-remoting.png.pagespeed.ce.HIMsJb_Xya.png)
 当您需要通过Web服务访问现有代码时，可以使用Spring的Hessian-，Burlap-，Rmi-或JaxRpcProxyFactory类。启用对现有应用程序的远程访问并不困难。
 
-*EJBs - 包装现有的POJO*
+***EJBs - 包装现有的POJO***
 ![EJBs - 包装现有的POJO](/images/spring/overview-ejb.png.pagespeed.ce.VN88UiKUhA.png)
 Spring Framework还为Enterprise JavaBeans提供了一个访问和抽象层，使您能够重用现有的POJO，并将其包装在无状态会话bean中，以便在可能需要声明式安全性的可扩展的，故障安全的Web应用程序中使用。
 
@@ -151,12 +151,12 @@ Spring Framework的每个版本都会将artifacts发布到以下位置：
 |org.springframework|spring-webmvc-portlet|在Portlet环境中使用MVC实现|
 |org.springframework|spring-websocket|的WebSocket和SockJS基础框架，包括STOMP消息支持|
 
-**Spring依赖和依赖Spring**   
+#### Spring依赖和依赖Spring   
 虽然Spring为大型企业和其他外部工具提供集成和支持，它有意将它的强制依赖保持在最小：您不必为了简单的案例使用Spring而去定位和下载（甚至自动）大量的jar库。对于基本依赖注入，只有一个强制性的外部依赖关系，也就是用于日志记录（有关日志记录选项的更详细描述，请参阅下文）。
 
 接下来我们概述需要配置一个依赖Spring的应用程序，首先是使用Maven，然后是Gradle，最后是Ivy。在这些所有情况下，如果哪些不清楚，请参阅你的依赖管理系统的文档，或者看些简单代码-Spring它自己在构建的时候使用Gradle来管理依赖，并且我们的示例大多使用Gradle或Maven。
 
-**Maven依赖管理**
+#### Maven依赖管理
 如果你使用Maven作为依赖管理，那么你甚至不必明确的提供日志依赖。比如，要创建应用程序上下文并使用依赖注入来配置应用程序，您的Maven依赖项将如下所示：
 ```xml
 <dependencies>
@@ -201,7 +201,7 @@ Spring Framework的每个版本都会将artifacts发布到以下位置：
 </repositories>
 ```
 
-**Maven“物料清单”依赖**
+#### Maven“物料清单”依赖**
 使用Maven时，可能会意外混合不同版本的Spring JAR。比如，你可能发现一个第三方库或者另一个Spring项目，将传递依赖传递给了旧的版本。如果你忘记自己明确声明一个直接依赖，可能会出现各种意外问题。
 
 为了克服这些问题，Maven支持“物料单”（BOM）依赖的概念。您可以在dependencyManagement部分中导入spring-framework-bom，以确保所有的spring 依赖（直接和传递）都是相同的版本。
@@ -232,7 +232,7 @@ Spring Framework的每个版本都会将artifacts发布到以下位置：
 <dependencies>
 ```
 
-**Gradle依赖管理**
+#### Gradle依赖管理
 要使用具有Gradle构建系统的Spring存储库，请在存储库部分中包含适当的URL：
 ```
 repositories {
@@ -248,7 +248,7 @@ dependencies {
     testCompile("org.springframework:spring-test:4.3.10.RELEASE")
 }
 ```
-**Ivy依赖管理**
+#### Ivy依赖管理
 如果您喜欢使用Ivy来管理依赖关系，那么还有类似的配置选项。
 
 要配置Ivy指向Spring存储库，请将以下解析器添加到您的ivysettings.xml中：
@@ -264,7 +264,7 @@ dependencies {
 <dependency org="org.springframework"
     name="spring-core" rev="4.3.10.RELEASE" conf="compile->runtime"/>
 ```
-**分发Zip文件**
+#### 分发Zip文件
 虽然使用支持依赖关系管理的构建系统是推荐的获取Spring框架的方法，但仍然可以下载分发zip文件。
 
 分发zip被发布到Spring Maven仓库中（这只是为了我们的方便，你不需要Maven或任何其他构建系统来下载它们）。
@@ -283,7 +283,7 @@ Spring中的强制性日志依赖是Jakarta Commons Logging API（JCL）。我�
 
 commons-logging的好处在于，您不需要任何其他操作来使您的应用程序正常工作。它有一个运行时期发现算法，可以在classpath中的众所周知的地方查找其他的日志框架，并且使用一个它认为合适的使用（或者你可以可以告诉它你需要哪一个）。如果没有其他可用的，你可以从JDK（java.util.logging或者简称JUL）中看到非常漂亮的日志。您应该发现，在大多数情况下，您的Spring应用程序可以快乐地登录到控制台，这很重要。
 
-**使用Log4j 1.2或2.X**
+#### 使用Log4j 1.2或2.X
 > Log4j 1.2在此期间已经终止。此外，Log4j 2.3是最新的Java 6兼容版本，较新的Log4j 2.x版本需要Java 7+版本。
 
 为了配置和管理的目的，许多人使用Log4j作为日志框架。它是高效和成熟的，实际上它是我们在构建Spring时在运行时使用的。Spring还提供了一些用于配置和初始化Log4j的工具，所以它在一些模块中它有一个对Log4j的可选的编译时期依赖。
@@ -357,7 +357,7 @@ log4j.category.org.springframework.beans.factory=DEBUG
 </Configuration>
 ```
 
-**避免使用Commons Logging**
+#### 避免使用Commons Logging
 不幸的是，在标准commons-logging API中的运行时期发现算法，方便终端用户的同时，也会带来问题。如果你想避免JCL的标准查找，基本上有两种方法来关闭它：
 1. 从spring-core模块中排除依赖（因为它是明确依赖于commons-logging的唯一模块）
 2. 依赖一个特殊的commons-logging依赖，用一个空的jar取代这个库（更多细节可以在[SLF4J FAQ](http://slf4j.org/faq.html#excludingJCL)中找到）
@@ -380,7 +380,7 @@ log4j.category.org.springframework.beans.factory=DEBUG
 ```
 现在这个应用程序目前被打破了，因为在类路径上没有JCL API实现，所以要解决它，必须提供一个新的。在下一节，我们向你展示如何使用SLF4J提供一个JCL的替代实现。
 
-**使用SLF4J与Log4j或Logback**
+#### 使用SLF4J与Log4j或Logback
 Simple Logging Facade for Java (SLF4J) 是Spring常用的其他库使用的流行API。它通常和Logback一起使用，Logback是SLF4J API的本地实现。
 
 SLF4J提供绑定到许多常见的日志记录框架，包括Log4j，反过来也是在其他日志框架和它自身之间桥接。所以要在Spring使用SLF4J，你需要使用SLF4J-JCL桥接来替换commos-logging依赖。一旦你这么做，那么来自Spring内的日志记录调用将会被转换为SLF4J API的日志调用，所以如果在你的应用程序中的其他库使用这个API，那么您有一个地方来配置和管理日志记录。
@@ -432,10 +432,10 @@ SLF4J提供绑定到许多常见的日志记录框架，包括Log4j，反过来�
 </dependencies>
 ```
 
-**使用JUL（java.util.logging）**
+#### 使用JUL（java.util.logging）
 默认情况下Commons Logging会被委托给java.util.logging,前提是在类路径中没有检测到Log4j。所以这里没有特别的依赖需要设置：只需在独立应用程序（具有JDK级别的自定义或默认JUL设置）或应用程序服务器的日志系统（以及其全系统的JUL设置）中使用不带有外部依赖关系的日志输出到java.util.logging ）。
 
-**Commons Logging在WebSphere上**
+#### Commons Logging在WebSphere上
 Spring应用程序可以在本身提供JCL实现的容器上运行，例如IBM的WebSphere Application Server（WAS）。这本身并不引起问题，但是它导致有两个不同的场景需要理解：
 
 在“parent first”ClassLoader委托模型（WAS中的默认值）中，应用程序将始终拾取服务器提供的Commons Logging版本，委托给WAS记录子系统（实际上基于JUL）。JCL的应用程序提供的变体，无论是标准的Commons Logging还是JCL-over-SLF4J桥，都将被有效地被忽略，以及任何本地包含的日志提供程序。
