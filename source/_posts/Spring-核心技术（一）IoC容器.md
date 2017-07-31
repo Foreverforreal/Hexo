@@ -1017,7 +1017,7 @@ foo bean有一个fred属性，fred属性又有一个bob属性，bob属性又有�
 ***
 Spring容器可以自动关联协作bean。你可以通过检查ApplicationContext的内容来允许Spring为你的bean自动解析协作者（其他bean）。自动装配有以下的优点：
 - 自动装配可以显著减少指定属性或构造函数参数的需要。（其他机制，如本章其他地方讨论的bean模板在这方面也很有价值。）
-- 自动装配可以随着对象的发展而更新配置。例如，如果你需要给一个类添加一个依赖，则可以自动满足该依赖关系，而无需修改配置。因此，自动装配在开发过程中特别有用，而在代码库变得更加稳定时，无需切换到显式装配。
+- 自动装配可以随着对象的发展而更新配置。例如，如果你需要给一个类添加一个依赖，则可以无需修改配置，自动满足该依赖关系。因此，自动装配在开发过程中特别有用，在代码库变得更加稳定时，无需切换到显式装配。
 
 当使用基于XML的配置元数据时，你使用&lt;bean/>元素上的autowire属性为bean定义指定自动装配模式。自动装配功能有四种模式。您可以指定自动装配每一个bean并且因此可以选择哪一个来自动装配。
 
@@ -1053,7 +1053,7 @@ Spring容器可以自动关联协作bean。你可以通过检查ApplicationConte
 
 > autowire-candidate属性被设计为仅影响基于类型的自动装配。它不会影响通过名称的明确引用，即使指定的bean没有被标记为一个自动装配候选，它也会被解析。因此，如果名称匹配的话，通过名称的自动装配依旧会注入这个bean。
 
-你也可以基于模式匹配而不是bean名称来限制自动装配的候选者。顶级&lt;beans/>元素在它的default-autowire-candidates属性中接收一个或多个模式。例如，要将自动装配候选者状态限制为任何名称以Repository结尾的bean，提供一个 \*Repository的值。要提供多个模式，在一个以逗号分割的列表中定义它们。对一个bean明确定义autowire-candidate属性的值为true或false的，这种设置始终有些，对于这样的bean，模式匹配不适用。
+你也可以基于模式匹配而不是bean名称来限制自动装配的候选者。顶级&lt;beans/>元素的default-autowire-candidates属性接收一个或多个模式。例如，要将自动装配候选者状态限制为任何名称以Repository结尾的bean，提供一个 \*Repository的值。要提供多个模式，在一个以逗号分割的列表中定义它们。对一个bean明确定义autowire-candidate属性的值为true或false的，这种设置始终优先，对于这样的bean，模式匹配将不再适用。
 
 这些技术对于您不想通过自动装配注入其他bean的bean很有用。这并不意味着被排除的bean本身不能使用自动装配来配置。而是，这个bean它本身不是其他bean自动装配的候选者。
 
@@ -1586,7 +1586,7 @@ public class ExampleBean {
 
 }
 ```
-它域下面完成一样
+它与下面完成一样
 ```xml
 <bean id="exampleInitBean" class="examples.AnotherExampleBean"/>
 ```
@@ -1604,7 +1604,7 @@ public class AnotherExampleBean implements DisposableBean {
 > 一个&lt;bean>元素的destroy-method属性可以被赋予一个特殊的（推断的）值，该值指示Spring在特定的bean类上自动检测公共的close或shutdown方法。（任何实现java.lang.AutoCloseable或java.io.Closeable的类会因此匹配）。这个特殊的（推测的）值也可以在&lt;beans>元素的default-destroy-method属性上设置，以将此行为应用于一整套bean（请参阅[“默认初始化和销毁方法”](#默认初始化和销毁方法)一节）。注意这是Java cofig的默认行为。
 
 ### 默认初始化和销毁方法
-当您编写不使用Spring指定的InitializingBean和DisposableBean回调接口的初始化和销毁​​方法回调时，你通常用init(), initialize(), dispose()等这些名称。理想情况下，这些生命周期回调方法的名称贯穿整个项目，以便所有的开发者使用相同的方法名称和确保一致性。
+当您编写不使用Spring指定的**InitializingBean**和**DisposableBean**回调接口的初始化和销毁​​方法回调时，你通常用init(), initialize(), dispose()等这些名称。理想情况下，这些生命周期回调方法的名称贯穿整个项目，以便所有的开发者使用相同的方法名称和确保一致性。
 
 你可以配置Spring容器去查找在每个bean上的命名初始化和销毁回调方法名称。这意味着你作为一个程序开发者，可以编写你的应用程序类，并且使用一个名为init()的初始化回调，而不用必在每个bean定义上配置init-method=“init”属性。Spring IoC容器在bean被创建的时候调用这个方法（并按照前面描述的标准生命周期回调契约）。这个功能同样为初始化和销毁方法回调执行一致的命名约定。
 
@@ -1717,7 +1717,7 @@ public interface SmartLifecycle extends Lifecycle, Phased {
 如前所述，LifecycleProcessor接口定义了用于刷新和关闭上下文的回调方法。后者将简单地驱动关闭过程，就像已经明确调用了stop()一样，但是它是在上下文关闭时发生。另一方面，“refresh”回调启用了SmartLifecycle bean的另一个功能。当上下文被刷新（在所有对象被实例化和初始化之后）时，该回调将被调用，并且在这个点上，默认生命周期处理器将检查每个SmartLifecycle对象的isAutoStartup()方法返回的布尔值。如果为“true”，则该对象将在该点启动，而不是等待上下文或它自己的start()方法的显式调用（与上下文刷新不同，对于标准的上下文实现上下文启动不会自动发生）。“phase”值以及任何“depends-on”关系将以与上述相同的方式决定来启动顺序。
 
 
-### 在非Web应用程序中优雅的正常Spring IoC容器
+### 在非Web应用程序中正常关闭Spring IoC容器
 > 本节仅适用于非Web应用程序。 Spring的基于Web的ApplicationContext实现已经有代码在关闭相关Web应用程序时，正常关闭Spring IoC容器。
 
 如果在非Web应用程序环境中使用Spring的IoC容器;例如，在富客户端桌面环境中;你为JVM注册一个关闭钩子。这样做可以确保正常关机，并在单例Bean上调用相关的destroy方法，以便释放所有资源。当然，您仍然必须正确配置和实现这些销毁回调。
@@ -1775,19 +1775,26 @@ public interface BeanNameAware {
 |名称|注入的依赖|在...解释|
 |----|-----------|---------|
 |**ApplicationContextAware**|声明ApplicationContext|[第6.2节“ApplicationContextAware和BeanNameAware”](#ApplicationContextAware和BeanNameAware)|
-|****||[](#)|
-|****||[](#)|
-|****||[](#)|
-|****||[](#)|
-|****||[](#)|
-|****||[](#)|
-|****||[](#)|
+|**ApplicationEventPublisherAware**|封闭的ApplicationContext事件发布`器|[7.15节“ApplicationContext的附加功能”](#ApplicationContext的附加功能)|
+|**BeanClassLoaderAware**|用于加载bean类的类加载器。|[第3.2节“实例化bean”](#)|
+|**BeanFactoryAware**|声明的BeanFactory|[第6.2节“ApplicationContextAware和BeanNameAware”](#ApplicationContextAware和BeanNameAware)|
+|**BeanNameAware**|声明bean的名称|[第6.2节“ApplicationContextAware和BeanNameAware”](#ApplicationContextAware和BeanNameAware)|
+|**BootstrapContextAware**|容器运行的资源适配器BootstrapContext。通常仅在JCA感知的ApplicationContexts中可用|[第32章，JCA CCI](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#cci)|
+|**LoadTimeWeaverAware**|定义了加载时处理类定义的weaver|[](#)|
+|**MessageSourceAware**|解析消息的配置策略（支持参数化和国际化）|[](#)|
+|**NotificationPublisherAware**|Spring JMX通知发布器|[第31.7节“通知”](#)|
+|**PortletConfigAware**|当前容器运行的PortletConfig。只有在Web感知的Spring ApplicationContext中才有效|[第25章Portlet MVC框架](#)|
+|**PortletContextAware**|当前容器运行的PortletContext。只有在Web感知的Spring ApplicationContext中才有效|[第25章Portlet MVC框架](#)|
+|**ResourceLoaderAware**|用于低级别访问资源配置的loader|[第8章 资源](#)|
+|**ServletConfigAware**|当前容器运行的ServletConfig。只有在Web感知的Spring ApplicationContext中才有效|[第22章，Web MVC框架](#)|
+|**ServletContextAware**|当前容器运行的ServletContext。只有在Web感知的Spring ApplicationContext中才有效|[第22章，Web MVC框架](#)|
+
 ***
 # Bean定义继承
 ***
-一个bean定义可以包含很多配置信息，包括构造函数参数，属性值和容器特定信息，如初始化方法，静态工厂方法名称等。子bean定义从父定义继承配置数据。子定义可以根据需要覆盖某些值，或者添加其他值。使用父和子bean定义可以节省大量的输入。有效地，这是模板的一种形式。
+一个bean定义可以包含很多配置信息，包括构造函数参数，属性值和容器特定信息，如初始化方法，静态工厂方法名称等。子bean定义从父定义继承配置数据。子定义可以根据需要覆盖某些值，或者添加其他值。使用父和子bean定义可以节省大量的输入。实际上，这是模板的一种形式。
 
-如果以编程方式使用ApplicationContext接口，则子Bean定义由ChildBeanDefinition类表示。大多数用户不能在这个级别上使用它们，而是以类似于ClassPathXmlApplicationContext的方式声明地配置bean定义。当您使用基于XML的配置元数据时，通过使用parent属性指定一个子bean的定义，指定父bean作为此属性的值。
+如果以编程方式使用ApplicationContext接口，子Bean定义由ChildBeanDefinition类表示。大多数用户不能在这个级别上使用它们，而是以类似于ClassPathXmlApplicationContext的方式声明地配置bean定义。当您使用基于XML的配置元数据时，你通过使用parent属性指定一个子bean的定义，指定父bean作为此属性的值。
 ```xml
 <bean id="inheritedTestBean" abstract="true"
         class="org.springframework.beans.TestBean">
@@ -1799,26 +1806,352 @@ public interface BeanNameAware {
         class="org.springframework.beans.DerivedTestBean"
         parent="inheritedTestBean" init-method="initialize">
     <property name="name" value="override"/>
-    <!-- the age property value of 1 will be inherited from parent -->
+    <!-- 值为1的age属性会从父级继承 -->
 </bean>
 ```
+一个自bean定义如果没有指定bean类的话则使用父级的定义，但也可以覆盖父级定义。在后一种情况，这个子bean必须兼容父级，也就是，它必须接受父级的属性值。
 
+子bean继承父级的域，构造函数参数值，属性值，和方法重写，并可以添加新值。你指定的任何域，初始化方法，销毁方法，和/或静态工厂方法会覆盖父级中相应的设置。
 
+其余设置始终采用自子定义：depends on，自动装配模式，依赖关系检查，单例，懒加载。
+
+上面的例子使用**abstract**属性明确标示父bean定义是抽象的。如果父定义没有指定一个类，则需要将父bean定义明确标识为抽象，如下所示：
+```xml
+<bean id="inheritedTestBeanWithoutClass" abstract="true">
+    <property name="name" value="parent"/>
+    <property name="age" value="1"/>
+</bean>
+
+<bean id="inheritsWithClass" class="org.springframework.beans.DerivedTestBean"
+        parent="inheritedTestBeanWithoutClass" init-method="initialize">
+    <property name="name" value="override"/>
+    <!-- age会从父bean定义中继承值为1-->
+</bean>
+```
+父bean不能自己实例化，因为它是不完整的，它也被明确标记为**abstract**。当一个定义像这样是“abstract”的，它只能用作纯模板bean定义，作为子定义的父定义。尝试使用这样一个抽象的父bean，当通过引用它作为另一个bean的ref属性或使用父bean id进行显式的getBean()调用，会返回一个错误。类似地，容器的内部preInstantiateSingletons()方法忽略被定义为**abstract**的bean定义。
+
+> **ApplicationContext**默认预实例化所有的单例。因此，重要的是（至少对于单例bean），如果您有一个（父）bean定义，您打算仅作为模板使用，并且这个定义指定了一个类，则必须确保将abstract属性设置为true，否则应用程序上下文将实际（尝试）预实例化这个抽象bean。
 
 
 
 ***
 # 容器扩展点
 ***
+
 ***
 # 基于注解的容器配置
 ***
-<div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">**注解比XML更适合配置Spring吗？**   
-
+<div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">**注解比XML更适合配置Spring吗？**      
+基于注解配置的引入产生了这样一个问题，这种方式比XML更好吗？短的答案是看情况。长的答案是每种方式都有它自己的优缺点，并且通常由开发人员决定哪种策略更适合他们。由于它们被定义的方式，注解在它们的声明中提供了大量的上下文，从而使配置更短，更简洁。然而，XML非常适合在不接触源代码或重新编译组件的情况下组装组件。一些开发人员喜欢将装配就近源代码，而其他开发者认为注解类不再是POJO，此外，配置变得分散化，难以控制。      
+无论怎么选择，Spring都可以容纳这两种风格，甚至将它们混合在一起。需要指出的是，通过其JavaConfig选项，Spring允许以非侵入式的方式使用注解，而不用触及目标组件源代码，并且而在工具方面，Spring Tool Suite支持所有配置样式。
 </div> 
+基于注解的配置提供了XML配置的替代方法，这种配置依赖于字节码元数据来装配组件，而不是角括号声明。相比使用XML来声明一个bean装配，开发者通过在相关类，方法，字段声明上使用注解，将配置移动到组件类本身。正如在“示例：RequiredAnnotationBeanPostProcessor”一节中所提到的，使用** BeanPostProcessor** 结合注解是扩展Spring IoC容器的常用手段。例如，Spring 2.0引入了使用@Required注解强制执行所需属性的可能。Spring 2.5使得可以遵循相同的通用方式来驱动Spring的依赖注入。实质上，@Autowired注解提供了与第4.5节 [“自动装配协作者”](#自动装配协作者) 中所述相同的功能，但具有更细粒度的控制和更广泛的适用性。Spring 2.5还添加了对JSR-250注解的支持，如**@PostConstruct**和**@PreDestroy**。Spring 3.0增加了javax.inject包中包含的JSR-330（用于Java的依赖注入）注解，例如**@Inject**和**@Named**。有关这些注解的详细信息，请参见 [相关章节]()。
 
+> 注解注入在XML注入之前执行，因此通过这两种方式进行注入时，后一种配置会覆盖前面的属性装配。
 
+和之前一样，你可以以单独的bean定义来注册，但也可以通过在基于XML的Spring配置中包含以下标签来隐式注册（注意包含的context命名空间）
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <context:annotation-config/>
 
+</beans>
+```
+（隐式注册的post-processors包括**AutowiredAnnotationBeanPostProcessor**，**CommonAnnotationBeanPostProcessor**，**PersistenceAnnotationBeanPostProcessor**以及前述的**RequiredAnnotationBeanPostProcessor**。）
 
+>  **&lt;context:annotation-config/>**只在定义它们的应用程序上下文中查找bean上的注解。这意味着，如果你将**&lt;context:annotation-config/>**放入到一个**WebApplicationContext**用于**DispatcherServlet**，那么它只会检查controller中的**@AutoWired** bean，而不是service上。更多信息请查看第22.2节 [“The 于DispatcherServlet”](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#mvc-servlet)。
+
+## @Required
+***
+@Required注解应用于bean属性的setter方法，如下面示例所示`：
+```java
+public class SimpleMovieLister {
+
+    private MovieFinder movieFinder;
+
+    @Required
+    public void setMovieFinder(MovieFinder movieFinder) {
+        this.movieFinder = movieFinder;
+    }
+
+    // ...
+
+}
+```
+这个注解只是的指示受影响的bean属性必须在配置时填充，通过在bean定义中的明确属性值或自动装配。如果受影响bean属性没有被填充，容器会抛出一个异常；这允许急切和明确的失败，在以后避免NullPointerExceptions等异常。它还建议您将断言放入bean类本身，例如，将其放入init方法中。这样做确保这些必须的引用和值，即使你在容器外使用这个类。
+
+##  @Autowired
+***
+> 以下示例中可以使用JSR 330的@Inject注解来代替Spring的@Autowired注解。请参阅 [这里]() 了解更多详情。
+
+你可以将@Autowired注解应用到构造函数：
+```java
+public class MovieRecommender {
+
+    private final CustomerPreferenceDao customerPreferenceDao;
+
+    @Autowired
+    public MovieRecommender(CustomerPreferenceDao customerPreferenceDao) {
+        this.customerPreferenceDao = customerPreferenceDao;
+    }
+
+    // ...
+
+}
+```
+> 从Spring Framework 4.3开始，如果目标bean只定义一个构造函数，则@Autowired构造函数不再需要。如果有几个构造函数可用，至少必须注解一个构造函数来指导容器必须使用哪个构造函数。
+
+如预期的那样，您还可以将@Autowired注解应用于“传统”setter方法：
+```java
+public class SimpleMovieLister {
+
+    private MovieFinder movieFinder;
+
+    @Autowired
+    public void setMovieFinder(MovieFinder movieFinder) {
+        this.movieFinder = movieFinder;
+    }
+
+    // ...
+
+}
+```
+您还可以将注解应用于具有任意名称和/或多个参数的方法：
+public class MovieRecommender {
+
+    private MovieCatalog movieCatalog;
+
+    private CustomerPreferenceDao customerPreferenceDao;
+
+    @Autowired
+    public void prepare(MovieCatalog movieCatalog,
+            CustomerPreferenceDao customerPreferenceDao) {
+        this.movieCatalog = movieCatalog;
+        this.customerPreferenceDao = customerPreferenceDao;
+    }
+
+    // ...
+
+}
+```
+您也可以将@Autowired应用于字段，甚至将其与构造函数进行混合：
+```java
+public class MovieRecommender {
+
+    private final CustomerPreferenceDao customerPreferenceDao;
+
+    @Autowired
+    private MovieCatalog movieCatalog;
+
+    @Autowired
+    public MovieRecommender(CustomerPreferenceDao customerPreferenceDao) {
+        this.customerPreferenceDao = customerPreferenceDao;
+    }
+
+    // ...
+
+}
+```
+还可以通过将注解添加到期望特定类型数组的字段或方法上，从ApplicationContext提供该类型的所有bean。
+```java
+public class MovieRecommender {
+
+    @Autowired
+    private MovieCatalog[] movieCatalogs;
+
+    // ...
+
+}
+```
+同样适用于类型集合：
+```java
+public class MovieRecommender {
+
+    private Set<MovieCatalog> movieCatalogs;
+
+    @Autowired
+    public void setMovieCatalogs(Set<MovieCatalog> movieCatalogs) {
+        this.movieCatalogs = movieCatalogs;
+    }
+
+    // ...
+
+}
+```
+> 如果你希望将数组或列表中的项目按特定顺序排序话，你的bean可以实现**org.springframework.core.Ordered**接口，或者要么使用**@Order**要么使用标准的**@Priority**。
+
+只要预期的键的类型为String，即使类型Map也可以自动装配。 Map值将包含预期类型的​​所有bean，键将包含相应的bean名称：Map值将包含预期类型的​​所有bean，键将包含相应的bean名称：  
+```java
+public class MovieRecommender {
+
+    private Map<String, MovieCatalog> movieCatalogs;
+
+    @Autowired
+    public void setMovieCatalogs(Map<String, MovieCatalog> movieCatalogs) {
+        this.movieCatalogs = movieCatalogs;
+    }
+
+    // ...
+
+}
+```
+默认情况下，自动装配会在没有候选bean可用时失败；默认行为是将注解的方法，构造函数和字段视为指明的必须依赖。这种行为可以如下演示来修改：
+```java
+public class SimpleMovieLister {
+
+    private MovieFinder movieFinder;
+
+    @Autowired(required=false)
+    public void setMovieFinder(MovieFinder movieFinder) {
+        this.movieFinder = movieFinder;
+    }
+
+    // ...
+
+}
+```
+> 每个类只有一个注解构造函数可以被标记为必需，但是可以注解多个非必须构造函数。在这种情况下，候选的每一个都不被考虑，并且Spring使用依赖可以被满足的最可靠的构造函数，也就是有最多参数的构造函数。**@AutoWired的必需属性建议使用@Required注解。**必需属性表示该属性不是用于自动装配目的，因为如果属性不能被自动装配，那么该属性将被忽略。另一方面，@Required更强大，它强迫属性必须被容器支持的任何bean设置，如果没有注入值，则会引发响应的异常。
+
+你还可以对于众所周知的可解析的依赖接口使用@Autowired：**BeanFactory**, **ApplicationContext**, **Environment**,** ResourceLoader**, **ApplicationEventPublisher**, 和 **MessageSource**。这些接口以及它们的拓展接口（比如**ConfigurableApplicationContext**或**ResourcePatternResolver**）是自动解析的，不需要特殊设置。
+```java
+public class MovieRecommender {
+
+    @Autowired
+    private ApplicationContext context;
+
+    public MovieRecommender() {
+    }
+
+    // ...
+
+}
+```
+>  **@Autowired **， **@Inject **， **@Resource **和 **@Value **注解由Spring  **BeanPostProcessor **实现处理，这又意味着你不能在自己的 **BeanPostProcessor **或 **BeanFactoryPostProcessor **类型（如果有的话）中应用这些注解。这些类型必须通过XML或使用Spring @Bean方法显式地“装配”。
+
+## 使用@Primary微调基于注解的自动装配
+***
+因为通过类型的自动装配可能导致多个候选者，它经常需要对选择的过程有更多的控制。完成这项工作的一个方式是使用Spring的**Primary**注解。**Primary**表示当多个bean是自动装配到一个单值依赖的候选者时，给定一个特定的bean优先权。如果候选人中只存在一个“主要”bean，那么它将是自动装配的值。
+
+让我们假设我们下面的配置，它定义firstMovieCatalog作为主要的MovieCatalog。
+```java
+@Configuration
+public class MovieConfiguration {
+
+    @Bean
+    @Primary
+    public MovieCatalog firstMovieCatalog() { ... }
+
+    @Bean
+    public MovieCatalog secondMovieCatalog() { ... }
+
+    // ...
+
+}
+```
+通过这样的配置，以下MovieRecommender将会使用firstMovieCatalog自动注解。
+```java
+public class MovieRecommender {
+
+    @Autowired
+    private MovieCatalog movieCatalog;
+
+    // ...
+
+}
+```
+相应的bean定义如下所示。
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <bean class="example.SimpleMovieCatalog" primary="true">
+        <!-- 注入此bean所需的任何依赖项 -->
+    </bean>
+
+    <bean class="example.SimpleMovieCatalog">
+        <!-- 注入此bean所需的任何依赖项 -->
+    </bean>
+
+    <bean id="movieRecommender" class="example.MovieRecommender"/>
+
+</beans>
+```
+## 使用@Qualifier微调基于注解的自动装配
+***
+当使用通过类型的注解，有多个实例匹配确定一个主要候选者时，**@Primary**是一种有效方式。当对选择过程需要更多控制时，可以使用Spring的**@Qualifier**注解。您可以将qualifier值与特定参数相关联，缩小类型匹配集，以便为每个参数选择特定的bean。在最简单的情况下，这可以是一个简单的描述性值：
+```java
+public class MovieRecommender {
+
+    @Autowired
+    @Qualifier("main")
+    private MovieCatalog movieCatalog;
+
+    // ...
+
+}
+```
+**@Qualifier**注解也可以在各个构造函数参数或方法参数中指定：
+```java
+public class MovieRecommender {
+
+    private MovieCatalog movieCatalog;
+
+    private CustomerPreferenceDao customerPreferenceDao;
+
+    @Autowired
+    public void prepare(@Qualifier("main")MovieCatalog movieCatalog,
+            CustomerPreferenceDao customerPreferenceDao) {
+        this.movieCatalog = movieCatalog;
+        this.customerPreferenceDao = customerPreferenceDao;
+    }
+
+    // ...
+
+}
+```
+相应的bean定义如下所示。具有qualifier值“main”的bean，使用具有相同值的qualifier的构造函数参数进行装配。
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <bean class="example.SimpleMovieCatalog">
+        <qualifier value="main"/>
+
+        <!-- 注入此bean所需的任何依赖项 -->
+    </bean>
+
+    <bean class="example.SimpleMovieCatalog">
+        <qualifier value="action"/>
+
+        <!-- 注入此bean所需的任何依赖项 -->
+    </bean>
+
+    <bean id="movieRecommender" class="example.MovieRecommender"/>
+
+</beans>
+```
+对于回退匹配，bean名称被认为是默认qualifier值。因此，您可以使用id“main”来定义bean，而不是嵌套的qualifier元素，这导致相同的匹配结果。但是，尽管你可以使用这个惯例通过名称引用特定的bean，但是@Autowired从根本上是使用可选语义qualifier的类型驱动的注入。这意味着即使使用bean名称回退，qualifier值在类型匹配集合中总是具有缩小的语义;他们没有在语义上表达对唯一bean ID的引用。良好的qualifier值是“main”或“EMEA”或“persistent”，表示独立于bean id的特定组件的特征，可以在上述示例中的匿名bean定义的情况下自动生成。
 
