@@ -180,6 +180,21 @@ public class GolfingWebAppInitializer extends AbstractAnnotationConfigDispatcher
 
 }
 ```
+## WebApplicationContext中的特殊Bean类型
+***
+Spring DispatcherServlet使用特殊的bean来处理请求并渲染适当的视图。这些bean是Spring MVC的一部分。您可以通过在WebApplicationContext中简单配置一个或多个选择要使用的特殊bean。但是，你最初不需要这样做，因为如果你没有做任何配置的话，Spring MVC已经维护了一个默认bean列表，。更多信息在下一节。首先看下表列出DispatcherServlet依赖的特殊bean类型。
+
+*WebApplicationContext中的特殊bean类型*
+
+|Bean类型|说明|
+|--------|----|
+|HandlerMapping|根据一些标准将传入的请求映射到处理器以及一个pre-和post-processors（处理器拦截器）列表上，其细节因HandlerMapping实现而异。最流行的实现支持注解控制器，但其他实现也存在。|
+|HandlerAdapter|帮助DispatcherServlet调用映射到请求的处理器，而不管实际调用哪个处理器。例如，调用一个注解的控制器需要解析各种注解。因此，HandlerAdapter的主要目的是将DispatcherServlet和这些细节屏蔽开。|
+|HandlerExceptionResolver|映射异常到视图上，也允许更复杂的异常处理代码。|
+|LocaleResolver&LocaleContextResolver|解析客户端使用的区域设置以及可能的时区，以便能够提供国际化的视图|
+|ThemeResolver|解析你的Web应用程序可以使用的主题，例如，提供个性化的布局|
+|MultipartResolver|解析multi-part请求，例如支持处理从HTML表单文件上传。|
+|FlashMapManager|存储并获取“输入”和“输出”的FlashMap，它可以用于将属性从一个请求传递给另一个请求，通常是跨重定向。|
 
 ## 默认DispatcherServlet配置
 ***
@@ -191,14 +206,14 @@ public class GolfingWebAppInitializer extends AbstractAnnotationConfigDispatcher
 
 在第16节[“配置Spring MVC”](#配置Spring MVC)中，你将了解配置Spring MVC的其他选项，包括MVC Java配置和MVC XML命名空间，这两个都提供了一个简单的起点，这假定你对Spring MVC的工作原理并不太了解。无论你选择如何配置应用程序，本节中介绍的概念都是基本的，应该对你有所帮助。
 
-## DispatcherServlet处理序列
+## DispatcherServlet处理顺序
 ***
 在你设置了一个DispatcherServlet并且针对该特定DispatcherServlet启动了一个请求后，DispatcherServlet将按如下所示开始处理请求：
 - WebApplicationContext被搜索和绑定到request上作为一个属性，这样控制器和其他元素在处理过程中可以使用。默认它被绑定到DispatcherServlet.WEB\_APPLICATION\_CONTEXT\_ATTRIBUTE这个key上。
 - 语言环境解析器被绑定到request上，这样使处理过程中的元素能够解析语言环境设置来在处理request时使用（渲染视图，准备数据等）。如果您不需要语言环境解析，则不需要它。
 - 主题解析器被绑定到request上，使元素（如视图）决定要使用哪个主题。如果不使用主题，可以忽略它。
 - 如果你指定了multiparts文件解析器，则会检查该request的multipart;如果找到multipart，request会被包装在一个MultipartHttpServletRequest中，以便处理过程中的其他元素进一步处理。有关multiparts处理的更多信息，请参见[第10节“Spring的multipart（文件上传）支持”](#Spring的multipart（文件上传）支持)。
-- 搜索适当的处理器。如果找到一个处理器，与处理器关联的执行链（预处理器，后处理器和控制器）被执行，以便准备 一个model或rendering。
+- 搜索适当的处理器。如果找到一个处理器，与处理器关联的执行链（预处理器，后处理器和控制器）被执行，以便准备一个model或rendering。
 - 如果返回一个modle，试图会被渲染。如果没有model返回，（可能是由于预处理器或后处理器基于安全原因拦截请求）则没有视图会被渲染，因为请求可能已经被完成了。
 
 处理器异常解析器被声明在WebApplicationContext中，它可以提取在处理请求的过程中抛出的异常。使用这些异常解析器使你可以定义自定义的行为来解决异常。
@@ -243,7 +258,7 @@ public class HelloWorldController {
 
 @Controller注解作为被注解的类的构造型，表明它的角色。dispatcher为了映射方法和自动探测@RequestMapping注解（请参阅下一节），扫描这些被注解类。
 
-你可以明确定义注解控制器bean，通过在dispatcher的上下文中使用标准的Spring bean定义。然而，@Controller模型还允许自动检测，这与Spring对在类路径中探测组件类和从他们中自动注册bena定义的支持对齐。
+你可以显示定义注解的控制器bean，通过在dispatcher的上下文中使用标准的Spring bean定义。然而，@Controller模型还允许自动检测，这与Spring对在类路径中探测组件类和从他们中自动注册bena定义的支持对齐。
 
 要开启对这样的注解控制器自动探测的支持，你要向你的配置中添加组件扫描。如下面XML片段那样使用spring-context schema：
 ```xml
@@ -386,7 +401,7 @@ public class AppointmentsController {
 在某些情况下，控制器可能需要在运行时用AOP代理进行装饰。一个例子是如果您选择在控制器上直接使用@Transactional注解。在这种情况下，对于控制器，我们建议使用基于类的代理。这通常是控制器的默认选择。但是，如果控制器必须实现不是Spring Context回调的接口（例如InitializingBean，*Aware等），你可能需要明确配置基于类的代理。例如，使用&lt;tx:annotation-driven/>，更改为&lt;tx:annotation-driven proxy-target-class =“true”/>。
 
 ### Spring MVC 3.1中对@RequestMapping方法的新支持类
-Spring 3.1为@RequestMapping方法引入了一组新的支持类，分别叫做RequestMappingHandlerMapping和RequestMappingHandlerAdapter。推荐使用它们，即使需要使用Spring MVC 3.1和未来版本的新功能。MVC命名空间和MVC Java配置默认启用这些新的支持类，但是如果你不使用，则必须明确配置。本节介绍旧支持类和新支持类之间的一些重要区别。
+Spring 3.1为@RequestMapping方法引入了一组新的支持类，分别叫做RequestMappingHandlerMapping和RequestMappingHandlerAdapter。推荐使用它们，即使需要使用Spring MVC 3.1和之后版本的新功能。MVC命名空间和MVC Java配置默认启用这些新的支持类，但是如果你不使用，则必须明确配置。本节介绍旧支持类和新支持类之间的一些重要区别。
 
 在Spring 3.1之前，类型和方法级请求映射在两个不同的阶段进行了检查— 首先由DefaultAnnotationHandlerMapping选择一个控制器，然后通过AnnotationMethodHandlerAdapter缩小实际方法调用范围。
 
@@ -598,6 +613,208 @@ public void addPet(@RequestBody Pet pet, Model model) {
     // 忽略实现
 }
 ```
+Consumable Media Types表达式也可以以!text/plain否定，以匹配除为text/plain的Content-Type 之外的所有请求。还要考虑使用MediaType中提供的常量，例如APPLICATION_JSON_VALUE和APPLICATION_JSON_UTF8_VALUE。
+
+> 在类型和方法级上支持consume条件。不想大多数其他条件，当用在类型级上，方法级consumable类型覆盖而不是拓展类型级consumable类型。
+
+### 可生产媒体类型
+您可以通过指定producible媒体类型列表来缩小主映射。只有当Accept请求头匹配这些值之一时，才会匹配该请求。此外，使用produce条件确保用于产生响应的实际内容类型与produce条件中指定的媒体类型相关。例如：
+```java
+@GetMapping(path = "/pets/{petId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@ResponseBody
+public Pet getPet(@PathVariable String petId, Model model) {
+    // 忽略实现
+}
+```
+
+> 请注意，在produce条件中指定的媒体类型还可以选择指定一个字符集。例如，在上面的代码片段中，我们指定与MappingJackson2HttpMessageConverter中配置的相同的媒体类型，包括UTF-8字符集。
+
+就像consumes一样，producible媒体类型表达式可以以!text/plain否定，以匹配除为text/plain的Accept之外的所有请求。还要考虑使用MediaType中提供的常量，例如APPLICATION_JSON_VALUE和APPLICATION_JSON_UTF8_VALUE。
+
+> 在类型和方法级上支持produces条件。不想大多数其他条件，当用在类型级上，方法级producible 类型覆盖而不是拓展类型级producible 类型。
+
+### 请求参数和请求头值
+你可以通过请求参数条件（如“myParam”，“!myParam”或​​“myParam=myValue”）缩小请求匹配。前两个测试请求参数存在/不存在，第三个为特定参数值。下面是一个请求参数值条件的例子：
+```java
+@Controller
+@RequestMapping("/owners/{ownerId}")
+public class RelativePathUriTemplateController {
+
+    @GetMapping(path = "/pets/{petId}", params = "myParam=myValue")
+    public void findPet(@PathVariable String ownerId, @PathVariable String petId, Model model) {
+        // implementation omitted
+    }
+
+}
+```
+这同样也可用于对于测试请求头存在/不存在或基于指定的请求头值来匹配
+```java
+@Controller
+@RequestMapping("/owners/{ownerId}")
+public class RelativePathUriTemplateController {
+
+    @GetMapping(path = "/pets", headers = "myHeader=myValue")
+    public void findPet(@PathVariable String ownerId, @PathVariable String petId, Model model) {
+        // implementation omitted
+    }
+
+}
+```
+
+> 虽然可以使用媒体类型通配符匹配Content-Type和Accept标头值（例如“content-type=text/\*”将匹配“text/plain”和“text/html”），但建议分别使用consumes和produces条件来代替。它们专门用于此目的。
+
+### HTTP HEAD和HTTP OPTIONS
+映射到“GET”的@RequestMapping方法也隐式映射到“HEAD”，即不需要明确声明“HEAD”。处理一个HTTP HEAD请求就和处理HTTP GET一样，除了它仅统计响应体的字节数，并且设置在"Content-Length" 响应头中，而不写入响应体。
+
+@RequestMapping方法内置支持HTTP OPTIONS。默认情况下，HTTP OPTIONS请求通过在HTTP方法（明确声明在所有与URL模式匹配的@RequestMapping方法上的）上设置“Allow”响应头来处理。当没有HTTP方法被显示声明“Allow”，头被设置为"GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"。理想地总是声明@RequestMapping方法要处理的HTTP方法，或者使用专用的组合的@RequestMapping变体之一（请参阅[“组合@RequestMapping变体”](#组合@RequestMapping变体)一节）。
+
+
+尽管不需要@RequestMapping方法可以映射到HTTP HEAD或HTTP OPTIONS，或同时两者。
+
+## 定义@RequestMapping处理器方法
+***
+@RequestMapping处理器方法可以有非常灵活的签名。支持的方法参数和返回值将在以下部分中介绍。大多数参数可以按任意顺序使用，唯一的例外是BindingResult参数。这将在下一节中介绍。
+
+> Spring 3.1分别为@RequestMapping方法引入了一组新的支持类，分别叫做RequestMappingHandlerMapping和RequestMappingHandlerAdapter推荐使用它们，即使需要使用Spring MVC 3.1和之后版本的新功能。MVC命名空间和MVC Java配置默认启用这些新的支持类，但是如果你不使用，则必须明确配置
+
+
+### 支持的方法参数类型
+以下是支持的方法参数类型：
+- Request或response对象（Servlet API）。选择任何特定的request或response类型，例如ServletRequest或HttpServletRequest。
+- Session对象（Servlet API）：类型为HttpSession。此类型的参数强制存在相应的session。因此，这样的论证从不为空。
+> Session访问可能不是线程安全的，特别在Servlet环境中。如果允许多个request同时访问session，请考虑将RequestMappingHandlerAdapter的“synchronizeOnSession”标志设置为“true”。
+
+- org.springframework.web.context.request.WebRequest或org.springframework.web.context.request.NativeWebRequest。允许通用请求参数访问以及request/session属性访问，与本地Servlet/Portlet API无关。
+- java.util.Locale——当前的请求语言环境，由最具体的语言环境解析器确定，实际上是在MVC环境中配置的LocaleResolver/LocaleContextResolver。
+- java.util.TimeZone(Java 6+)/java.time.ZoneId(Java 8)——当前请求相关联的时区，由LocaleContextResolver确定。
+- java.io.InputStream/java.io.Reader——访问请求的内容。该值是由Servlet API暴露的原生InputStream/Reader。
+- java.io.OutputStream/java.io.Writer——用于生成响应的内容。该值是由Servlet API暴露的原生 OutputStream/Writer。
+- org.springframework.http.HttpMethod——HTTP请求方法。
+- java.security.Principal——包含当前验证的用户
+- @PathVariable注解参数——用于访问URI模板变量。请参阅[“URI模板模式”](#URI模板模式)一节。
+- @MatrixVariable注解参数——用于访问位于URI路径段中的name-value对。请参阅[“矩阵变量”](#矩阵变量)一节。
+- @RequestParam注解参数——用于访问特定的Servlet请求参数。参数值将转换为声明的方法参数类型。请参阅[“使用@RequestParam绑定请求参数到方法参数”](#使用@RequestParam绑定请求参数到方法参数)一节。
+- @RequestHeader注解参数——用于访问特定的Servlet请求头。参数值将转换为声明的方法参数类型。请参阅[“使用@RequestHeader注解映射请求头属性”](#使用@RequestHeader注解映射请求头属性)一节。
+- @RequestBody注解参数——用于访问HTTP请求体。使用HttpMessageConverters将参数值转换为声明的方法参数类型。请参阅[“使用@RequestBody注解映射请求体”](#使用@RequestBody注解映射请求体)一节。
+- @RequestPart注解参数——用于访问“multipart/form-data”请求部分的内容。请参见[第10.5节“从程序化客户端处理文件上传请求”](#从程序化客户端处理文件上传请求)和[第10节“Spring的多部分（文件上传）支持”）](#Spring的多部分（文件上传）支持)。
+- @SessionAttribute注解参数——用于访问现有,永久的session属性（例如，用户认证对象），而不是通过@SessionAttributes作为控制器工作流程一部分临时存储在session中的model属性。
+- @RequestAttribute注解参数——用于访问请求属性。
+- HttpEntity&lt;?>参数——用于访问Servlet请求HTTP头和内容。请求流将使用HttpMessageConverters转换为实体。请参阅[“使用HttpEntity”](#使用HttpEntity)一节。
+- java.util.Map / org.springframework.ui.Model / org.springframework.ui.ModelMap——用于富化暴露给Web视图的隐式model。
+- org.springframework.web.servlet.mvc.support.RedirectAttributes在重定向情况下指定确切的属性集来使用，并且还添加flash属性（临时存储在服务器端的属性，使其在重定向之后可用于请求）。请参见(“将数据传递到重定向目标”](#将数据传递到重定向目标)一节和(第22.6节“使用flash属性”](#使用flash属性)一节。
+- 根据@InitBinder方法和/或HandlerAdapter配置，使用自定义的类型转换，命令或表单对象将请求参数绑定到bean属性（通过setter）或直接转到字段上。请参阅RequestMappingHandlerAdapter上的webBindingInitializer属性。默认情况下，这些命令对象及其验证结果将作为model属性公开，使用命令类名称-例如。对于“some.package.OrderAddress”类型的命令对象的model属性“orderAddress”。ModelAttribute注解可以用于方法参数来自定义所使用的model属性名称。
+- org.springframework.validation.Errors/org.springframework.validation.BindingResult验证前一个命令或表单对象的结果（即在前面的方法参数）。
+- org.springframework.web.bind.support.SessionStatus用于标记表单处理完成的状态处理，这会触发在处理器类型级别上由@SessionAttributes注解指示的session属性的清理。
+- org.springframework.web.util.UriComponentsBuilder——用于准备一个与当前请求的 host, port, scheme, context path以及servlet映射的文字部分相对的URL的构建器。
+
+Errors或BindingResult参数必须后跟正在绑定的model对象，因为方法签名可能有多个model对象，Spring将为每个model对象创建一个单独的BindingResult实例，因此以下示例将无法工作：
+
+**BindingResult和@ModelAttribute无效排序。**
+```java
+@PostMapping
+public String processSubmit(@ModelAttribute("pet") Pet pet, Model model, BindingResult result) { ... }
+```
+注意，在Pet和BindingResult之间有一个Model参数。要使其工作，你必须将参数按如下重新排序：
+```java
+@PostMapping
+public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result, Model model) { ... }
+```
+> JDK 1.8的java.util.Optional也被支持作为带有注解的方法参数类型，该注解有一个required属性（例如@RequestParam，@RequestHeader等）在这些情况下使用java.util.Optional相当于有有一个属性required = false。
+
+### 支持的方法返回类型
+以下是支持的方法返回类型：
+- 一个ModelAndView对象，带有使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化的model。
+- 一个Model对象，视图名称通过RequestToViewNameTranslator隐式确定，model使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化。
+- 用于暴露model的Map对象，视图名称通过RequestToViewNameTranslator隐式确定，model使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化。
+- 一个View对象，model通过命令对象和@ModelAttribute注解引用数据访问器方法隐式确定。这个处理器方法也可以通过声明一个Model参数（见上文）以编程方式富化model。
+- 一个String值，它被解释为逻辑视图名，model通过命令对象和@ModelAttribute注解引用数据访问器方法隐式确定。这个处理器方法也可以通过声明一个Model参数（见上文）以编程方式富化model。
+- void，如果方法自己处理响应（通过直接写入响应内容，为此目的声明一个ServletResponse/HttpServletResponse类型的参数）或者视图名称应该通过RequestToViewNameTranslator隐式确定（不在处理器方法签名中声明响应参数）。
+- 如果方法被@ResponseBody注解，返回的类型被写入到响应HTTP体中。返回值将使用HttpMessageConverters转换为声明的方法参数类型。请参阅[“使用@ResponseBody注解映射响应体”](#使用@ResponseBody注解映射响应体)一节。
+- 一个HttpEntity&lt;>或ResponseEntity&lt;>对象,以提供对Servlet响应HTTP头和内容的访问。实体将使用HttpMessageConverters转换为响应流。请参阅[“使用HttpEntity”](#使用HttpEntity)一节。
+- 一个HttpHeaders 对象，它返回没有响应体的响应。
+- 一个Callable&lt;?>，当应用程序想要在由Spring MVC管理的线程中异步生成返回值时，可以返回它。
+- 一个DeferredResult&lt;?>，当应用程序想从自己选择​​的线程生成返回值时，可以返回它。
+- 一个ListenableFuture&lt;?>或CompletableFuture&lt;?>/CompletionStage&lt;?>当应用程序想要从线程池提交中产生值时，可以返回它们
+- 一个ResponseBodyEmitter ，可以返回它以异步地将多个对象写入响应;也支持作为ResponseEntity内的主体。
+- 一个SseEmitter ，可以返回它以将异步的Server-Sent事件写入响应;也支持作为ResponseEntity内的主体。
+- 一个StreamingResponseBody ，可以返回它以异步写入响应OutputStream;;也支持作为ResponseEntity内的主体。
+- 任何其他返回类型都被认为是要暴露给视图的单个model属性，使用在方法级通过@ModelAttribute指定的属性名称（或基于返回类型类名的默认属性名称）。model使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化。
+
+### 使用@RequestParam将请求参数绑定到方法参数
+在控制器中使用@RequestParam注解将请求参数绑定到方法参数
+
+以下代码片段显示用法：
+```java
+@Controller
+@RequestMapping("/pets")
+@SessionAttributes("pet")
+public class EditPetForm {
+
+    // ...
+
+    @GetMapping
+    public String setupForm(@RequestParam("petId") int petId, ModelMap model) {
+        Pet pet = this.clinic.loadPet(petId);
+        model.addAttribute("pet", pet);
+        return "petForm";
+    }
+
+    // ...
+
+}
+```
+使用这个注解的参数默认是必须的，但是你可以通过设置@RequestParam的属性required为false来指定这个参数为可选（例如@RequestParam(name =“id”，required = false)）
+
+如果目标方法参数类型不是String，则会自动应用类型转换。请参阅[“方法参数和类型转换”](#方法参数和类型转换)一节。
+
+当在Map&lt;String,String>或MultiValueMap&lt;String,String>参数上使用@RequestParam注解时，映射将填充所有请求参数。
+
+### 使用@RequestBody注解映射请求体
+@RequestBody方法参数注解表示方法参数应绑定到HTTP请求体的值上。例如：
+```java
+@PutMapping("/something")
+public void handle(@RequestBody String body, Writer writer) throws IOException {
+    writer.write(body);
+}
+```
+你通过使用HttpMessageConverter将请求体转换为方法参数。HttpMessageConverter负责将HTTP请求消息转换为对象，并从对象转换为HTTP响应体。RequestMappingHandlerAdapter支持带有以下默认HttpMessageConverters的@RequestBody注解：
+- ByteArrayHttpMessageConverter转换字节数组。
+- StringHttpMessageConverter转换字符串。
+- FormHttpMessageConverter将表单数据从/到 MultiValueMap<String, String>转换。
+- SourceHttpMessageConverter与javax.xml.transform.Source互相转换。
+
+有关这些转换器的更多信息，请参阅[”消息转换器”](#消息转换器)。另请注意，如果使用MVC命名空间或MVC Java配置，默认情况下会注册更广泛的消息转换器。有关详细信息，请参见[第16.1节“启用MVC Java配置或MVC XML命名空间”](#启用MVC Java配置或MVC XML命名空间)。
+
+如果您打算读写XML，则需要使用org.springframework.oxm包中的具体的Marshaller和Unmarshaller实现配置MarshallingHttpMessageConverter。下面的示例显示了如何直接在配置中执行此操作，但是如果您的应用程序通过MVC命名空间或MVC Java配置进行配置，请参阅[第16.1节“启用MVC Java配置或MVC XML命名空间”](#启用MVC Java配置或MVC XML命名空间)。
+```xml
+<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+    <property name="messageConverters">
+        <util:list id="beanList">
+            <ref bean="stringHttpMessageConverter"/>
+            <ref bean="marshallingHttpMessageConverter"/>
+        </util:list>
+    </property
+</bean>
+
+<bean id="stringHttpMessageConverter"
+        class="org.springframework.http.converter.StringHttpMessageConverter"/>
+
+<bean id="marshallingHttpMessageConverter"
+        class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+    <property name="marshaller" ref="castorMarshaller"/>
+    <property name="unmarshaller" ref="castorMarshaller"/>
+</bean>
+
+<bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller"/>
+```
+@RequestBody方法参数可以使用@Valid注解，在这种情况下，它将使用配置的Validator实例进行验证。当使用MVC命名空间或MVC Java配置时，会自动配置一个JSR-303验证器，假设在类路径上有可用的JSR-303实现。
+
+就像@ModelAttribute参数一样，可以使用一个Errors参数来检查错误。如果未声明此类参数，则将引发MethodArgumentNotValidException异常。这个异常在DefaultHandlerExceptionResolver中处理，它将向客户端发送一个400错误。
+
+> 有关通过MVC命名空间或MVC Java配置配置消息转换器和验证器的信息，请参见[第16.1节“启用MVC Java配置或MVC XML命名空间”](#启用MVC Java配置或MVC XML命名空间)。
+
+### 使用@ResponseBody注解映射响应体
+
 
 
 
