@@ -22,7 +22,7 @@ Spring Web模型-视图-控制器（MVC）框架是围绕一个DispatcherServlet
 <div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">“开放扩展...”在Spring Web MVC和Spring中的一个关键设计原则是“开放扩展，关闭修改”原则。<br/>
 Spring Web MVC的核心类中的一些方法被标记为final。作为开发人员，您不能覆盖这些方法来提供自己的行为。这并不是随意设计的，而是特别考虑到这个原则。<br/>
 有关这个原理的解释，请参考Seth Ladd的Expert Spring Web MVC和Web Flow;具体参见第一版第117页的“A Look At Design”一节。或者，参见
-- [Bob Martin, The Open-Closed Principle (PDF)](https://www.cs.duke.edu/courses/fall07/cps108/papers/ocp.pdf)<br/>
+[Bob Martin, The Open-Closed Principle (PDF)](https://www.cs.duke.edu/courses/fall07/cps108/papers/ocp.pdf)
 当您使用Spring MVC时，您不能向final方法添加advice 。例如，您不能向AbstractController.setSynchronizeOnSession()方法添加advice 。有关AOP代理的更多信息，以及为什么不能向final方法添加advice ，请参阅第11.6.1节“[了解AOP代理”](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#aop-understanding-aop-proxies)。
 </div> 
 在Spring Web MVC中，您可以使用任何对象作为命令或表单支持对象;您不需要实现框架特定的接口或基类。Spring的数据绑定时高度灵活的：例如，它将类型不匹配视为可由应用程序评估的验证错误，而不是系统错误。因此，你不需要将你的业务对象的属性复制为简单的无类型的字符串，仅用于处理无效提交，或者用于正确转换字符串。相反，它通常最好直接绑定到您的业务对象。
@@ -392,4 +392,216 @@ Spring 3.1为@RequestMapping方法引入了一组新的支持类，分别叫做R
 
 使用Spring 3.1中的新支持类，RequestMappingHandlerMapping是唯一可以决定哪个方法应该处理请求的地方。将这些控制器方法视为映射每个由类型和方法级@RequestMapping信息派生的方法的唯一端点集合。
 
-这开启了一些新的可能性。
+这开启了一些新的可能性。一旦一个HandlerInterceptor或HandlerExceptionResolver现在可以期望基于对象的处理器作为HandlerMethod，这就允许他们检查确切的方法，其参数和相关注解。URL的处理就不再需要跨不同的控制器进行拆分。
+
+还有几件事情已经不复存在了：
+- 首先使用SimpleUrlHandlerMapping或BeanNameUrlHandlerMapping选择控制器，然后基于@RequestMapping注解来缩小方法。
+- 依靠方法名称作为一种回退机制，以消除两个没有映射URL路径的明确路径，但是其他方面匹配（例如HTTP方法）的@RequestMapping方法之间的歧义。在新的支持类中，@RequestMapping方法必须被唯一地映射。
+- 如果没有其他控制器方法更具体地匹配，有一个单个默认方法（没有显示的路径映射）处理请求。在新的支持类中，如果一个匹配的方法没有找到，就会产生一个404错误。
+
+上面这些功能依旧被现有支持类支持。不过要利用新的Spring MVC 3.1功能，你需要使用新的支持类。
+
+### URI模板
+可以使用URI模板方便地访问@RequestMapping方法中URL的所选部分
+
+URI模板是一个类似URI的字符串，包含一个或多个变量名称。当你为这些变量替换值时，模板就变成了一个URI。URI模板的提议RFC定义了一个URI如何被参数化。例如，URI模板http://www.example.com/users/{userId}包含变量userId。将fred的值分配给变量会得到http://www.example.com/users/fred。
+
+在Spring MVC你可以在一个方法参数上使用@PathVariable注解来绑定它到URI模板变量的值上：
+```java
+@GetMapping("/owners/{ownerId}")
+public String findOwner(@PathVariable String ownerId, Model model) {
+    Owner owner = ownerService.findOwner(ownerId);
+    model.addAttribute("owner", owner);
+    return "displayOwner";
+}
+```
+URI模板 " /owners/{ownerId}`"指定了变量名称为'owenerId'。当控制器处理这个请求时，ownerId的值设置为在URI的适当部分中找到的值。例如，当进来一个/owner /fred请求时，ownerId的值为fred。
+
+> 要处理@PathVariable注解，Spring MVC需要按名称找到匹配的URI模板变量。你可以在注解中指定它。
+```java
+@GetMapping("/owners/{ownerId}")
+public String findOwner(@PathVariable("ownerId") String theOwner, Model model) {
+    // 忽略实现
+}
+```
+或者如果URI模板变量名称与方法参数名称匹配，则可以省略该详细信息。只要您的代码使用调试信息或Java 8上的-parameters编译器标记进行编译，Spring MVC会将方法参数雨URI模板变量名称进行匹配：
+```java
+@GetMapping("/owners/{ownerId}")
+public String findOwner(@PathVariable String ownerId, Model model) {
+    // 忽略实现
+}
+```
+
+一个方法可以有任意数量的@PathVariable注解：
+```java
+@GetMapping("/owners/{ownerId}/pets/{petId}")
+public String findPet(@PathVariable String ownerId, @PathVariable String petId, Model model) {
+    Owner owner = ownerService.findOwner(ownerId);
+    Pet pet = owner.getPet(petId);
+    model.addAttribute("pet", pet);
+    return "displayPet";
+}
+```
+当在Map&lt;String，String>参数上使用@PathVariable注解时，map会被填充上所有URI模板变量。
+
+URI模板可以从类型和方法级@RequestMapping注解中进行组合。因此，可以使用/owner/42/pets/21等URL调用findPet()方法。
+```java
+@Controller
+@RequestMapping("/owners/{ownerId}")
+public class RelativePathUriTemplateController {
+
+    @RequestMapping("/pets/{petId}")
+    public void findPet(@PathVariable String ownerId, @PathVariable String petId, Model model) {
+        // implementation omitted
+    }
+
+}
+```
+@PathVariable参数可以是任何简单的类型，如int，long，Date等。Spring会自动转换为适当的类型或抛出TypeMismatchException异常,如果Spring转换失败的话。您还可以注册解析其他数据类型的支持。请参见[“方法参数和类型转换”](#方法参数和类型转换)一节以及[“自定义WebDataBinder初始化”](#自定义WebDataBinder初始化)一节。
+
+### 使用正则表达式的URI模板模式
+有时你需要更精确地定义URI模板变量。考虑URL“/spring-web/spring-web-3.0.5.jar”。你怎么把它分解成多个部分？
+
+@RequestMapping注解支持在URI模板变量中使用正则表达式。语法是{varName:regex}，其中第一部分定义了变量名，第二部分定义了正则表达式。例如：
+```java
+@RequestMapping("/spring-web/{symbolicName:[a-z-]+}-{version:\\d\\.\\d\\.\\d}{extension:\\.[a-z]+}")
+public void handle(@PathVariable String version, @PathVariable String extension) {
+    // ...
+}
+```
+### 路径模式
+除了URI模板，@RequestMapping注解和所有的@RequestMapping变体还支持Ant风格的路径模式（例如/myPath/\*.do）。还支持URI模板变量和Ant-style glob的组合（例如/ owners / \* / pets / {petId}）。
+
+### 路径模式比较
+当一个URL匹配多个模式时，使用排序来查找最具体的匹配。
+
+具有较低数量的URI变量和通配符的模式被认为更具体。例如/hotels/{hotel}/\*有一个URI变量和一个通配符，它被认为比有一个URI变量和两个通配符的/hotels/{hotel}/\*\*更具体。
+
+如果两个模式有相同的数量，那么更长的那个被认为更具体。例如，/foo/bar\*比/foo/\*更长，因此也被认为更具体。
+
+当两个模式有相同的数量和长度，那么有更少通配符的会被认为更具体。例如/hotels/{hotel}比/hotels/\*更具体。
+
+还有一些额外的特殊规则：
+- **默认的映射模式**/\*\* 比任何其他模式都更不具体。相比下/api/{a}/{b}/{c}更具体。
+- **前缀模式**例如/public/\*\*比任何其他不包含双通配符的模式都更不具体。例如相比下/public/path3/{a}/{b}/{c}更具体。
+
+有关详细信息，请参阅AntPathMatcher中的AntPatternComparator。注意，PathMatcher可以进行自定义（参见章节16.11“配置Spring MVC”中的[第16.11节“路径匹配”](#路径匹配)）。
+
+### 有占位符的路径模式
+@RequestMapping注解中的模式支持对本地属性和/或系统属性和环境变量的$ {...}占位符。在一个控制器需要映射的路径可能需要通过配置自定义的情况下，这很有用。关于占位符的更多信息，请参阅PropertyPlaceholderConfigurer类的javadocs 。
+
+### 后缀模式匹配
+默认情况下，Spring MVC执行“.\*”后缀模式匹配，以便映射到/person的控制器也隐式映射到/person.\*上。这使得通过URL路径可以轻松地请求资源的不同表示（例如/person.pdf，/person.xml）。
+
+后缀模式匹配可以关闭或限制为一组明确注册用于内容协商的路径扩展。通常建议通过诸如/person/{id}之类的普通请求映射来减少歧义，这里其中的点可能不表示文件扩展名，例如/person/joe@email.com vs /person/joe@email.com.json。此外，如下面的注释中所说明的，后缀模式匹配以及内容协商可能在某些情况下被用于尝试恶意攻击，因此有充分的理由有意义地限制它们。
+
+对于后缀模式匹配请参见[第16.11，“路径匹配”](#路径匹配),对于内容协商配置请参见[第16.6，“内容协商”](#内容协商)。
+
+### 后缀模式匹配和RFD
+Trustwave在2014年的论文中首次描述了反射文件下载 — Reflected file download（RFD）攻击。攻击类似于XSS，因为它依靠在响应中反映的输入（例如查询参数，URI变量）。然而，相比将JavaScript插入到HTML中，RFD攻击依赖浏览器切换为之行一个下载或者酱响应视为一个可执行脚本，如果如果根据文件扩展名双击（例如.bat，.cmd）的话。
+
+在Spring MVC中@ResponseBody和ResponseEntity方法存在风险，因为它们可以呈现不同的内容类型，客户端可以通过URL路径拓展请求包含它们。但是请注意，禁用后缀模式匹配或禁用仅用于内容协商的路径扩展都可以有效地防止RFD攻击。
+
+为了全面防范RFD，在渲染响应体之前，Spring MVC添加了一个Content-Disposition:inline;filename=f.txt头来建议一个固定和安全的下载文件文件名。但只有当URL路径包含一个既不在白名单中，也不是用于内容协商的目的而注册的文件扩展名，才会这么做。然而，当URL直接输入浏览器时，这可能会产生一个副作用。
+
+许多常见的路径扩展名默认为白名单。此外，REST API调用通常在浏览器中不是直接用作URL。然而，使用自定义HttpMessageConverter实现的应用程序可以明确地注册用于内容协商的文件扩展名，并且不会为此类扩展添加Content-Disposition头。见[第16.6节“内容协商”](#内容协商)。
+
+> 这是CVE-2015-5211工作的一部分。以下是报告中的其他建议：
+- 编码而不是转义JSON响应。这也是OWASP XSS的建议。有关Spring的例子，请参阅[spring-jackson-owasp](#https://github.com/rwinch/spring-jackson-owasp)。
+- 将后缀模式匹配配置为关闭或仅限于明确注册的后缀。
+- 使用将属性“useJaf”和“ignoreUnknownPathExtensions”设置为false来配置内容协商，这会对带有未知拓展名的URL响应一个406错误。如果URL自然希望在最后有一个点的话，这可能不是一个选择。
+- 添加X-Content-Type-Options: nosniff头到响应。 Spring Security 4默认情况下执行此操作。
+
+### 矩阵变量
+URI规范RFC 3986定义了在路径片段中包含name-value对的可能性。规范中没有使用特定的术语。一般的“URI路径参数”可能适用，尽管来自Tim Berners-Lee的旧帖子的更独特的“Matrix URI”也经常被使用并且是相当熟知的。在Spring MVC中，这些被称为矩阵变量（Matrix Variables）。
+
+矩阵变量可以出现在任何路径段中，每个矩阵变量用“;”（分号）分隔。例如：“/cars;color=red;year=2012”。多个值可以是“,”（逗号）分隔“color=red,green,blue”，或者变量名称可以重复“color=red; color=green; color=blue”。
+
+如果URL期望包含矩阵变量，则请求映射模式必须使用URI模板来表示它们。这确保了请求可以正确匹配，无论矩阵变量是否存在，以及它们以什么顺序提供。
+
+以下是提取矩阵变量“q”的示例：
+```java
+// GET /pets/42;q=11;r=22
+
+@GetMapping("/pets/{petId}")
+public void findPet(@PathVariable String petId, @MatrixVariable int q) {
+
+    // petId == 42
+    // q == 11
+
+}
+```
+由于所有路径段都可能包含矩阵变量，因此在某些情况下，您需要更具体地确定变量预期位于何处：
+```java
+// GET /owners/42;q=11/pets/21;q=22
+
+@GetMapping("/owners/{ownerId}/pets/{petId}")
+public void findPet(
+        @MatrixVariable(name="q", pathVar="ownerId") int q1,
+        @MatrixVariable(name="q", pathVar="petId") int q2) {
+
+    // q1 == 11
+    // q2 == 22
+
+}
+```
+矩阵变量可以定义为可选参数，并指定一个默认值：
+```java
+// GET /pets/42
+
+@GetMapping("/pets/{petId}")
+public void findPet(@MatrixVariable(required=false, defaultValue="1") int q) {
+
+    // q == 1
+
+}
+```
+所有矩阵变量可以在Map中获得：
+```java
+// GET /owners/42;q=11;r=12/pets/21;q=22;s=23
+
+@GetMapping("/owners/{ownerId}/pets/{petId}")
+public void findPet(
+        @MatrixVariable MultiValueMap<String, String> matrixVars,
+        @MatrixVariable(pathVar="petId"") MultiValueMap<String, String> petMatrixVars) {
+
+    // matrixVars: ["q" : [11,22], "r" : 12, "s" : 23]
+    // petMatrixVars: ["q" : 11, "s" : 23]
+
+}
+```
+请注意，为了使用矩阵变量，必须将RequestMappingHandlerMapping的removeSemicolonContent属性设置为false。默认设置为true。
+> MVC Java配置和MVC命名空间都提供了使用矩阵变量的选项。
+如果您使用Java配置，[使用MVC Java Config进行高级自定义](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#mvc-config-advanced-java)部分将介绍如何自定义RequestMappingHandlerMapping。    
+在MVC命名空间中，&lt;mvc:annotation-driven>元素有enable-matrix-variables属性,它应该被设置为true。默认情况下它被设置为false。 
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <mvc:annotation-driven enable-matrix-variables="true"/>
+
+</beans>
+```
+
+### Consumable Media Types
+您可以通过指定Consumable Media Types的列表来缩小主要映射。只有当Content-Type请求头与指定的媒体类型匹配时，才会匹配该请求。例如：
+```java
+@PostMapping(path = "/pets", consumes = "application/json")
+public void addPet(@RequestBody Pet pet, Model model) {
+    // 忽略实现
+}
+```
+
+
+
+
+
+
+
