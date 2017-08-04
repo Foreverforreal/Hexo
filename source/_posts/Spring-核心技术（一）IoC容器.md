@@ -7,6 +7,17 @@ categories:
   - Spring
 date: 2017-07-25 21:17:00
 ---
+strong {
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1px 3px 0;
+    text-shadow: none;
+    white-space: nowrap;
+	color: #6d180b;
+	font-weight: normal;
+}
+
 [原文链接](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#beans)
 ***
 # Spring IoC容器和bean介绍
