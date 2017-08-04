@@ -432,7 +432,7 @@ Spring 3.1为@RequestMapping方法引入了一组新的支持类，分别叫做R
 ### URI模板
 可以使用URI模板方便地访问@RequestMapping方法中URL的所选部分
 
-URI模板是一个类似URI的字符串，包含一个或多个变量名称。当你为这些变量替换值时，模板就变成了一个URI。URI模板的提议RFC定义了一个URI如何被参数化。例如，URI模板http://www.example.com/users/{userId}包含变量userId。将fred的值分配给变量会得到http://www.example.com/users/fred。
+URI模板是一个类似URI的字符串，包含一个或多个变量名称。当你为这些变量替换值时，模板就变成了一个URI。URI模板的提议RFC定义了一个URI如何被参数化。例如，URI模板{%raw%}http://www.example.com/users/{userId} {%endraw%} 包含变量userId。如果将fred值分配给变量会得到{%raw%}http://www.example.com/users/fred{%endraw%} 。
 
 在Spring MVC你可以在一个方法参数上使用@PathVariable注解来绑定它到URI模板变量的值上：
 ```java
@@ -443,7 +443,7 @@ public String findOwner(@PathVariable String ownerId, Model model) {
     return "displayOwner";
 }
 ```
-URI模板 "/owners/{ownerId}"指定了变量名称为'owenerId'。当控制器处理这个请求时，ownerId的值设置为在URI的适当部分中找到的值。例如，当进来一个/owner /fred请求时，ownerId的值为fred。
+URI模板 "/owners/{ownerId}"指定了变量名称为'owenerId'。当控制器处理这个请求时，会用在URI的适当部分中找到的值，来设置ownerId的值。例如，当进来一个 /owner/fred 请求时，ownerId的值为fred。
 
 > 要处理@PathVariable注解，Spring MVC需要按名称找到匹配的URI模板变量。你可以在注解中指定它。
 ```java
@@ -452,7 +452,7 @@ public String findOwner(@PathVariable("ownerId") String theOwner, Model model) {
     // 忽略实现
 }
 ```
-或者如果URI模板变量名称与方法参数名称匹配，则可以省略该详细信息。只要您的代码使用调试信息或Java 8上的-parameters编译器标记进行编译，Spring MVC会将方法参数雨URI模板变量名称进行匹配：
+或者如果URI模板变量名称与方法参数名称匹配，则可以省略该详细信息。只要您的代码使用调试信息或Java 8上的-parameters编译器标记进行编译，Spring MVC会将方法参数与URI模板变量名称进行匹配：
 ```java
 @GetMapping("/owners/{ownerId}")
 public String findOwner(@PathVariable String ownerId, Model model) {
@@ -498,7 +498,7 @@ public void handle(@PathVariable String version, @PathVariable String extension)
 }
 ```
 ### 路径模式
-除了URI模板，@RequestMapping注解和所有的@RequestMapping变体还支持Ant风格的路径模式（例如/myPath/\*.do）。还支持URI模板变量和Ant-style glob的组合（例如/ owners / \* / pets / {petId}）。
+除了URI模板，@RequestMapping注解和所有的@RequestMapping变体还支持Ant风格的路径模式（例如/myPath/\*.do）。还支持URI模板变量和Ant-style glob的组合（例如/owners/ \* /pets/{petId}）。
 
 ### 路径模式比较
 当一个URL匹配多个模式时，使用排序来查找最具体的匹配。
@@ -510,8 +510,8 @@ public void handle(@PathVariable String version, @PathVariable String extension)
 当两个模式有相同的数量和长度，那么有更少通配符的会被认为更具体。例如/hotels/{hotel}比/hotels/\*更具体。
 
 还有一些额外的特殊规则：
-- **默认的映射模式**/\*\* 比任何其他模式都更不具体。相比下/api/{a}/{b}/{c}更具体。
-- **前缀模式**例如/public/\*\*比任何其他不包含双通配符的模式都更不具体。例如相比下/public/path3/{a}/{b}/{c}更具体。
+- **默认的映射模式**——/\*\* 比任何其他模式都更不具体。相比下/api/{a}/{b}/{c}更具体。
+- **前缀模式**——例如/public/\*\*比任何其他不包含双通配符的模式都更不具体。例如相比下/public/path3/{a}/{b}/{c}更具体。
 
 有关详细信息，请参阅AntPathMatcher中的AntPatternComparator。注意，PathMatcher可以进行自定义（参见章节16.11“配置Spring MVC”中的[第16.11节“路径匹配”](#路径匹配)）。
 
@@ -521,7 +521,7 @@ public void handle(@PathVariable String version, @PathVariable String extension)
 ### 后缀模式匹配
 默认情况下，Spring MVC执行“.\*”后缀模式匹配，以便映射到/person的控制器也隐式映射到/person.\*上。这使得通过URL路径可以轻松地请求资源的不同表示（例如/person.pdf，/person.xml）。
 
-后缀模式匹配可以关闭或限制为一组明确注册用于内容协商的路径扩展。通常建议通过诸如/person/{id}之类的普通请求映射来减少歧义，这里其中的点可能不表示文件扩展名，例如/person/joe@email.com vs /person/joe@email.com.json。此外，如下面的注释中所说明的，后缀模式匹配以及内容协商可能在某些情况下被用于尝试恶意攻击，因此有充分的理由有意义地限制它们。
+后缀模式匹配可以关闭或限制为一组明确注册用于内容协商的路径扩展。通常建议通过使用诸如/person/{id}之类的普通请求映射来减少歧义，这里其中的点可能不表示文件扩展名，例如/person/joe@email.com vs /person/joe@email.com.json。此外，如下面的注释中所说明的，后缀模式匹配以及内容协商可能在某些情况下被用于尝试恶意攻击，因此有充分的理由有意义地限制它们。
 
 对于后缀模式匹配请参见[第16.11，“路径匹配”](#路径匹配),对于内容协商配置请参见[第16.6，“内容协商”](#内容协商)。
 
@@ -710,17 +710,17 @@ public class RelativePathUriTemplateController {
 - **@RequestHeader**注解参数——用于访问特定的Servlet请求头。参数值将转换为声明的方法参数类型。请参阅[“使用@RequestHeader注解映射请求头属性”](#使用@RequestHeader注解映射请求头属性)一节。
 - **@RequestBody**注解参数——用于访问HTTP请求体。使用HttpMessageConverters将参数值转换为声明的方法参数类型。请参阅[“使用@RequestBody注解映射请求体”](#使用@RequestBody注解映射请求体)一节。
 - **@RequestPart**注解参数——用于访问“multipart/form-data”请求部分的内容。请参见[第10.5节“从程序化客户端处理文件上传请求”](#从程序化客户端处理文件上传请求)和[第10节“Spring的多部分（文件上传）支持”）](#Spring的多部分（文件上传）支持)。
-- **@SessionAttribute**注解参数——用于访问现有,永久的session属性（例如，用户认证对象），而不是通过@SessionAttributes作为控制器工作流程一部分临时存储在session中的model属性。
+- **@SessionAttribute**注解参数——用于访问现有,永久的session属性（例如，用户认证对象），而不是访问作为控制器工作流程一部分通过@SessionAttributes临时存储在session中的model属性。
 - **@RequestAttribute**注解参数——用于访问请求属性。
 - **HttpEntity&lt;?>**参数——用于访问Servlet请求HTTP头和内容。请求流将使用HttpMessageConverters转换为实体。请参阅[“使用HttpEntity”](#使用HttpEntity)一节。
 - **java.util.Map** / **org.springframework.ui.Model** / **org.springframework.ui.ModelMap**——用于富化暴露给Web视图的隐式model。
 - **org.springframework.web.servlet.mvc.support.RedirectAttributes**在重定向情况下指定确切的属性集来使用，并且还添加flash属性（临时存储在服务器端的属性，使其在重定向之后可用于请求）。请参见(“将数据传递到重定向目标”](#将数据传递到重定向目标)一节和(第22.6节“使用flash属性”](#使用flash属性)一节。
 - 根据**@InitBinder**方法和/或**HandlerAdapter**配置，使用自定义的类型转换，命令或表单对象将请求参数绑定到bean属性（通过setter）或直接转到字段上。请参阅**RequestMappingHandlerAdapter**上的**webBindingInitializer**属性。默认情况下，这些命令对象及其验证结果将作为model属性公开，使用命令类名称-例如。对于“some.package.OrderAddress”类型的命令对象的model属性“orderAddress”。**ModelAttribute**注解可以用于方法参数来自定义所使用的model属性名称。
-- **org.springframework.validation.Errors/org.springframework.validation.BindingResult**验证前一个命令或表单对象的结果（即在前面的方法参数）。
+- **org.springframework.validation.Errors/org.springframework.validation.BindingResult**验证前面的命令或表单对象的结果（即在前面的方法参数）。
 - **org.springframework.web.bind.support.SessionStatus**用于标记表单处理完成的状态处理，这会触发在处理器类型级别上由@SessionAttributes注解指示的session属性的清理。
 - **org.springframework.web.util.UriComponentsBuilder**——用于准备一个与当前请求的 host, port, scheme, context path以及servlet映射的文字部分相对的URL的构建器。
 
-Errors或BindingResult参数必须后跟正在绑定的model对象，因为方法签名可能有多个model对象，Spring将为每个model对象创建一个单独的BindingResult实例，因此以下示例将无法工作：
+Errors或BindingResult参数必须跟在被绑定的模型对象后，因为方法签名可能有多个模型对象，Spring将为每个模型对象创建一个单独的BindingResult实例，因此以下示例将无法工作：
 
 *BindingResult和@ModelAttribute无效排序。*
 ```java
@@ -871,7 +871,7 @@ public ResponseEntity<String> handle(HttpEntity<byte[]> requestEntity) throws Un
 在方法上的@ModelAttribute表示该方法的目的是添加一个或多个Model属性。这样的方法支持与@RequestMapping方法相同的参数类型，但不能直接映射到请求上。在同一个控制器中，控制器中的@ModelAttribute方法在@RequestMapping方法之前被调用。几个例子：
 ```java
 // 添加一个属性
-// The return value of the method is added to the model under the name "account"
+// 方法的返回值类型会被在”account“名称下添加到model中
 // 你可以通过@ModelAttribute（“myAccount”）自定义名称
 
 @ModelAttribute
@@ -902,7 +902,7 @@ public void populateModel(@RequestParam String number, Model model) {
 ### 在方法参数上使用@ModelAttribute
 如上一节所述，@ModelAttribute可以在方法或方法参数上使用。本节介绍了其在方法参数中的用法。
 
-方法参数上的@ModelAttribute表示这个参数应该从model中检索。如果model中不存在，参数首先被实例化，然后添加到model中。一旦model中存在，这个参数字段回从所有名称相匹配的请求参数中填充。这在Spring MVC中被称为的数据绑定，这是一个非常有用的机制，可以节省您逐个解析每个表单字段时间。
+方法参数上的@ModelAttribute表示这个参数应该从model中检索。如果model中不存在，参数首先被实例化，然后添加到model中。一旦model中存在，这个参数字段会从所有名称相匹配的请求参数中填充。这在Spring MVC中被称为的数据绑定，这是一个非常有用的机制，可以节省您逐个解析每个表单字段时间。
 ```java
 @PostMapping("/owners/{ownerId}/pets/{petId}/edit")
 public String processSubmit(@ModelAttribute Pet pet) { }
@@ -913,9 +913,183 @@ public String processSubmit(@ModelAttribute Pet pet) { }
 - 它可以基于URI模板变量和类型转换器（下面更详细地解释）来检索。
 - 它可以使用其默认构造函数实例化。
 
+@ModelAttribute方法是从数据库检索属性的常用方式，可以通过使用@SessionAttributes来选择性地存储在请求之间。在某些情况下，通过使用URI模板变量和类型转换器来检索属性可能很方便。这是一个例子：
+```java
+@PutMapping("/accounts/{account}")
+public String save(@ModelAttribute("account") Account account) {
+    // ...
+}
+```
+在此示例中，model属性（即“account”）的名称与URI模板变量的名称相匹配。如果你注册可以将String类型的account值转换为Account实例的Converter&lt;String,Account>，那么上面的例子不需要一个@ModelAttribute方法也可以工作。
 
+下一步是数据绑定。WebDataBinder类按照名称将请求参数名称（包括查询字符串参数和表单字段）匹配到model属性字段上。匹配的字段在必要的类型转换（从String到目标字段类型）应用后被填充。数据绑定和验证在第9章”验证，数据绑定，和类型转换“中一经介绍。自定义控制器级别的数据绑定过程将在[“自定义WebDataBinder初始化”](#自定义WebDataBinder初始化)一节中介绍。
 
+数据绑定可能会出现错误，比如缺少必须字段或类型转换错误。要检查这样的错误，，请在@ModelAttribute参数之后立即添加BindingResult参数：
+```java
+@PostMapping("/owners/{ownerId}/pets/{petId}/edit")
+public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result) {
 
+    if (result.hasErrors()) {
+        return "petForm";
+    }
 
+    // ...
 
+}
+```
+使用BindingResult可以检查是否发现错误，在通常呈现相同表单的情况吓,这里可以在Spring的&lt;errors>表单标签的帮助下显示错误。
 
+注意，在某些情况下，不使用数据绑定来获取访问modle中的属性可能是有用的。对于这种情况，您可以将**Model**注入控制器，或者作为选择的在注解上使用**binding**标志：
+```java
+@ModelAttribute
+public AccountForm setUpForm() {
+    return new AccountForm();
+}
+
+@ModelAttribute
+public Account findAccount(@PathVariable String accountId) {
+    return accountRepository.findOne(accountId);
+}
+
+@PostMapping("update")
+public String update(@Valid AccountUpdateForm form, BindingResult result,
+        @ModelAttribute(binding=false) Account account) {
+
+    // ...
+}
+```
+除了数据绑定之外，你还可以使用你自己的自定义验证器传递相同的用于记录数据绑定错误的BindingResult来调用验证。这允许数据绑定和验证的错误在同一个地方累积，并随后向用户报告：
+```java
+@PostMapping("/owners/{ownerId}/pets/{petId}/edit")
+public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result) {
+
+    new PetValidator().validate(pet, result);
+    if (result.hasErrors()) {
+        return "petForm";
+    }
+
+    // ...
+
+}
+```
+或者您可以通过添加JSR-303 @Valid注解来自动调用验证：
+```java
+@PostMapping("/owners/{ownerId}/pets/{petId}/edit")
+public String processSubmit(@Valid @ModelAttribute("pet") Pet pet, BindingResult result) {
+
+    if (result.hasErrors()) {
+        return "petForm";
+    }
+
+    // ...
+
+}
+```
+有关如何配置和使用验证的详细信息，请参见第9.8节[“Spring验证”](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#validation-beanvalidation)和[第9章“验证，数据绑定和类型转换“](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#validation)。
+
+### 使用@SessionAttributes在请求之间的HTTP session中存储model属性
+类型级@SessionAttributes注解声明指定处理器使用的session属性。这通常将列出model属性名称或模型属性的类型，这些模型属性或类型应该透明地存储在会话或某些会话存储中，作为后续请求之间的表单支持bean。
+
+下面的代码片段展示了这个注解的用法，指定model属性名称：
+```java
+@Controller
+@RequestMapping("/editPet.do")
+@SessionAttributes("pet")
+public class EditPetForm {
+    // ...
+}
+```
+### 使用@SessionAttribute访问预先存在的全局session属性
+如果您需要访问全局管理的预先存在的session属性，即控制器之外的（如一个过滤器），并且它可能或不存在，则可以在方法参数上使用@SessionAttribute注解：
+```java
+@RequestMapping("/")
+public String handle(@SessionAttribute User user) {
+    // ...
+}
+```
+对于需要添加或删除session属性的用例，请考虑将**org.springframework.web.context.request.WebRequest**或**javax.servlet.http.HttpSession**注入到控制器方法中。
+
+对于作为控制器工作流程中的一部分，临时存储在session中的model属性，请考虑使用SessionAttributes，如上面“使用@SessionAttributes在请求之间的HTTP session中存储model属性”一节中所述。
+
+### 使用@RequestAttribute来访问请求属性
+与@SessionAttribute类似，@RequestAttribute注解可用于访问由过滤器或拦截器创建的预先存在的请求属性：
+```java
+@RequestMapping("/")
+public String handle(@RequestAttribute Client client) {
+    // ...
+}
+```
+
+### 使用“application/x-www-form-urlencoded”数据
+前面的部分介绍了使用@ModelAttribute来支持来自浏览器客户端的表单提交请求。建议来自非浏览器客户端的请求使用同样的注解。然而，在使用HTTP PUT请求时，会有一个显着的区别。浏览器可以通过HTTP GET或HTTP POST提交表单数据。非浏览器客户端还可以通过HTTP PUT提交表单。这提出了一个挑战，因为Servlet规范要求**ServletRequest.getParameter *()**系列方法仅支持HTTP POST的表单字段访问，而不支持HTTP PUT。
+
+为了支持HTTP PUT和PATCH请求，**spring-web**模块提供了过滤器HttpPutFormContentFilter，它可以在web.xml中配置：
+```xml
+<filter>
+    <filter-name>httpPutFormFilter</filter-name>
+    <filter-class>org.springframework.web.filter.HttpPutFormContentFilter</filter-class>
+</filter>
+
+<filter-mapping>
+    <filter-name>httpPutFormFilter</filter-name>
+    <servlet-name>dispatcherServlet</servlet-name>
+</filter-mapping>
+
+<servlet>
+    <servlet-name>dispatcherServlet</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+</servlet>
+```
+上述过滤器拦截内容类型为application/x-www-form-urlencoded的HTTP PUT和PATCH请求，从请求的正文中读取表单数据，并包装成ServletRequest，以便可以通过ServletRequest.getParameter *()系列方法使表单数据。
+
+> 由于HttpPutFormContentFilter消耗了请求的正文，所以不应该为PUT或PATCH URLs配置依赖其他的按application/x-www-form-urlencoded的转换器。这包括@RequestBody MultiValueMap&lt;String，String>和HttpEntity&lt;MultiValueMap&lt;String，String >>。
+
+### 使用@CookieValue注解映射Cookie值
+@CookieValue注解允许将方法参数被绑定到HTTP cookie的值上。
+
+让我们考虑下面从一个http请求中接收的cookie：
+JSESSIONID=415A4AC178C59DACE0B2C9CA727CDD84
+以下代码示例演示如何获取JSESSIONID cookie的值：
+```java
+@RequestMapping("/displayHeaderInfo.do")
+public void displayHeaderInfo(@CookieValue("JSESSIONID") String cookie) {
+    //...
+}
+```
+如果目标方法参数类型不是String，则会自动应用类型转换。请参阅[“方法参数和类型转换”](#方法参数和类型转换)一节。
+
+Servlet和Portlet环境中的注解处理器方法支持此注解。
+
+### 使用@RequestHeader注解映射请求头属性
+**@RequestHeader**注解允许将一个方法参数绑定到一个请求头上。
+
+以下是一个示例请求头：
+```
+Host                    localhost:8080
+Accept                  text/html,application/xhtml+xml,application/xml;q=0.9
+Accept-Language         fr,en-gb;q=0.7,en;q=0.3
+Accept-Encoding         gzip,deflate
+Accept-Charset          ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive              300
+```
+
+以下代码示例演示了如何获取**Accept-Encoding**和**Keep-Alive**头的值：
+```java
+@RequestMapping("/displayHeaderInfo.do")
+public void displayHeaderInfo(@RequestHeader("Accept-Encoding") String encoding,
+        @RequestHeader("Keep-Alive") long keepAlive) {
+    //...
+}
+```
+如果方法参数类型不是String，则会自动应用类型转换。请参阅[“方法参数和类型转换”](#方法参数和类型转换)一节。
+
+当在Map&lt;String,String>，MultiValueMap&lt;String,String>或HttpHeaders参数上使用@RequestHeader注解时，map会被填充所有头值。
+
+> 内置支持可用于将一个逗号分割的字符串转换为一个字符串或类型转换系统已知的其他类型的数组/集合。例如，使用@RequestHeader（“Accept”）注解的方法参数可以是String类型，但也可以是String []或List <String>。
+
+Servlet和Portlet环境中的注解处理器方法支持此注解。
+
+### 方法参数和类型转换
+从请求中提取的基于字符串的值包括请求参数，路径变量，请求头和cookie值，它们可能需要转换为它们要绑定到的方法参数或字段的目标类型（例如，将请求参数绑定到@ModelAttribute参数中的字段）。如果目标类型不是String，则Spring将自动转换为适当的类型。所有简单的类型，如int，long，Date等都被支持。您可以通过WebDataBinder进一步自定义转换过程（请参阅“自定义WebDataBinder初始化”一节），或者使用FormattingConversionService注册Formatter（参见第9.6节“Spring字段格式化”）。
+
+### 自定义WebDataBinder初始化
