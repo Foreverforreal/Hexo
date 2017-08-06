@@ -222,7 +222,10 @@ Float salary = (Float) company.getPropertyValue("managingDirector.salary");
 ```
 ## 内置PropertyEditor实现
 ***
-Spring使用**PropertyEditors**的概念来实现Object和String之间的转换。如果你考虑到这一点,有时以一个不同的方式，而不是用对象本身来表示属性可能更为方便。例如，Date可以用人类可读的方式表示（以String '2007-14-09'），而我们仍然能够将人类可读的形式转换回原来的date（或甚至更好：将以人类可读形式输入的任何日期转换回Date对象）。
+Spring使用**PropertyEditor**的概念来实现Object和String之间的转换。如果你考虑到这一点,有时以一个不同的方式，而不是用对象本身来表示属性可能更为方便。例如，Date可以用人类可读的方式表示（以String '2007-14-09'），而我们仍然能够将人类可读的形式转换回原来的date（或甚至更好：将以人类可读形式输入的任何日期转换回Date对象）。这种行为可以通过注册**java.beans.PropertyEditor**类型的自定义编辑器来实现。在BeanWrapper或者在上一章中提到的特定IoC容器中注册自定义编辑器，可以了解如何将属性转换为所需类型。在Oracle提供的java.beans包的javadoc中阅读有关PropertyEditors的更多信息。
+
+Spring中使用了一些属性编辑的例子：
+- 在bean上设置属性是通过使用PropertyEditors完成的
 
 
 
