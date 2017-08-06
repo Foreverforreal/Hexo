@@ -1093,3 +1093,26 @@ Servlet和Portlet环境中的注解处理器方法支持此注解。
 从请求中提取的基于字符串的值包括请求参数，路径变量，请求头和cookie值，它们可能需要转换为它们要绑定到的方法参数或字段的目标类型（例如，将请求参数绑定到@ModelAttribute参数中的字段）。如果目标类型不是String，则Spring将自动转换为适当的类型。所有简单的类型，如int，long，Date等都被支持。您可以通过WebDataBinder进一步自定义转换过程（请参阅“自定义WebDataBinder初始化”一节），或者使用FormattingConversionService注册Formatter（参见第9.6节“Spring字段格式化”）。
 
 ### 自定义WebDataBinder初始化
+要通过Spring的WebDataBinder将自定义请求参数绑定到PropertyEditors，你可以在你的控制器中使用@InitBinder注解方法，在@ControllerAdvice类中使用@InitBinder方法，或提供自定义WebBindingInitializer。有关更多详细信息，请参阅“使用@ControllerAdvice和@RestControllerAdvice的通知控制器”一节。
+
+### 使用@InitBinder自定义数据绑定
+使用@InitBinder的注解方法允许你直接在你的控制器类中配置web数据绑定。@InitBinder标识初始化WebDataBinder的方法，WebDataBinder将用于填充注解处理器方法的命令和表单对象参数。
+
+这种init-binder方法支持@RequestMapping方法支持的所有参数，除了命令/表单对象和相应的验证结果对象。Init-binder方法不能有返回值。因此，它们通常被声明为void。典型的参数包括WebDataBinder与WebRequest或java.util.Locale的组合，允许代码注册上下文特定的编辑器。
+
+以下示例演示如何使用@InitBinder为所有java.util.Date表单属性配置CustomDateEditor。
+```java
+@Controller
+public class MyFormController {
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
+    }
+
+    // ...
+}
+```
+或者，从Spring 4.2起，考虑使用addCustomFormatter来指定Formatter实现而不是PropertyEditor实例。
