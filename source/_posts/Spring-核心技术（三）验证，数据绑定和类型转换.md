@@ -581,4 +581,405 @@ cs.convert(input,
 
 值类型转换器会被重用于数组和集合，所以不需要创建溢恶特定的转换器来将S的Collection转换为T的Collection，假如标准集合处理合适的话。
 
+***
 # Spring字段格式化
+***
+如上一节所述，**core.convert**是一个通用类型转换系统。它提供了一个统一的ConversionService API以及一个强类型Converter SPI，用于实现从一种类型到另一种类型的转换逻辑。Spring容器使用此系统绑定bean属性值。此外，Spring表达式语言（Spel）和DataBinder都使用此系统绑定字段值。例如，当SpEL需要强转一个Short为Long来完成一个**expression.setValue(Object bean，Object value)**尝试时，**core.convert**系统执行此强转。
+
+现在考虑一个典型的客户端环境（如Web或桌面应用程序）的类型转换要求。在这样的环境中，你通常会从String转换为支持客户端回发过程，以及转回到String以支持视图渲染过程。此外，你经常需要本地化String值。更通用的core.convert Converter SPI不能直接解决这种格式化要求。为了直接解决它们，Spring 3引入了一个方便的Formatter SPI，为客户端环境提供了一个简单而强大的PropertyEditor替代方案。
+
+一般来说，当需要实现通用类型转换逻辑时，使用Converter SPI ;例如，用于在java.util.Date和java.lang.Long之间进行转换。当您在客户端环境（如Web应用程序）中工作，并且需要解析和打印本地化的字段值时，请使用Formatter SPI。
+
+## Formatter SPI
+***
+Formatter SPI实现字段格式化逻辑是简单和强类型：
+```java
+package org.springframework.format;
+
+public interface Formatter<T> extends Printer<T>, Parser<T> {
+}
+```
+Formatter继承自Printer和Parser 构建块接口：
+```java
+public interface Printer<T> {
+    String print(T fieldValue, Locale locale);
+}
+```
+```java
+import java.text.ParseException;
+
+public interface Parser<T> {
+    T parse(String clientValue, Locale locale) throws ParseException;
+}
+```
+要创建你自己的Formatter，只需实现上面的Formatter接口。将参数化T是要格式化的对象的类型，例如java.util.Date。实现print()操作来打印T的示例以显示在客户端语言环境中显示。实现parse()操作来从客户端语言环境返回的格式化表现形式中解析出T的一个实例。如果解析尝试失败，你的Formatter应抛出ParseException或IllegalArgumentException异常。注意确保您的Formatter实现是线程安全的。
+
+为方便起见，**format**子包中提供了几个Formatter实现。**number**包提供一个**NumberFormatter**,**CurrencyFormatter**,和**PercentFormatter**使用**java.text.NumberFormat**来格式化**java.lang.Number**对象。**datetime**包提供一个**DateFormatter**使用**java.text.DateFormat**来格式化**java.util.Date**对象。**datetime.joda**包基于Joda Time库提供完整的datetime格式支持。
+
+考虑**DateFormatter**作为一个**Formatter**实现的例子：
+```java
+package org.springframework.format.datetime;
+
+public final class DateFormatter implements Formatter<Date> {
+
+    private String pattern;
+
+    public DateFormatter(String pattern) {
+        this.pattern = pattern;
+    }
+
+    public String print(Date date, Locale locale) {
+        if (date == null) {
+            return "";
+        }
+        return getDateFormat(locale).format(date);
+    }
+
+    public Date parse(String formatted, Locale locale) throws ParseException {
+        if (formatted.length() == 0) {
+            return null;
+        }
+        return getDateFormat(locale).parse(formatted);
+    }
+
+    protected DateFormat getDateFormat(Locale locale) {
+        DateFormat dateFormat = new SimpleDateFormat(this.pattern, locale);
+        dateFormat.setLenient(false);
+        return dateFormat;
+    }
+
+}
+```
+Spring团队欢迎社区推动Formatter的贡献;见[jira.spring.io](https://jira.spring.io/browse/SPR)贡献。
+
+## 注解驱动格式化
+***
+如你所见，现字段格式化可以通过字段类型或注解进行配置。要将注解绑定到formatter，请实现AnnotationFormatterFactory：
+```java
+package org.springframework.format;
+
+public interface AnnotationFormatterFactory<A extends Annotation> {
+
+    Set<Class<?>> getFieldTypes();
+
+    Printer<?> getPrinter(A annotation, Class<?> fieldType);
+
+    Parser<?> getParser(A annotation, Class<?> fieldType);
+
+}
+```
+参数化A是你想要将格式化逻辑相关联的字段annotationType，例如，org.springframework.format.annotation.DateTimeFormat。getFieldTypes()返回可以使用注解的字段类型。getPrinter()返回一个要打印注解字段的值的Printer。getParser()返回一个用来解析注解字段的clientValue的Parser 。
+
+下面AnnotationFormatterFactory实现的示例将@NumberFormat注解绑定到一个格式化器上。此注解允许指定数字样式或模式样式：
+```java
+public final class NumberFormatAnnotationFormatterFactory
+        implements AnnotationFormatterFactory<NumberFormat> {
+
+    public Set<Class<?>> getFieldTypes() {
+        return new HashSet<Class<?>>(asList(new Class<?>[] {
+            Short.class, Integer.class, Long.class, Float.class,
+            Double.class, BigDecimal.class, BigInteger.class }));
+    }
+
+    public Printer<Number> getPrinter(NumberFormat annotation, Class<?> fieldType) {
+        return configureFormatterFrom(annotation, fieldType);
+    }
+
+    public Parser<Number> getParser(NumberFormat annotation, Class<?> fieldType) {
+        return configureFormatterFrom(annotation, fieldType);
+    }
+
+    private Formatter<Number> configureFormatterFrom(NumberFormat annotation,
+            Class<?> fieldType) {
+        if (!annotation.pattern().isEmpty()) {
+            return new NumberFormatter(annotation.pattern());
+        } else {
+            Style style = annotation.style();
+            if (style == Style.PERCENT) {
+                return new PercentFormatter();
+            } else if (style == Style.CURRENCY) {
+                return new CurrencyFormatter();
+            } else {
+                return new NumberFormatter();
+            }
+        }
+    }
+}
+```
+要触发格式化，只需使用@NumberFormat注解字段：
+```java
+public class MyModel {
+
+    @NumberFormat(style=Style.CURRENCY)
+    private BigDecimal decimal;
+
+}
+```
+### 格式化注解API
+org.springframework.format.annotation包中有一个易移植的格式注解API。使用@NumberFormat格式化java.lang.Number字段。使用@DateTimeFormat 格式化java.util.Date，java.util.Calendar，java.util.Long，或Joda Time字段。
+
+下面的示例使用@DateTimeFormat将java.util.Date格式化为ISO日期（yyyy-MM-dd）：
+```java
+public class MyModel {
+
+    @DateTimeFormat(iso=ISO.DATE)
+    private Date date;
+
+}
+```
+
+## FormatterRegistry SPI
+***
+FormatterRegistry是用于注册格式化器和转换器的SPI。
+**FormattingConversionService**是一个适用于大多数环境的FormatterRegistry的实现。这个实现可以编程式或使用**FormattingConversionServiceFactoryBean**声明为一个Spring bean来配置。由于此实现还实现了**ConversionService**，因此可以直接配置为与Spring的DataBinder和Spring Expression Language（Spel）配合使用。
+
+请查看下面的FormatterRegistry SPI：
+```java
+package org.springframework.format;
+
+public interface FormatterRegistry extends ConverterRegistry {
+
+    void addFormatterForFieldType(Class<?> fieldType, Printer<?> printer, Parser<?> parser);
+
+    void addFormatterForFieldType(Class<?> fieldType, Formatter<?> formatter);
+
+    void addFormatterForFieldType(Formatter<?> formatter);
+
+    void addFormatterForAnnotation(AnnotationFormatterFactory<?, ?> factory);
+
+}
+```
+如上所示，可以通过fieldType或注解注册Formatter。
+
+FormatterRegistry SPI允许你集中配置格式化规则，而不是在你的Controller上复制此类配置。例如，你可能想要强制所有的Date字段以某种方式格式化；或带有指定注解的字段以某种方式格式化。使用一个共享的FormatterRegistry，你可以一次性定义这些规则，并且在需要格式化时应用它们。
+
+## FormatterRegistrar SPI
+***
+FormatterRegistrar是一个通过FormatterRegistry注册格式化器和转换器的SPI：
+```java
+package org.springframework.format;
+
+public interface FormatterRegistrar {
+
+    void registerFormatters(FormatterRegistry registry);
+
+}
+```
+当为一个给定的格式化类别（如Date格式化）注册多个相关的转换器和格式化器时，FormatterRegistrar很有用。在声明性注册不足够的情况下也是有用的。例如，当一个格式化器需要在与其自己的<T>不同的特定字段类型下索引时，或者在注册 Printer/Parser对时进行索引。下一节提供有关下一节提供有关转换器和格式化器注册的更多信息。
+
+## 在Spring MVC中配置格式化
+***
+参见Spring MVC章节的[第16.3节“转换和格式化”](#)。
+
+***
+配置全局日期和时间格式
+***
+默认情况下，未使用**@DateTimeFormat**注解的日期和时间字段使用**DateFormat.SHORT**样式从字符串转换。如果你愿意，你可以通过定义你自己的全局格式化来改变。
+
+你将需要确保Spring不注册默认格式化器，而应手动注册所有格式化器。根据您是否使用Joda Time库，使用**org.springframework.format.datetime.joda.JodaTimeFormatterRegistrar**或**org.springframework.format.datetime.DateFormatterRegistrar**类。
+
+
+例如，以下Java配置会注册一个全局“yyyyMMdd”格式。此示例不依赖于Joda Time库：
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public FormattingConversionService conversionService() {
+
+        //使用DefaultFormattingConversionService，但不要注册默认值
+        DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService(false);
+
+        // 确保@NumberFormat仍然受支持
+        conversionService.addFormatterForFieldAnnotation(new NumberFormatAnnotationFormatterFactory());
+
+        //使用指定的全局格式注册日期转换
+        DateFormatterRegistrar registrar = new DateFormatterRegistrar();
+        registrar.setFormatter(new DateFormatter("yyyyMMdd"));
+        registrar.registerFormatters(conversionService);
+
+        return conversionService;
+    }
+}
+```
+如果您喜欢基于XML的配置，你可以使用FormattingConversionServiceFactoryBean。这是同一个的例子，这次使用Joda Time：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd>
+
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="registerDefaultFormatters" value="false" />
+        <property name="formatters">
+            <set>
+                <bean class="org.springframework.format.number.NumberFormatAnnotationFormatterFactory" />
+            </set>
+        </property>
+        <property name="formatterRegistrars">
+            <set>
+                <bean class="org.springframework.format.datetime.joda.JodaTimeFormatterRegistrar">
+                    <property name="dateFormatter">
+                        <bean class="org.springframework.format.datetime.joda.DateTimeFormatterFactoryBean">
+                            <property name="pattern" value="yyyyMMdd"/>
+                        </bean>
+                    </property>
+                </bean>
+            </set>
+        </property>
+    </bean>
+</beans>
+```
+
+> Joda Time提供单独的不同类型来表示date,time和date-time值。JodaTimeFormatterRegistrar的dateFormatter, timeFormatter和dateTimeFormatter属性应该用来配置每个类型的不同格式。DateTimeFormatterFactoryBean提供了一种便捷的方式来创建格式化器。
+
+如果你使用Spring MVC，请记住要显示配置所使用的 conversion service。对于基于Java的@Configuration，这意味着扩展WebMvcConfigurationSupport类并覆盖mvcConversionService()方法。对于XML，你应该使用mvc:annotation-driven元素的'conversion-service'属性。更多细节参见Spring MVC章节的[第16.3节“转换和格式化”](#)。
+
+***
+# Spring 验证
+***
+Spring 3对其验证支持进行了几个增强。首先，JSR-303 Bean Validation API现在完全支持。其次，当使用编程方式时，Spring的DataBinder现在可以验证对象并且绑定到它们。第三，Spring MVC现在支持声明性地验证@Controller输入。
+
+## JSR-303 Bean Bean Validation API概述
+***
+JSR-303标准化Java平台的验证约束声明和元数据。使用此API，您可以使用声明性验证约束来注解域模型属性，并且运行时会强制执行它们。这有一些你可以利用的内置约束。你也可以定义自己的自定义约束。
+
+为了说明，考虑一个简单的有两个属性的PersonForm模型：
+```java
+public class PersonForm {
+    private String name;
+    private int age;
+}
+```
+JSR-303允许您针对这些属性定义声明性的验证约束：
+```java
+public class PersonForm {
+
+    @NotNull
+    @Size(max=64)
+    private String name;
+
+    @Min(0)
+    private int age;
+
+}
+```
+当此类的实例由JSR-303 Validator验证时，这些约束将被强制执行。
+
+有关JSR-303/JSR-349的一般信息，请参阅[ Bean Validation website](http://beanvalidation.org/)。有关默认引用实现的具体功能的信息，请参阅[Hibernate Validator](https://www.hibernate.org/412.html)文档。要了解如何将Bean Validation  provider设置为Spring bean，请继续阅读。
+
+## 配置一个Bean Validation Provider
+***
+Spring提供对Bean Validation Provider的全面支持。这还包含对将JSR-303/JSR-349 Bean Validation provider 作为Spring bean引导的便捷支持。这允许将**javax.validation.ValidatorFactory**或**javax.validation.Validator**注入到你的应用程序需要验证的地方。
+
+使用**LocalValidatorFactoryBean**以Spring bean形式配置一个默认的Validato：
+```java
+<bean id="validator"
+    class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+```
+上述基本配置将触发Bean Validation以使用其默认引导机制进行初始化。一个JSR-303/JSR-349 provider，如Hibernate Validator，被希望出现在类路径中并且会被自动探测到。
+
+### 注入一个Validator
+**LocalValidatorFactoryBean**实现了**javax.validation.ValidatorFactory**和**javax.validation.Validator**，以及Spring的**org.springframework.validation.Validator**。你可以将这些接口中的任一个注入到需要调用验证逻辑的bean中。
+
+如果您喜欢直接使用Bean Validation API，请注入javax.validation.Validator的引用：
+```java
+import javax.validation.Validator;
+
+@Service
+public class MyService {
+
+    @Autowired
+    private Validator validator;
+```
+如果您的bean需要Spring Validation API，请注入对org.springframework.validation.Validator的引用：
+```java
+import org.springframework.validation.Validator;
+
+@Service
+public class MyService {
+
+    @Autowired
+    private Validator validator;
+
+}
+```
+
+### 配置自定义约束
+每个Bean Validation约束由两部分组成。第一，一个声明约束及其可配置属性的@Constraint注解。第二，实现约束行为的**javax.validation.ConstraintValidator**接口的实现。要将声明与实现相关联，每个@Constraint注解引用相应的ValidationConstraint实现类。在运行时期，当你的域模型中遇到约束注解时，ConstraintValidatorFactory实例化这个引用的实现。
+
+默认情况下，LocalValidatorFactoryBean配置一个使用Spring创建ConstraintValidator实例的SpringConstraintValidatorFactory。这允许您的自定义ConstraintValidator像其他Spring bean一样，从依赖注入中受益。
+
+下面显示了一个自定义@Constraint声明的例子，后跟一个使用Spring进行依赖注入的相关联的ConstraintValidator实现：
+```java
+@Target({ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy=MyConstraintValidator.class)
+public @interface MyConstraint {
+}
+```
+```java
+import javax.validation.ConstraintValidator;
+
+public class MyConstraintValidator implements ConstraintValidator {
+
+    @Autowired;
+    private Foo aDependency;
+
+    ...
+}
+```
+如你所见，ConstraintValidator实现可以像其他任何Spring bean一样，有它自己的依赖@Autowired。
+
+### Spring驱动的方法验证
+方法验证功能由Bean Validation 1.1支持，并且作为Hibernate Validator 4.3的自定义扩展，可以通过MethodValidationPostProcessor bean定义将其集成到Spring上下文中：
+```java
+<bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>
+```
+
+### 额外的配置选项
+对于大多数情况，默认的**LocalValidatorFactoryBean**配置应该足够。这有各种Bean Validation结构的配置选项，从消息插入到遍历解析。有关这些选项的更多信息，请参阅**LocalValidatorFactoryBean** javadocs。
+
+## 配置DataBinder
+***
+从Spring 3起，可以使用Validator来配置DataBinder实例。一旦配置，可以通过调用binder.validate()来调用Validator。任何验证Errors都会自动添加到binder的BindingResult中。
+
+以编程方式使用DataBinder时，可以在绑定到目标对象之后调用验证逻辑：
+```java
+Foo target = new Foo();
+DataBinder binder = new DataBinder(target);
+binder.setValidator(new FooValidator());
+
+// 绑定到target对象
+binder.bind(propertyValues);
+
+// 验证target对象
+binder.validate();
+
+// 获取包含任何验证错误的BindingResult
+BindingResult results = binder.getBindingResult();
+```
+DataBinder还可以通过**dataBinder.addValidators**和**dataBinder.replaceValidators**配置多个**Validator**实例。当将全局配置的Bean Validation与在DataBinder实例上本地配置的Spring Validator 组合时，此功能非常有用。见???
+
+## Spring MVC 3验证
+***
+参见Spring MVC章节的[第16.4节“验证”]()。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
