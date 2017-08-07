@@ -7,7 +7,10 @@ categories:
   - Spring
 date: 2017-07-25 21:17:00
 ---
+
+<style>
 strong {
+    margin: 2px;
     background-color: #f2f2f2;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -17,6 +20,7 @@ strong {
 	color: #6d180b;
 	font-weight: normal;
 }
+</style>
 
 [原文链接](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#beans)
 ***
@@ -1951,17 +1955,17 @@ org.springframework.scripting.groovy.GroovyMessenger@272961
 
 ## 使用BeanFactoryPostProcessor自定义配置元数据
 ***
-我们将看到的下一个扩展点是**org.springframework.beans.factory.config.BeanFactoryPostProcessor**。该接口的语义与BeanPostProcessor类似，主要区别在于：BeanFactoryPostProcessor对bean配置元数据进行操作;也就是说，Spring IoC容器允许BeanFactoryPostProcessor读取配置元数据，并在容器实例化除BeanFactoryPostProcessors之外的任何Bean之前,可能会更改它。
+我们将看到的下一个扩展点是**org.springframework.beans.factory.config.BeanFactoryPostProcessor**。该接口的语义与**BeanPostProcessor**类似，主要区别在于：**BeanFactoryPostProcessor**对bean配置元数据进行操作;也就是说，Spring IoC容器允许**BeanFactoryPostProcessor**读取配置元数据，并可能在容器实例化除**BeanFactoryPostProcessors**之外的任何Bean之前,会更改它。
 
-你可以配置多个BeanFactoryPostProcessors，并且可以通过设置order属性来控制这些BeanFactoryPostProcessors执行的顺序。但是，你只能在BeanFactoryPostProcessor实现了Ordered接口，才能设置此属性。如果你编写自己的BeanFactoryPostProcessor，你也应该考虑实现Ordered接口。有关更多详细信息，请参阅BeanFactoryPostProcessor和Ordered接口的javadocs。
+你可以配置多个**BeanFactoryPostProcessors**，并且可以通过设置order属性来控制这些BeanFactoryPostProcessors执行的顺序。但是，你只能在BeanFactoryPostProcessor实现了Ordered接口，才能设置此属性。如果你编写自己的BeanFactoryPostProcessor，你也应该考虑实现Ordered接口。有关更多详细信息，请参阅BeanFactoryPostProcessor和Ordered接口的javadocs。
 
 > 如果要更改实际的bean实例（即从配置元数据创建的对象），则需要使用BeanPostProcessor（如第8.1节“使用BeanPostProcessor自定义bean”中所述）。尽管在技术上可以在BeanFactoryPostProcessor中使用bean实例（例如，使用BeanFactory.getBean()），但这样做会导致过早的bean实例化，违反了标准容器生命周期。这可能会导致负面的副作用，如旁路bean后处理。此外，BeanFactoryPostProcessors作用域在每个容器范围。这只有在使用容器层次结构时才有用。如果在一个容器中定义了一个BeanFactoryPostProcessor，那么它只会应用于该容器中的bean定义。一个容器中的Bean定义不会被另一个容器中的BeanFactoryPostProcessors进行post-processed，即使这两个容器都是同一层次结构的一部分。
 
-当在ApplicationContext中声明一个bean工厂后处理器，它会被自动执行以便对定义容器的配置元数据进行更改。Spring包括一些预定义的bean工厂后处理器，如PropertyOverrideConfigurer和PropertyPlaceholderConfigurer。例如，也可以使用自定义BeanFactoryPostProcessor来注册自定义属性编辑器。
+当在ApplicationContext中声明一个BeanFactoryPostProcessor，它会被自动执行以便对定义容器的配置元数据进行更改。Spring包括一些预定义的BeanFactoryPostProcessor，如**PropertyOverrideConfigurer**和**PropertyPlaceholderConfigurer**。例如，也可以使用自定义BeanFactoryPostProcessor来注册自定义属性编辑器。
 
-ApplicationContext自动检测部署到其中的任何实现BeanFactoryPostProcessor接口的bean。它在适当的时候使用这些bean作为bean工厂后处理器。你可以像任何其他bean一样部署这些后处理器bean。
+**ApplicationContext**自动检测部署到其中的任何实现**BeanFactoryPostProcessor**接口的bean。它在适当的时候使用这些bean作为**BeanFactoryPostProcessor**。你可以像任何其他bean一样部署这些后处理器bean。
 
-> 与BeanPostProcessors一样，您通常不想将BeanFactoryPostProcessors配置为懒加载。如果没有其他bean引用一个Bean(Factory)PostProcessor，那么后处理器根本不会被实例化。因此，将它的懒加载标记会被忽略，即使在&lt;beans/>元素的声明中将default-lazy-init属性设置为true，Bean(Factory)PostProcessor也会被立即实例化。
+> 与BeanPostProcessors一样，您通常不想将BeanFactoryPostProcessors配置为懒加载。如果没有其他bean引用一个Bean(Factory)PostProcessor，那么后处理器根本不会被实例化。因此，它的懒加载标记会被忽略，即使在&lt;beans/>元素的声明中将default-lazy-init属性设置为true，Bean(Factory)PostProcessor也会被立即实例化。
 
 ### 示例：类名替换PropertyPlaceholderConfigurer
 你可以使用**PropertyPlaceholderConfigurer **在在一个单独的文件使用标准的Java Properties格式在bean定义具化属性值。这样做使得部署应用程序的人可以自定义环境特定的属性（如数据库URL和密码），避免修改容器的主要XML定义文件或文件的复杂性及风险。
@@ -2015,7 +2019,7 @@ PropertyPlaceholderConfigurer不仅在您指定的Properties文件中查找属�
 如果类不能在运行时解析为有效类，那么即将要创建的bean的解析失败了，对于非懒加载的bean这发生ApplicationContext的preInstantiateSingletons()阶段期间。
 
 ### 示例：PropertyOverrideConfigurer
-另一个bean工厂后处理器的PropertyOverrideConfigurer与PropertyPlaceholderConfigurer类似，但是不想后者，原始定义可以具有默认值或根本没有任何值用于bean属性。如果一个用于覆盖的Properties文件没有某个bean属性的条目，则使用默认上下文定义。
+另一个bean工厂后处理器的**PropertyOverrideConfigurer**与**PropertyPlaceholderConfigurer**类似，但是不像后者，原始定义可以具有默认值或根本没有任何值用于bean属性。如果一个用于覆盖的Properties文件没有某个bean属性的条目，则使用默认上下文定义。
 
 请注意，bean定义感知不到被覆盖，所以从XML定义文件中不能立即显示覆盖configurer正在被使用。如果多个PropertyOverrideConfigurer实例为同一个bean属性定义不同的值，由于覆盖机制而获胜，最后一个覆盖值生效。
 
@@ -2056,7 +2060,7 @@ FactoryBean接口提供三种方法：
 
 FactoryBean的概念和接口在Spring Framework中的许多地方使用; FactoryBean接口的50多个实现与Spring本身一起运行。
 
-当你需要向容器询问实际的FactoryBean实例本身而不是其生成的bean时，在调用ApplicationContext的getBean()方法时，使用＆符号（＆）来表示bean的id。所以对于给定的FactoryBean，其ID为myBean，在容器上调用getBean（“myBean”）返回FactoryBean的产物;而调用getBean（“＆myBean”）则返回FactoryBean实例本身。
+当你需要向容器询问实际的FactoryBean实例本身而不是其生成的bean时，在调用ApplicationContext的getBean()方法时，使用＆符号（＆）来表示bean的id。所以对于给定的FactoryBean，其ID为myBean，在容器上调用getBean(“myBean”)返回FactoryBean的产物;而调用getBean(“＆myBean”)则返回FactoryBean实例本身。
 
 ***
 # 基于注解的容器配置

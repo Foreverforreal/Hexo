@@ -9,6 +9,7 @@ date: 2017-07-29 16:08:00
 ---
 <style>
 strong {
+    margin: 2px;
     background-color: #f2f2f2;
     border: 1px solid #ccc;
     border-radius: 4px;
