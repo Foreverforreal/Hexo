@@ -791,15 +791,15 @@ public void handle(@RequestBody String body, Writer writer) throws IOException {
     writer.write(body);
 }
 ```
-你通过使用HttpMessageConverter将请求体转换为方法参数。HttpMessageConverter负责将HTTP请求消息转换为对象，并从对象转换为HTTP响应体。RequestMappingHandlerAdapter支持带有以下默认HttpMessageConverters的@RequestBody注解：
-- ByteArrayHttpMessageConverter转换字节数组。
-- StringHttpMessageConverter转换字符串。
-- FormHttpMessageConverter将表单数据从到 MultiValueMap&lt;String,String>转换。
-- SourceHttpMessageConverter与javax.xml.transform.Source互相转换。
+你通过使用**HttpMessageConverter**将请求体转换为方法参数。**HttpMessageConverter**负责将HTTP请求消息转换为对象，并从对象转换为HTTP响应体。**RequestMappingHandlerAdapter**以以下默认**HttpMessageConverters**支持**@RequestBody**注解：
+- **ByteArrayHttpMessageConverter**转换字节数组。
+- **StringHttpMessageConverter**转换字符串。
+- **FormHttpMessageConverter**将表单数据从到 MultiValueMap&lt;String,String>转换。
+- **SourceHttpMessageConverter**与**javax.xml.transform.Source**互相转换。
 
 有关这些转换器的更多信息，请参阅[”消息转换器”](#消息转换器)。另请注意，如果使用MVC命名空间或MVC Java配置，默认情况下会注册更广泛的消息转换器。有关详细信息，请参见[第16.1节“启用MVC Java配置或MVC XML命名空间”](#启用MVC Java配置或MVC XML命名空间)。
 
-如果您打算读写XML，则需要使用org.springframework.oxm包中的具体的Marshaller和Unmarshaller实现配置MarshallingHttpMessageConverter。下面的示例显示了如何直接在配置中执行此操作，但是如果您的应用程序通过MVC命名空间或MVC Java配置进行配置，请参阅[第16.1节“启用MVC Java配置或MVC XML命名空间”](#启用MVC Java配置或MVC XML命名空间)。
+如果您打算读写XML，则需要使用**org.springframework.oxm**包中的具体的**Marshaller**和**Unmarshaller**实现配置**MarshallingHttpMessageConverter**。下面的示例显示了如何直接在配置中执行此操作，但是如果您的应用程序通过MVC命名空间或MVC Java配置进行配置，请参阅[第16.1节“启用MVC Java配置或MVC XML命名空间”](#启用MVC Java配置或MVC XML命名空间)。
 
 ```xml
 <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
@@ -823,9 +823,9 @@ public void handle(@RequestBody String body, Writer writer) throws IOException {
 <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller"/>
 ```
 
-@RequestBody方法参数可以使用@Valid注解，在这种情况下，它将使用配置的Validator实例进行验证。当使用MVC命名空间或MVC Java配置时，会自动配置一个JSR-303验证器，假设在类路径上有可用的JSR-303实现。
+**@RequestBody**方法参数可以使用**@Valid**注解，在这种情况下，它将使用配置的**Validator**实例进行验证。当使用MVC命名空间或MVC Java配置时，会自动配置一个JSR-303验证器，假设在类路径上有可用的JSR-303实现。
 
-就像@ModelAttribute参数一样，可以使用一个Errors参数来检查错误。如果未声明此类参数，则将引发MethodArgumentNotValidException异常。这个异常在DefaultHandlerExceptionResolver中处理，它将向客户端发送一个400错误。
+就像**@ModelAttribute**参数一样，可以使用一个**Errors**参数来检查错误。如果未声明此类参数，则将引发**MethodArgumentNotValidException**异常。这个异常在**DefaultHandlerExceptionResolver**中处理，它将向客户端发送一个400错误。
 
 > 有关通过MVC命名空间或MVC Java配置配置消息转换器和验证器的信息，请参见[第16.1节“启用MVC Java配置或MVC XML命名空间”](#启用MVC Java配置或MVC XML命名空间)。
 

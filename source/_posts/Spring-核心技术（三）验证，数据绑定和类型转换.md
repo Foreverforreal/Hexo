@@ -30,18 +30,18 @@ Spring Framework 4.0在安装支持方面支持Bean Validation 1.0（JSR-303）�
 应用程序可以选择一次全局启用Bean验证，如[第8节“Spring验证”](#pring验证)中所述，并专门用于所有验证需求。</br>
 应用程序还可以为每个DataBinder实例注册额外的Spring Validator实例，如[第8.3节“配置DataBinder”](#配置DataBinder)中所述。这可能有助于不使用注解来插入验证逻辑。
 </div> 
-将验证视为业务逻辑有利有弊，而Spring提供了一种验证（和数据绑定）的设计，不排除任何一种。明确的的验证不应该与Web层相关联，应该易于本地化，并且应该可以插入任何可用的验证器。考虑到上述情况，Spring已经提出了一个**Validator**接口，它应用程序的每一层都是基本和非常可用的。
+将验证视为业务逻辑有利有弊，而Spring提供了一种验证（和数据绑定）的设计，不排除任何一种。明确的的验证不应该与Web层相关联，应该易于本地化，并且应该可以插入任何可用的验证器。考虑到上述情况，Spring已经提出了一个**Validator**接口，它对应用程序的每一层都是基本和非常可用的。
 
 数据绑定对于允许将用户输入动态绑定到应用程序的域模型（或用于处理用户输入的任何对象）是有用的。Spring提供了所谓的**DataBinder**来做到这一点。**Validator**和**DataBinder**构成**validation**包，主要用于但不限于MVC框架。
 
 **BeanWrapper**是Spring框架中的一个基本概念，并且用于很多地方。但是，你可能不需要直接使用BeanWrapper。因为这是参考文档，我们觉得有些解释可能需要按顺序来。我们将在本章中解释BeanWrapper，如果你要使用它，你最可能在尝试绑定数据到对象的时候这么做。
 
-Spring的DataBinder和较低级别的BeanWrapper都使用PropertyEditor来解析和格式化属性值。**PropertyEditor**概念是JavaBeans规范的一部分，本章还将对此进行说明。Spring 3引入了一个“core.convert”包，它提供一个通用的类型转换工具，而且还有一个更高级的“format”包,用于格式化UI字段值。这些新的包可能被用作PropertyEditor的更简单的替代方法，本章还将讨论这些新的软件包。
+Spring的**DataBinder**和较低级别的**BeanWrapper**都使用**PropertyEditor**来解析和格式化属性值。**PropertyEditor**概念是JavaBeans规范的一部分，本章还将对此进行说明。Spring 3引入了一个“**core.convert**”包，它提供一个通用的类型转换工具，而且还有一个更高级的“format”包,用于格式化UI字段值。这些新的包可能被用作**PropertyEditor**的更简单的替代方法，本章还将讨论这些新的包。
 
 ***
 # 使用Spring Validator接口验证
 ***
-Spring具有可用于验证对象的**Validator**接口。**Validator**接口使用Errors对象进行工作，以便在验证时，验证器可以向**Errors**对象报告验证失败。
+Spring具有可用于验证对象的**Validator**接口。**Validator**接口使用**Errors**对象进行工作，以便在验证时，验证器可以向**Errors**对象报告验证失败。
 
 我们来考虑一个小数据对象
 ```java
@@ -57,7 +57,7 @@ public class Person {
 - **supports(Class)** —— 此Validator可以验证提供的Class的实例吗？
 - **validate(Object, org.springframework.validation.Errors)** —— 验证给定的对象，并在验证错误的情况下，注册这些错误给给定的**Errors**对象
 
-实现Validator是非常简单的，特别是当您知道Spring Framework还提供的ValidationUtils帮助类时。
+实现Validator是非常简单的，特别是当您知道Spring Framework还提供的**ValidationUtils**帮助类时。
 ```java
 public class PersonValidator implements Validator {
 
@@ -79,9 +79,9 @@ public class PersonValidator implements Validator {
     }
 }
 ```
-如您所见，**ValidationUtils**类上的**static** **rejectIfEmpty(..)**方法用于拒绝'name'属性,如果它为null或是空字符串的话。看看ValidationUtils的javadocs，除了以前显示的例子，它提供了什么功能。
+如您所见，**ValidationUtils**类上的**static** **rejectIfEmpty(..)**方法用于拒绝'name'属性,如果它为null或是空字符串的话。看下ValidationUtils的javadocs，除了上面显示的例子，它还提供了什么功能。
 
-虽然确实可以通过实现一个单个Validator类来验证富对象中的每个嵌套对象，但最好为对象中的每个嵌套类在它自己的Validator实现中封装验证逻辑。一个'富'对象的简单示例是由两个String属性（第一个和第二个名称）以及一个复杂的Address对象组成的Customer。Address对象可能独立于Customer对象使用，因此一个不同的AddressValidator已经实现。如果你希望你的CustomerValidator无需复制和粘贴，就能重用AddressValidator类中包含的逻辑，你可以在你的CustomerValidator中依赖注入或实例化AddressValidator，如下一样使用：
+虽然确实可以通过实现一个单个的**Validator**类来验证富对象中的每个嵌套对象，但最好为对象中的每个嵌套类在它自己的Validator实现中封装验证逻辑。一个'富'对象的简单示例是由两个String属性（firstName和surname）以及一个复杂的Address对象组成的Customer。Address对象可能独立于Customer对象使用，因此已经实现了一个不同的AddressValidator。如果你希望你的CustomerValidator无需复制和粘贴，就能重用AddressValidator类中包含的逻辑，你可以在你的CustomerValidator中依赖注入或实例化AddressValidator，如下一样使用：
 ```java
 public class CustomerValidator implements Validator {
 
@@ -126,7 +126,7 @@ public class CustomerValidator implements Validator {
 ***
 我们已经讨论了数据绑定和验证。输出与验证错误相对应的消息是我们需要讨论的最后一件事。在上面显示的示例中，我们拒绝了name和age字段。如果我们要使用**MessageSource**输出错误消息，我们将在拒绝该字段（在这种情况下为'name'和'age'）时使用已经给出的错误代码来完成输出。当你从Errors接口调用（直接，或间接，使用例如ValidationUtils类）**rejectValue**或者其他**reject**方法之一时，底层实现将不仅注册您传递的代码，还会注册一些其他错误代码。它要注册什么错误代码由所使用的**MessageCodesResolver**决定。默认情况下，使用**DefaultMessageCodesResolver**，例如，它不仅注册了您提供的代码的消息，还包括传递给reject方法的字段名称的消息。因此，如果你使用rejectValue("age", "too.darn.old")拒绝一个字段，除了too.darn.old代码之外，Spring还将注册too.darn.old.age和too.darn.old.age.int（所以第一个将包括字段名称，第二个将包括该字段的类型）;这样做是为了方便开发人员定位错误消息等。
 
-有关MessageCodesResolver和默认策略的更多信息可以分别在MessageCodesResolver和DefaultMessageCodesResolver的javadoc中在线查找。
+有关**MessageCodesResolver**和默认策略的更多信息可以分别在**MessageCodesResolver**和**DefaultMessageCodesResolver**的javadoc中在线查找。
 
 ***
 # Bean操作和BeanWrapper
@@ -150,7 +150,7 @@ BeanWrapper的工作方式部分由其名称指示：它包装一个bean以对�
 |**account[2]**|指示索引属性**account**的第三个元素。索引属性可以是*array，list或其他自然排序集合类型。|
 |**account[COMPANYNAME]**|指示由Map属性**account**的键COMPANYNAME索引的map entry的值|
 
-下面你会发现一些使用BeanWrapper来获取和设置属性的例子。
+下面你会发现一些使用**BeanWrapper**来获取和设置属性的例子。
 
 *（如果你不打算直接使用BeanWrapper，下一节对您来说并不重要。如果你只是使用DataBinder和BeanFactory及其开箱即用的实现，您应该跳过关于PropertyEditors的部分。）*
 
@@ -228,15 +228,15 @@ Spring中使用了一些属性编辑的例子：
 - 在Spring的MVC框架中解析HTTP请求参数是使用各种PropertyEditor完成的，这些PropertyEditors可以手动绑定CommandController的所有子类。
 
 Spring有一些内置的PropertyEditor，使工作变得轻松。其中的每个都列在下面，它们都位于org.springframework.beans.propertyeditors包中。大多数但不是全部（如下所示），默认情况下由BeanWrapperImpl注册。属性编辑器可以以一些方式配置，你当然可以注册自己的变体来覆盖默认的：
-```
-Built-in PropertyEditors
+
+内置PropertyEditors
 
 |Class|说明|
 |----|----|
 |**ByteArrayPropertyEditor**|字节数组编辑器。String将简单的转换为它们的字节表现形式。由BeanWrapperImpl默认注册|
-|ClassEditor|解析String表示的class为实际的类和反过来也是。当没有找到这个类时，抛出IllegalArgumentException。由BeanWrapperImpl默认注册 |
+|**ClassEditor**|解析String表示的class为实际的类和反过来也是。当没有找到这个类时，抛出IllegalArgumentException。由BeanWrapperImpl默认注册 |
 |**CustomBooleanEditor**|Boolean属性的可自定义属性编辑器。由BeanWrapperImpl默认注册，但是，可以通过将其自定义实例注册为自定义编辑器来覆盖。|
-|**CustomCollectionEditor|Collection的属性编辑器，将任何源Collection转换为给定的目标Collection类型。|
+|**CustomCollectionEditor**|Collection的属性编辑器，将任何源Collection转换为给定的目标Collection类型。|
 |**CustomDateEditor**|可自定义的java.util.Date属性编辑器，支持自定义DateFormat。默认情况下未注册。必须使用适当format进行用户注册。|
 |**CustomNumberEditor**|任何Number子类的可自定义属性编辑器，如Integer，Long，Float，Double。由BeanWrapperImpl默认注册，但是可以通过将其自定义实例注册为自定义编辑器来覆盖。|
 |**FileEditor**|能够将String解析为java.io.File对象。由BeanWrapperImpl默认注册。|
@@ -247,7 +247,7 @@ Built-in PropertyEditors
 |**StringTrimmerEditor**|修剪字符串的属性编辑器。可选的允许将空字符串转换为null值。默认情况下未注册;必须根据需要进行用户注册。|
 |**URLEditor**|能够将URL的String表示形式解析为实际的URL对象。由BeanWrapperImpl默认注册。|
 
-Spring使用java.beans.PropertyEditorManager设置可能需要的属性编辑器的搜索路径。搜索路径中还包括sun.bean.editors，它包括用于诸如Font，Color和大多数原始类型之类的PropertyEditor实现。还要注意的是，标准的JavaBeans基础框架会自动发现PropertyEditor类（不需要显示地注册它们），如果它们与他们处理的类在同一个包中，并且具有与该类相同的附加“Editor”的名称;例如，可能有如下类和包结构，这足以使FooEditor类被识别并用作Foo类型属性的PropertyEditor。
+Spring使用**java.beans.PropertyEditorManager**设置可能需要的属性编辑器的搜索路径。搜索路径中还包括sun.bean.editors，它包括用于诸如Font，Color和大多数原始类型之类的PropertyEditor实现。还要注意的是，标准的JavaBeans基础框架会自动发现**PropertyEditor**类（不需要显示地注册它们），如果它们与他们处理的类在同一个包中，并且具有与该类相同的附加“Editor”的名称;例如，可能有如下类和包结构，这足以使FooEditor类被识别并用作Foo类型属性的PropertyEditor。
 ```
 com
   chank
@@ -284,9 +284,9 @@ public class FooBeanInfo extends SimpleBeanInfo {
 }
 ```
 ### 注册其他自定义PropertyEditor
-当将bean属性设置为字符串值时，Spring IoC容器最终会使用标准的JavaBeans PropertyEditors将这些字符串转换为该属性的复杂类型。Spring预注册了一些自定义的PropertyEditor（例如，将一个字符串表达的类名转换为一个真正的Class对象）。另外，Java的标准JavaBeans PropertyEditor查找机制允许一个类的PropertyEdito只需被适当地命名，并且被放置在与它提供的类相同的包中，就会被自动找到。
+当将bean属性设置为字符串值时，Spring IoC容器最终会使用标准的JavaBeans PropertyEditors将这些字符串转换为该属性的复杂类型。Spring预注册了一些自定义的PropertyEditor（例如，将一个字符串表达的类名转换为一个真正的Class对象）。另外，Java的标准JavaBeans PropertyEditor查找机制允许一个类的PropertyEditor只需被适当地命名，并且被放置在与它提供的类相同的包中，就会被自动找到。
 
-如果需要注册其他自定义PropertyEditor，这有几种可用机制。最手动的方式，也是通常不方便或不推荐的，是只要使用ConfigurableBeanFactory接口的registerCustomEditor()方法，假设你有一个BeanFactory引用的话。另一个稍微更方便的机制就是使用一个名为CustomEditorConfigurer的特殊bean工厂的后处理器。虽然Bean工厂后处理器可以与BeanFactory实现一起使用，但CustomEditorConfigurer有一个嵌套属性设置，因此强烈建议将其与ApplicationContext一起使用，它可以与其他任何bean类似的样式被部署，并且被自动检测和应用。
+如果需要注册其他自定义PropertyEditor，这有几种可用机制。最手动的方式，也是通常不方便或不推荐的，是只要使用**ConfigurableBeanFactory**接口的**registerCustomEditor()**方法，假设你有一个BeanFactory引用的话。另一个稍微更方便的机制就是使用一个名为**CustomEditorConfigurer**的特殊bean工厂的后处理器。虽然Bean工厂后处理器可以与**BeanFactory**实现一起使用，但**CustomEditorConfigurer**有一个嵌套属性设置，因此强烈建议将其与**ApplicationContext**一起使用，它可以与其他任何bean类似的样式被部署，并且被自动检测和应用。
 
 请注意，所有bean工厂和应用程序上下文都会自动使用一些内置的属性编辑器，通过使用一些名为**BeanWrapper**的东西来处理属性转换。**BeanWrapper**注册的标准属性编辑器在上一节中都被列出。此外，**ApplicationContexts**还会以适合特定应用程序上下文类型的方式覆盖或添加额外数量的编辑器来处理资源查找。
 
@@ -398,7 +398,7 @@ public final class RegisterUserController extends SimpleFormController {
 ***
 # Spring类型转换
 ***
-Spring 3引入了一个core.convert包来提供通用的类型转换系统。该系统定义了一个SPI来实现类型转换逻辑，以及一个在运行时执行类型转换的API。在Spring容器中，该系统可以用作PropertyEditor的替代方法，将外部化的bean属性值的字符串转换为必需的属性类型。这个公共API也可以在应用程序中需要类型转换的任何地方使用。
+Spring 3引入了一个**core.convert**包来提供通用的类型转换系统。该系统定义了一个SPI来实现类型转换逻辑，以及一个在运行时执行类型转换的API。在Spring容器中，该系统可以用作PropertyEditor的替代方法，将外部化的bean属性值的字符串转换为必需的属性类型。这个公共API也可以在应用程序中需要类型转换的任何地方使用。
 
 ## Converter SPI
 ***
@@ -412,11 +412,11 @@ public interface Converter<S, T> {
 
 }
 ```
-要创建自己的转换器，只需实现上面的接口。参数化S作为你需要转换的类型，而T是你要转换为的类型。
+要创建自己的转换器，只需实现上面的接口。参数化S作为你需要转换的类型，而T是你要转换为的类型。如果需要将S的集合或数组转换为T的数组或集合，则这种转换器也可以透明地应用，前提是已经注册了一个委托array/collection转换器（默认情况下是DefaultConversionService）。
 
-对于convert(S)的每个调用，源参数保证不为null。如果转换失败，转换器可能会抛出任何未经检查的异常;具体来说，应该抛出一个IllegalArgumentException来报告一个无效的源值。注意确保你的Converter实现是线程安全的。
+对于**convert(S)**的每个调用，源参数保证不为null。如果转换失败，转换器可能会抛出任何未经检查的异常;具体来说，应该抛出一个**IllegalArgumentException**来报告一个无效的源值。注意确保你的**Converter**实现是线程安全的。
 
-为方便起见，在core.convert.support包中提供了几个转换器实现。这些包括从Strings到Numbers和其他常见类型的转换器。以StringToInteger为例，介绍典型的Converter实现：
+为方便起见，在**core.convert.support**包中提供了几个转换器实现。这些包括从Strings到Numbers和其他常见类型的转换器。考虑**StringToInteger**作为典型的Converter实现的例子：
 
 ```java
 package org.springframework.core.convert.converter;
@@ -429,7 +429,7 @@ public interface Converter<S, T> {
 ```
 ## ConverterFactory
 ***
-当您需要集中整个类层次结构的转换逻辑时，例如，当从String转换为java.lang.Enum对象时，实现ConverterFactory：
+当您需要集中整个类层次结构的转换逻辑时，例如，当从String转换为java.lang.Enum对象时，实现**ConverterFactory**：
 ```java
 package org.springframework.core.convert.converter;
 
@@ -439,9 +439,9 @@ public interface ConverterFactory<S, R> {
 
 }
 ```
-参数化S是你需要转换的类型，R为定义您转换为类的范围的基本类型。然后实现getConverter(Class &lt;T>)，其中T是R的子类。然后实现getConverter（Class <T>），其中T是R的子类。
+参数化S是你需要转换的类型，R为定义您转换为类的范围的基本类型。然后实现**getConverter(Class &lt;T>)**，其中T是R的子类。
 
-以StringToEnum ConverterFactory为例：
+以**StringToEnum** ConverterFactory为例：
 ```java
 package org.springframework.core.convert.support;
 
@@ -467,7 +467,7 @@ final class StringToEnumConverterFactory implements ConverterFactory<String, Enu
 ```
 ## GenericConverter
 ***
-当你需要一个复杂的Converter实现时，请考虑GenericConverter接口。GenericConverter具有更灵活但不太强的类型签名，支持在多种源和目标类型之间进行转换。此外，GenericConverter可以提供源和目标字段的上下文，这样你可以在实现转换逻辑时使用。这种上下文允许类型转换由字段注解或在字段签名上声明的泛型信息来驱动。
+当你需要一个复杂的**Converter**实现时，请考虑**GenericConverter**接口。**GenericConverter**具有更灵活但不太强的类型签名，支持在多种源和目标类型之间进行转换。此外，**GenericConverter**可以提供源和目标字段的上下文，这样你可以在实现转换逻辑时使用。这种上下文允许类型转换由字段注解或在字段签名上声明的泛型信息来驱动。
 ```java
 package org.springframework.core.convert.converter;
 
@@ -479,10 +479,106 @@ public interface GenericConverter {
 
 }
 ```
-要实现GenericConverter，getConvertibleTypes()返回支持的源→目标类型对。然后实现convert(Object，TypeDescriptor，TypeDescriptor)来实现你的转换逻辑。转换源的TypeDescriptor提供对持有正在转换的值的转换源字段的访问。转换目标的TypeDescriptor提供对会被设置转换后值的目标字段的访问。
+为了实现GenericConverter，getConvertibleTypes()返回支持的源→目标类型对。然后实现convert(Object，TypeDescriptor，TypeDescriptor)来实现你的转换逻辑。转换源的TypeDescriptor提供对持有正在转换的值的转换源字段的访问。转换目标的TypeDescriptor提供对会被设置转换后值的目标字段的访问。
 
-GenericConverter是转换器的一个很好的例子是在Java Array和Collection之间进行转换。这样的ArrayToCollectionConverter会内省声明目标Collection类型的字段，来解析Collection的元素类型。
+GenericConverter是转换器的一个很好的例子是在Java Array和Collection之间进行转换。这样的ArrayToCollectionConverter会内省声明目标Collection类型的字段，来解析Collection的元素类型。这将允许源数组中的每个元素在Collection被设置在目标字段上之前转换为Collection元素类型。
 
+> 因为GenericConverter是一个更复杂的SPI接口，只有当您需要它时才可以使用它。Favor Converter或ConverterFactory用于基本类型转换的需要。
 
+### ConditionalGenericConverter
+有时候，你只想在指定条件成立时，才执行**Converter**。例如，你可能只想在目标字段上存在特定注解的时候，才执行一个**Converter**。或者你可能只想如果在目标类上定义了一个特定的方法，例如**static valueOf**方法，才执行一个**Converter**。**ConditionalGenericConverter**是**GenericConverter**和**ConditionalConverter**接口的组合，允许您定义这样的自定义匹配条件：
+```java
+public interface ConditionalConverter {
 
+    boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType);
 
+}
+
+public interface ConditionalGenericConverter
+    extends GenericConverter, ConditionalConverter {
+
+}
+```
+**ConditionalGenericConverter**的一个很好的例子是EntityConverter，它在持久性实体标识符和实体引用之间进行转换。这样一个EntityConverter只有如果目标实体类型声明一个静态的finder方法，如findAccount(Long)，才会匹配。你会在matches(TypeDescriptor,TypeDescriptor)的实现中执行这样的finder方法检查。
+
+## ConversionService API
+***
+ConversionService定义了一个统一的在运行时执行类型转换逻辑的API。Converters 通常在这个正面接口后面执行：
+```java
+package org.springframework.core.convert;
+
+public interface ConversionService {
+
+    boolean canConvert(Class<?> sourceType, Class<?> targetType);
+
+    <T> T convert(Object source, Class<T> targetType);
+
+    boolean canConvert(TypeDescriptor sourceType, TypeDescriptor targetType);
+
+    Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType);
+
+}
+```
+大多数ConversionService实现还实现了ConverterRegistry，它提供了一个用于注册转换器的SPI。在内部，ConversionService的实现委托给它注册的转换器来执行类型转换逻辑。
+
+**core.convert.support**包中提供了一个强大的ConversionService实现。**GenericConversionService**是适用于大多数环境的通用实现。**ConversionServiceFactory**为创建通用的**ConversionService**配置提供了便利的工厂。
+
+## 配置ConversionService
+***
+ConversionService是一种无状态对象，并且被设计为在应用程序启动时实例化，然后在多个线程之间共享。在Spring应用程序中，你通常为每个Spring容器（或ApplicationContext）配置一个ConversionService实例。这个ConversionService将被Spring采用，然后在框架需要执行类型转换时使用。你也可以将此ConversionService注入任何你的bean中，并直接调用。
+
+> 如果没有向Spring注册ConversionService，则使用原始的基于PropertyEditor的系统。
+
+要在Spring中注册默认的ConversionService，请使用id conversionService添加以下bean定义：
+```xml
+<bean id="conversionService"
+    class="org.springframework.context.support.ConversionServiceFactoryBean"/>
+```
+默认的ConversionService可以在字符串，数字，枚举，集合，map和其他常见类型之间进行转换。要使用你自己的自定义转换器补充或覆盖默认的转换器，设置**converters**属性。属性值可以实现Converter，ConverterFactory或GenericConverter接口之一。
+```xml
+<bean id="conversionService"
+        class="org.springframework.context.support.ConversionServiceFactoryBean">
+    <property name="converters">
+        <set>
+            <bean class="example.MyCustomConverter"/>
+        </set>
+    </property>
+</bean>
+```
+在Spring MVC应用程序中使用ConversionService也很常见。参见Spring MVC章节的[第16.3节“转换和格式化”]()。
+
+在某些情况下，您可能希望在转换期间应用格式化。有关使用**FormattingConversionServiceFactoryBean**的详细信息，请参见[第6.3节“FormatterRegistry SPI”](#FormatterRegistry SPI)。
+
+## 编程式使用ConversionService
+***
+要以编程方式使用ConversionService实例，只需像其他bean那样注入它的引用：
+```java
+@Service
+public class MyService {
+
+    @Autowired
+    public MyService(ConversionService conversionService) {
+        this.conversionService = conversionService;
+    }
+
+    public void doIt() {
+        this.conversionService.convert(...)
+    }
+}
+```
+对于大多数用例，可以使用指定targetType的**convert**方法，但它不适用于更复杂的类型，例如参数化元素的集合。如果你想编程式的将一个Integer的List转换为一个String的List，你需要提供源和目标类型的正式定义。
+
+幸运的是，**TypeDescriptor**提供了各种各样的选项，使之简单化：
+```java
+DefaultConversionService cs = new DefaultConversionService();
+
+List<Integer> input = ....
+cs.convert(input,
+    TypeDescriptor.forObject(input), // List<Integer>类型描述符
+    TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(String.class)));
+```
+请注意，DefaultConversionService会自动注册适用于大多数环境的转换器。这包括集合转换器，scalar 转换器以及基本的Object到String转换器。可以使用DefaultConversionService类上的静态addDefaultConverters方法向任何ConverterRegistry注册相同的转换器。
+
+值类型转换器会被重用于数组和集合，所以不需要创建溢恶特定的转换器来将S的Collection转换为T的Collection，假如标准集合处理合适的话。
+
+# Spring字段格式化
