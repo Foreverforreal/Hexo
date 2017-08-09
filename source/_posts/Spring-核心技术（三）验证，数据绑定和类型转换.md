@@ -139,7 +139,7 @@ BeanWrapper的工作方式部分由其名称指示：它包装一个bean以对�
 
 ## 设置和获取基本及嵌套属性
 ***
-属性的设置和获取是使用setPropertyValue(s)和getPropertyValue(s)方法完成的，这两个方法都带有几个重载变体。它们都在Spring附带的javadocs中有更详细的描述。重要的是知道这有几个约定用于指示对象的属性。几个例子：
+属性的设置和获取是使用**setPropertyValue(s)**和**getPropertyValue(s)**方法完成的，这两个方法都带有几个重载变体。它们都在Spring附带的javadocs中有更详细的描述。重要的是知道这有几个约定用于指示对象的属性。几个例子：
 
 *属性示例*
 
@@ -221,15 +221,15 @@ Float salary = (Float) company.getPropertyValue("managingDirector.salary");
 ```
 ## 内置PropertyEditor实现
 ***
-Spring使用**PropertyEditor**的概念来实现Object和String之间的转换。如果你考虑到这一点,有时以一个不同的方式，而不是用对象本身来表示属性可能更为方便。例如，Date可以用人类可读的方式表示（以String '2007-14-09'），而我们仍然能够将人类可读的形式转换回原来的date（或甚至更好：将以人类可读形式输入的任何日期转换回Date对象）。这种行为可以通过注册**java.beans.PropertyEditor**类型的自定义编辑器来实现。在BeanWrapper或者在上一章中提到的特定IoC容器中注册自定义编辑器，可以了解如何将属性转换为所需类型。在Oracle提供的java.beans包的javadoc中阅读有关PropertyEditors的更多信息。
+Spring使用**PropertyEditor**的概念来实现**Object**和**String**之间的转换。如果你考虑到这一点,有时以一个不同的方式，而不是用对象本身来表示属性可能更为方便。例如，Date可以用人类可读的方式表示（以String '2007-14-09'），而我们仍然能够将人类可读的形式转换回原来的date（或甚至更好：将以人类可读形式输入的任何日期转换回Date对象）。这种行为可以通过注册**java.beans.PropertyEditor**类型的自定义编辑器来实现。在**BeanWrapper**或者在上一章中提到的特定IoC容器中注册自定义编辑器，可以了解如何将属性转换为所需类型。在Oracle提供的java.beans包的javadoc中阅读有关**PropertyEditor**的更多信息。
 
 Spring中使用了一些属性编辑的例子：
-- 在bean上设置属性是通过使用PropertyEditors完成的。当提及的java.lang.String作为您声明在XML文件中的某个bean的属性的值时，Spring会（如果相应属性的setter具有Class参数）使用ClassEditor尝试将参数解析为一个Class对象。
-- 在Spring的MVC框架中解析HTTP请求参数是使用各种PropertyEditor完成的，这些PropertyEditors可以手动绑定CommandController的所有子类。
+- 在bean上设置属性是通过使用**PropertyEditor**完成的。当提及的java.lang.String作为您声明在XML文件中的某个bean的属性的值时，Spring会（如果相应属性的setter具有Class参数）使用ClassEditor尝试将参数解析为一个Class对象。
+- 在Spring的MVC框架中解析HTTP请求参数是使用各种**PropertyEditor**完成的，这些**PropertyEditor**可以手动绑定CommandController的所有子类。
 
-Spring有一些内置的PropertyEditor，使工作变得轻松。其中的每个都列在下面，它们都位于org.springframework.beans.propertyeditors包中。大多数但不是全部（如下所示），默认情况下由BeanWrapperImpl注册。属性编辑器可以以一些方式配置，你当然可以注册自己的变体来覆盖默认的：
+Spring有一些内置的**PropertyEditor**，使工作变得轻松。其中的每个都列在下面，它们都位于**org.springframework.beans.propertyeditors**包中。大多数但不是全部（如下所示），默认情况下由**BeanWrapperImpl**注册。属性编辑器可以以一些方式配置，你当然可以注册自己的变体来覆盖默认的：
 
-内置PropertyEditors
+*内置PropertyEditors*
 
 |Class|说明|
 |----|----|
@@ -284,13 +284,13 @@ public class FooBeanInfo extends SimpleBeanInfo {
 }
 ```
 ### 注册其他自定义PropertyEditor
-当将bean属性设置为字符串值时，Spring IoC容器最终会使用标准的JavaBeans PropertyEditors将这些字符串转换为该属性的复杂类型。Spring预注册了一些自定义的PropertyEditor（例如，将一个字符串表达的类名转换为一个真正的Class对象）。另外，Java的标准JavaBeans PropertyEditor查找机制允许一个类的PropertyEditor只需被适当地命名，并且被放置在与它提供的类相同的包中，就会被自动找到。
+当将bean属性设置为字符串值时，Spring IoC容器最终会使用标准的JavaBeans **PropertyEditor**将这些字符串转换为该属性的复杂类型。Spring预注册了一些自定义的**PropertyEditor**（例如，将一个字符串表达的类名转换为一个真正的Class对象）。另外，Java的标准JavaBeans **PropertyEditor**查找机制允许一个类的**PropertyEditor**只需被适当地命名，并且被放置在与它提供的类相同的包中，就会被自动找到。
 
-如果需要注册其他自定义PropertyEditor，这有几种可用机制。最手动的方式，也是通常不方便或不推荐的，是只要使用**ConfigurableBeanFactory**接口的**registerCustomEditor()**方法，假设你有一个BeanFactory引用的话。另一个稍微更方便的机制就是使用一个名为**CustomEditorConfigurer**的特殊bean工厂的后处理器。虽然Bean工厂后处理器可以与**BeanFactory**实现一起使用，但**CustomEditorConfigurer**有一个嵌套属性设置，因此强烈建议将其与**ApplicationContext**一起使用，它可以与其他任何bean类似的样式被部署，并且被自动检测和应用。
+如果需要注册其他自定义PropertyEditor，这有几种可用机制。最手动的方式，也是通常不方便或不推荐的，是只要使用**ConfigurableBeanFactory**接口的**registerCustomEditor()**方法，假设你有一个**BeanFactory**引用的话。另一个稍微更方便的机制就是使用一个名为**CustomEditorConfigurer**的特殊bean工厂的后处理器。虽然Bean工厂后处理器可以与**BeanFactory**实现一起使用，但**CustomEditorConfigurer**有一个嵌套属性设置，因此强烈建议将其与**ApplicationContext**一起使用，它可以与其他任何bean类似的样式被部署，并且被自动检测和应用。
 
 请注意，所有bean工厂和应用程序上下文都会自动使用一些内置的属性编辑器，通过使用一些名为**BeanWrapper**的东西来处理属性转换。**BeanWrapper**注册的标准属性编辑器在上一节中都被列出。此外，**ApplicationContexts**还会以适合特定应用程序上下文类型的方式覆盖或添加额外数量的编辑器来处理资源查找。
 
-标准JavaBeans **PropertyEditor**实例用于将表示为字符串的属性值转换为属性的实际复杂类型。**CustomEditorConfigurer**，一个bean工厂后处理器，可以用来方便地向ApplicationContext添加额外的PropertyEditor实例。
+标准JavaBeans **PropertyEditor**实例用于将表示为字符串的属性值转换为属性的实际复杂类型。**CustomEditorConfigurer**，一个bean工厂后处理器，可以用来方便地向**ApplicationContext**添加额外的**PropertyEditor**实例。
 
 考虑一个用户类ExoticType，另一个类DependsOnExoticType需要ExoticType设置为一个属性：
 ```java
@@ -652,7 +652,7 @@ public final class DateFormatter implements Formatter<Date> {
 ```
 Spring团队欢迎社区推动Formatter的贡献;见[jira.spring.io](https://jira.spring.io/browse/SPR)贡献。
 
-## 注解驱动格式化
+## 注解驱动的格式化
 ***
 如你所见，现字段格式化可以通过字段类型或注解进行配置。要将注解绑定到formatter，请实现AnnotationFormatterFactory：
 ```java
@@ -716,9 +716,9 @@ public class MyModel {
 }
 ```
 ### 格式化注解API
-org.springframework.format.annotation包中有一个易移植的格式注解API。使用@NumberFormat格式化java.lang.Number字段。使用@DateTimeFormat 格式化java.util.Date，java.util.Calendar，java.util.Long，或Joda Time字段。
+**org.springframework.format.annotation**包中有一个易移植的格式注解API。使用**@NumberFormat**格式化**java.lang.Number**字段。使用**@DateTimeFormat**格式化**java.util.Date**，**java.util.Calendar**，**java.util.Long**，或Joda Time字段。
 
-下面的示例使用@DateTimeFormat将java.util.Date格式化为ISO日期（yyyy-MM-dd）：
+下面的示例使用**@DateTimeFormat**将java.util.Date格式化为ISO日期（yyyy-MM-dd）：
 ```java
 public class MyModel {
 
@@ -730,8 +730,8 @@ public class MyModel {
 
 ## FormatterRegistry SPI
 ***
-FormatterRegistry是用于注册格式化器和转换器的SPI。
-**FormattingConversionService**是一个适用于大多数环境的FormatterRegistry的实现。这个实现可以编程式或使用**FormattingConversionServiceFactoryBean**声明为一个Spring bean来配置。由于此实现还实现了**ConversionService**，因此可以直接配置为与Spring的DataBinder和Spring Expression Language（Spel）配合使用。
+**FormatterRegistry**是用于注册格式化器和转换器的SPI。
+**FormattingConversionService**是一个适用于大多数环境的FormatterRegistry的实现。这个实现可以编程式或使用**FormattingConversionServiceFactoryBean**声明为一个Spring bean来配置。由于此实现还实现了**ConversionService**，因此可以直接配置为与Spring的**DataBinder**和**Spring Expression Language（Spel）**配合使用。
 
 请查看下面的FormatterRegistry SPI：
 ```java
@@ -755,7 +755,7 @@ FormatterRegistry SPI允许你集中配置格式化规则，而不是在你的Co
 
 ## FormatterRegistrar SPI
 ***
-FormatterRegistrar是一个通过FormatterRegistry注册格式化器和转换器的SPI：
+**FormatterRegistrar**是一个通过**FormatterRegistry**注册格式化器和转换器的SPI：
 ```java
 package org.springframework.format;
 
@@ -772,7 +772,7 @@ public interface FormatterRegistrar {
 参见Spring MVC章节的[第16.3节“转换和格式化"](#)。
 
 ***
-配置全局日期和时间格式
+# 配置全局日期和时间格式
 ***
 默认情况下，未使用**@DateTimeFormat**注解的日期和时间字段使用**DateFormat.SHORT**样式从字符串转换。如果你愿意，你可以通过定义你自己的全局格式化来改变。
 

@@ -8,6 +8,7 @@ categories:
   - servlet
 date: 2017-06-21 09:34:00
 ---
+[原文链接：](https://docs.oracle.com/javaee/7/tutorial/servlets.htm#BNAFD)  
 Java Servlet技术使用请求 - 响应编程模型在Web应用程序中提供动态的面向用户的内容。
 # 什么是Servlet?
 　　servlet是一种Java编程语言类，用于扩展托管应用程序的服务器的功能，这些应用程序使用请求 - 响应编程模型来访问。虽然servlet可以响应任何类型的请求，但它们通常用于扩展由Web服务器托管的应用程序。对于这样的应用程序，Java Servlet技术定义了HTTP特定的servlet类。   
@@ -400,7 +401,7 @@ Servlet规范支持两种额外的HttpServletRequest方法：
 - Collection&lt;Part> getParts()
 - Part getPart(String name)
 
-　　request.getParts（）方法返回所有Part对象的集合。如果您有多个类型文件的输入，则返回多个Part对象。因为Part对象是有名称的，所以getPart（String name）方法可用于访问特定的Part。或者，可以使用返回Iterable &lt;Part>的getParts（）方法来获取所有Part对象上的迭代器。  
+　　request.getParts()方法返回所有Part对象的集合。如果您有多个类型文件的输入，则返回多个Part对象。因为Part对象是有名称的，所以getPart（String name）方法可用于访问特定的Part。或者，可以使用返回Iterable &lt;Part>的getParts()方法来获取所有Part对象上的迭代器。  
 　　javax.servlet.http.Part接口是一个简单的接口，它提供了允许对每个Part进行内省的方法。方法如下： 
 
 - 获取Part的名称，大小，和内容类型
@@ -423,7 +424,7 @@ Servlet规范支持两种额外的HttpServletRequest方法：
 @WebServlet(urlPatterns={"/asyncservlet"}, asyncSupported=true)
 public class AsyncServlet extends HttpServlet { ... }
 ```
-　　javax.servlet.AsyncContext类提供了在service方法中执行异步处理所需的功能。要获取AsyncContext的实例，请在service方法的请求对象上调用startAsync（）方法;例如：
+　　javax.servlet.AsyncContext类提供了在service方法中执行异步处理所需的功能。要获取AsyncContext的实例，请在service方法的request对象上调用startAsync()方法;例如：
 ```java
 public void doGet(HttpServletRequest req, HttpServletResponse resp) {
    ...
@@ -431,12 +432,12 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp) {
    ...
 }
 ```
-　　此调用将请求置于异步模式，并确保退出service方法后未提交响应。你必须在异步上下文中等待阻塞式操作完成后或者将请求转发到另一个servlet后，生成一个响应。  
+　　此调用将请求置于异步模式，并确保退出service方法后不提交响应。你必须在异步上下文中等待阻塞式操作完成后或者将请求转发到另一个servlet后，生成一个响应。  
 下表介绍了AsyncContext类提供的基本功能。 
 
 |Method Signature|Description|
 |----------------|-----------|
-|void start(Runnable run)|	容器提供了可以处理阻塞操作的不同线程。<br><br>你为阻塞式操作提供代码，作为一个实现了Runable接口的类。可以提供这个类作为内部类，当调用start方法，或者使用使用其他机制将AsyncContext实例传递给您的类。|
+|void start(Runnable run)|	容器提供了可以处理阻塞操作的不同线程。<br><br>你用一个实现了Runable接口的类为阻塞式操作提供代码。可以提供这个类作为内部类，当调用start方法，或者使用使用其他机制将AsyncContext实例传递给你的类。|
 |ServletRequest getRequest()|返回用于初始化此异步上下文的request。在上面的例子中，request与service方法中的相同。<br>您可以在异步上下文中使用此方法从request中获取参数。|
 |ServletResponse getResponse()|	返回用于初始化此异步上下文的response。在上面的例子中，response与service方法中的相同。<br>您可以在异步上下文中使用此方法，将阻塞操作的结果写入响应。|
 |void complete()|完成异步操作并关闭与此异步上下文相关联的响应。在写入异步上下文中的响应对象之后调用此方法。|
@@ -490,9 +491,9 @@ public class AsyncServlet extends HttpServlet {
 }
 ```
 AsyncServlet将asyncSupported = true添加到@WebServlet注解。其余的差异在服务方法之内。  
-- request.startAsync（）导致请求被异步处理;该响应不会在服务方法结束时发送给客户端。
-- acontext.start（new Runnable（）{...}）从容器中获取一个新的线程。
-- 内部类的run（）方法中的代码在新线程中执行。内部类可以访问异步上下文以从请求读取参数并写入响应。调用异步上下文的complete（）方法提交响应并将其发送给客户端。
+- request.startAsync()导致请求被异步处理;该响应不会在服务方法结束时发送给客户端。
+- acontext.start（new Runnable(){...}）从容器中获取一个新的线程。
+- 内部类的run()方法中的代码在新线程中执行。内部类可以访问异步上下文以从请求读取参数并写入响应。调用异步上下文的complete()方法提交响应并将其发送给客户端。
 AsyncServlet的服务方法立即返回，而请求在异步上下文中处理。
 
 # 非阻塞式I/O
@@ -565,7 +566,7 @@ public class AsyncIOServlet extends HttpServlet {
    }
 }
 ```
-　　此示例使用@WebServlet注解参数asyncSupported = true声明这个web servlet带有异步支持。服务方法首先通过调用request对象的startAsync（）方法将请求置于异步模式，这是为了使用非阻塞I / O所必需的。然后，服务方法获得与请求相关联的输入流，并分配一个定义为内部类的读取监听器。监听器读取请求的一部分，当它可用时，然后在完成读取请求后向客户端写入一些响应。
+　　此示例使用@WebServlet注解参数asyncSupported = true声明这个web servlet带有异步支持。服务方法首先通过调用request对象的startAsync()方法将请求置于异步模式，这是为了使用非阻塞I / O所必需的。然后，服务方法获得与请求相关联的输入流，并分配一个定义为内部类的读取监听器。监听器读取请求的一部分，当它可用时，然后在完成读取请求后向客户端写入一些响应。
 # 协议升级处理
 　　在HTTP / 1.1中，客户端可以通过使用Upgrade头字段来请求切换在当前连接上的不同协议。如果服务器接受客户端指示的切换协议请求，它会使用状态吗101（切换协议）产生一个HTTP响应。在此交换之后，客户端和服务器使用新协议进行通信。
 例如，一个客户端可以使一个HTTP请求切换到XYZP协议：

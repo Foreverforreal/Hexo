@@ -681,25 +681,25 @@ public class RelativePathUriTemplateController {
 > 虽然可以使用媒体类型通配符匹配Content-Type和Accept标头值（例如“content-type=text/\*"将匹配“text/plain"和“text/html"），但建议分别使用consumes和produces条件来代替。它们专门用于此目的。
 
 ### HTTP HEAD和HTTP OPTIONS
-映射到“GET"的@RequestMapping方法也隐式映射到“HEAD"，即不需要明确声明“HEAD"。处理一个HTTP HEAD请求就和处理HTTP GET一样，除了它仅统计响应体的字节数，并且设置在"Content-Length" 响应头中，而不写入响应体。
+映射到“GET"的**@RequestMapping**方法也隐式映射到“HEAD"，即不需要明确声明“HEAD"。处理一个HTTP HEAD请求就和处理HTTP GET一样，除了它仅统计响应体的字节数，并且设置在"Content-Length" 响应头中，而不写入响应体。
 
-@RequestMapping方法内置支持HTTP OPTIONS。默认情况下，HTTP OPTIONS请求通过在HTTP方法（明确声明在所有与URL模式匹配的@RequestMapping方法上的）上设置“Allow"响应头来处理。当没有HTTP方法被显示声明“Allow"，头被设置为"GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"。理想地总是声明@RequestMapping方法要处理的HTTP方法，或者使用专用的组合的@RequestMapping变体之一（请参阅[“组合@RequestMapping变体"](#组合@RequestMapping变体)一节）。
+**@RequestMapping**方法内置支持HTTP OPTIONS。默认情况下，HTTP OPTIONS请求通过在HTTP方法（明确声明在所有与URL模式匹配的@RequestMapping方法上的）上设置“Allow"响应头来处理。当没有HTTP方法被显示声明“Allow"，头被设置为"GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"。理想地总是声明**@RequestMapping**方法要处理的HTTP方法，或者使用专用的组合**@RequestMapping**变体之一（请参阅[“组合@RequestMapping变体"](#组合@RequestMapping变体)一节）。
 
 
-尽管不需要@RequestMapping方法可以映射到HTTP HEAD或HTTP OPTIONS，或同时两者。
+尽管不需要**@RequestMapping**方法可以映射到HTTP HEAD或HTTP OPTIONS，或同时两者。
 
 ## 定义@RequestMapping处理器方法
 ***
-@RequestMapping处理器方法可以有非常灵活的签名。支持的方法参数和返回值将在以下部分中介绍。大多数参数可以按任意顺序使用，唯一的例外是BindingResult参数。这将在下一节中介绍。
+**@RequestMapping**处理器方法可以有非常灵活的签名。支持的方法参数和返回值将在以下部分中介绍。大多数参数可以按任意顺序使用，唯一的例外是BindingResult参数。这将在下一节中介绍。
 
-> Spring 3.1分别为@RequestMapping方法引入了一组新的支持类，分别叫做RequestMappingHandlerMapping和RequestMappingHandlerAdapter推荐使用它们，即使需要使用Spring MVC 3.1和之后版本的新功能。MVC命名空间和MVC Java配置默认启用这些新的支持类，但是如果你不使用，则必须明确配置
+> Spring 3.1分别为**@RequestMapping**方法引入了一组新的支持类，分别叫做**RequestMappingHandlerMapping**和**RequestMappingHandlerAdapter**推荐使用它们，即使需要使用Spring MVC 3.1和之后版本的新功能。MVC命名空间和MVC Java配置默认启用这些新的支持类，但是如果你不使用，则必须明确配置
 
 
 ### 支持的方法参数类型
 以下是支持的方法参数类型：
-- **Request**或**response**对象（Servlet API）。选择任何特定的request或response类型，例如ServletRequest或HttpServletRequest。
-- **Session**对象（Servlet API）：类型为HttpSession。此类型的参数强制存在相应的session。因此，这样的论证从不为空。
-> **Session**访问可能不是线程安全的，特别在Servlet环境中。如果允许多个request同时访问session，请考虑将RequestMappingHandlerAdapter的“synchronizeOnSession"标志设置为“true"。
+- **Request**或**response**对象（Servlet API）。选择任何具体的request或response类型，例如ServletRequest或HttpServletRequest。
+- **Session**对象（Servlet API）：类型为**HttpSession**。这个类型的参数强制存在相应的session。因此，这样的参数从不为**null**。
+> **Session**访问可能不是线程安全的，特别在Servlet环境中。如果允许多个request同时访问session，请考虑将**RequestMappingHandlerAdapter**的“synchronizeOnSession"标志设置为“true"。
 
 - **org.springframework.web.context.request.WebRequest**或**org.springframework.web.context.request.NativeWebRequest**。允许通用请求参数访问以及request/session属性访问，与本地Servlet/Portlet API无关。
 - **java.util.Locale**——当前的请求语言环境，由最具体的语言环境解析器确定，实际上是在MVC环境中配置的LocaleResolver/LocaleContextResolver。
@@ -724,7 +724,7 @@ public class RelativePathUriTemplateController {
 - **org.springframework.web.bind.support.SessionStatus**用于标记表单处理完成的状态处理，这会触发在处理器类型级别上由@SessionAttributes注解指示的session属性的清理。
 - **org.springframework.web.util.UriComponentsBuilder**——用于准备一个与当前请求的 host, port, scheme, context path以及servlet映射的文字部分相对的URL的构建器。
 
-Errors或BindingResult参数必须跟在被绑定的模型对象后，因为方法签名可能有多个模型对象，Spring将为每个模型对象创建一个单独的BindingResult实例，因此以下示例将无法工作：
+**Errors**或**BindingResult**参数必须跟在被绑定的模型对象后，因为方法签名可能有多个模型对象，Spring将为每个模型对象创建一个单独的BindingResult实例，因此以下示例将无法工作：
 
 *BindingResult和@ModelAttribute无效排序。*
 ```java
@@ -736,15 +736,15 @@ public String processSubmit(@ModelAttribute("pet") Pet pet, Model model, Binding
 @PostMapping
 public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result, Model model) { ... }
 ```
-> JDK 1.8的java.util.Optional也被支持作为带有注解的方法参数类型，该注解有一个required属性（例如@RequestParam，@RequestHeader等）在这些情况下使用java.util.Optional相当于有有一个属性required = false。
+> JDK 1.8的java.util.Optional也被支持作为带有注解的方法参数类型，该注解有一个required属性（例如**@RequestParam**，**@RequestHeader**等）在这些情况下使用java.util.Optional相当于有有一个属性required = false。
 
 ### 支持的方法返回类型
 以下是支持的方法返回类型：
-- 一个**ModelAndView**对象，带有使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化的model。
-- 一个**Model**对象，视图名称通过RequestToViewNameTranslator隐式确定，model使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化。
-- 用于暴露model的**Map**对象，视图名称通过RequestToViewNameTranslator隐式确定，model使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化。
-- 一个**View**对象，model通过命令对象和@ModelAttribute注解引用数据访问器方法隐式确定。这个处理器方法也可以通过声明一个Model参数（见上文）以编程方式富化model。
-- 一个**String**值，它被解释为逻辑视图名，model通过命令对象和@ModelAttribute注解引用数据访问器方法隐式确定。这个处理器方法也可以通过声明一个Model参数（见上文）以编程方式富化model。
+- 一个**ModelAndView**对象，带有使用命令对象和**@ModelAttribute**注解引用的数据访问器方法的结果隐式富化的model。
+- 一个**Model**对象，视图名称通过**RequestToViewNameTranslator**隐式确定，model使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化。
+- 用于暴露model的**Map**对象，视图名称通过**RequestToViewNameTranslator**隐式确定，model使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化。
+- 一个**View**对象，model通过命令对象和**@ModelAttribute**注解引用数据访问器方法隐式确定。这个处理器方法也可以通过声明一个Model参数（见上文）以编程方式富化model。
+- 一个**String**值，它被解释为逻辑视图名，model通过命令对象和**@ModelAttribute**注解引用数据访问器方法隐式确定。这个处理器方法也可以通过声明一个Model参数（见上文）以编程方式富化model。
 - **void**，如果方法自己处理响应（通过直接写入响应内容，为此目的声明一个ServletResponse/HttpServletResponse类型的参数）或者视图名称应该通过RequestToViewNameTranslator隐式确定（不在处理器方法签名中声明响应参数）。
 - 如果方法被@ResponseBody注解，返回的类型被写入到响应HTTP体中。返回值将使用HttpMessageConverters转换为声明的方法参数类型。请参阅[“使用@ResponseBody注解映射响应体"](#使用@ResponseBody注解映射响应体)一节。
 - 一个**HttpEntity&lt;>**或**ResponseEntity&lt;>**对象,以提供对Servlet响应HTTP头和内容的访问。实体将使用HttpMessageConverters转换为响应流。请参阅[“使用HttpEntity"](#使用HttpEntity)一节。
@@ -758,7 +758,7 @@ public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result
 - 任何其他返回类型都被认为是要暴露给视图的单个model属性，使用在方法级通过@ModelAttribute指定的属性名称（或基于返回类型类名的默认属性名称）。model使用命令对象和@ModelAttribute注解引用的数据访问器方法的结果隐式富化。
 
 ### 使用@RequestParam将请求参数绑定到方法参数
-在控制器中使用@RequestParam注解将请求参数绑定到方法参数
+在控制器中使用**@RequestParam**注解将请求参数绑定到方法参数
 
 以下代码片段显示用法：
 ```java
@@ -780,11 +780,11 @@ public class EditPetForm {
 
 }
 ```
-使用这个注解的参数默认是必须的，但是你可以通过设置@RequestParam的属性required为false来指定这个参数为可选（例如@RequestParam(name =“id"，required = false)）
+使用这个注解的参数默认是必须的，但是你可以通过设置**@RequestParam**的属性**required**为false来指定这个参数为可选（例如**@RequestParam(name =“id"，required = false)**）
 
 如果目标方法参数类型不是String，则会自动应用类型转换。请参阅[“方法参数和类型转换"](#方法参数和类型转换)一节。
 
-当在Map&lt;String,String>或MultiValueMap&lt;String,String>参数上使用@RequestParam注解时，映射将填充所有请求参数。
+当在**Map&lt;String,String>**或**MultiValueMap&lt;String,String>**参数上使用**@RequestParam**注解时，map将被填充所有请求参数。
 
 ### 使用@RequestBody注解映射请求体
 **@RequestBody**方法参数注解表示方法参数应绑定到HTTP请求体的值上。例如：
@@ -833,7 +833,7 @@ public void handle(@RequestBody String body, Writer writer) throws IOException {
 > 有关通过MVC命名空间或MVC Java配置配置消息转换器和验证器的信息，请参见[第16.1节“启用MVC Java配置或MVC XML命名空间"](#启用MVC Java配置或MVC XML命名空间)。
 
 ### 使用@ResponseBody注解映射响应体
-@ResponseBody注解类似于@RequestBody。这个注解可以被放置在方法上，并且表示返回值类型应该被直接写入HTTP响应体中（而不是放在Model中，或者解释为视图名称）。例如
+**@ResponseBody**注解类似于**@RequestBody**。这个注解可以被放置在方法上，并表示返回值类型应该被直接写入HTTP响应体中（而不是放在Model中，或者解释为视图名称）。例如
 ```java
 @GetMapping("/something")
 @ResponseBody
@@ -842,16 +842,16 @@ public String helloWorld() {
 }
 ```
 上面的例子会导致文本Hello World被写入HTTP响应流中。
-与@RequestBody一样，Spring通过使用HttpMessageConverter将返回的对象转换为响应体。有关这些转换器的更多信息，请参阅上一部分和[消息转换器](#消息转换器)。
+与**@RequestBody**一样，Spring通过使用**HttpMessageConverter**将返回的对象转换为响应体。有关这些转换器的更多信息，请参阅上一部分和[消息转换器](#消息转换器)。
 
 ### 使用@RestController注解创建REST控制器
-控制器实现REST API是一个非常常见的用例，因此仅提供JSON，XML或自定义的MediaType内容。为了方便起见，相比使用@ResponseBody注解你的所有的@Reques天Mapping方法，你可以使用@RestController注解你的控制器类。
+控制器实现REST API是一个非常常见的用例，从而仅提供JSON，XML或自定义的MediaType内容。为了方便起见，相比使用**@ResponseBody**注解你的所有的**@RequestMapping**方法，你可以使用**@RestController**注解你的控制器类。
 
-@RestController是一个结合了@ResponseBody和@Controller的模型注解。更重要的是，它给您的控制器提供了更多的意义，并且可能在将来的框架版本中携带额外的语义。
-与常规的@Controlers一样，@RestController可以由@ControllerAdvice或@RestControllerAdvice beans协助。有关更多详细信息，请参阅[“使用@ControllerAdvice和@RestControllerAdvice通知控制器"](使用@ControllerAdvice和@RestControllerAdvice通知控制器)一节。
+**@RestController**是一个结合了**@ResponseBody**和**@Controller**的模型注解。更重要的是，它给您的控制器提供了更多的意义，并且可能在将来的框架版本中携带额外的语义。
+与常规的**@Controller**一样，**@RestController**可以由**@ControllerAdvice**或@**RestControllerAdvice **beans协助。有关更多详细信息，请参阅[“使用@ControllerAdvice和@RestControllerAdvice通知控制器"](#使用@ControllerAdvice和@RestControllerAdvice通知控制器)一节。
 
 ### 使用HttpEntity
-HttpEntity类似于@RequestBody和@ResponseBody。除了访问请求和响应体之外，HttpEntity（以及响应特定的子类ResponseEntity）还允许访问请求和响应头，如下所示：
+**HttpEntity**类似于**@RequestBody**和**@ResponseBody**。除了访问请求和响应体之外，**HttpEntity**（以及响应特定的子类**ResponseEntity**）还允许访问请求和响应头，如下所示：
 ```java
 @RequestMapping("/something")
 public ResponseEntity<String> handle(HttpEntity<byte[]> requestEntity) throws UnsupportedEncodingException {
@@ -865,14 +865,14 @@ public ResponseEntity<String> handle(HttpEntity<byte[]> requestEntity) throws Un
     return new ResponseEntity<String>("Hello World", responseHeaders, HttpStatus.CREATED);
 }
 ```
-以上示例获取MyRequestHeader请求头的值，并将字节数组读取形式读取请求体。在响应中添加了MyResponseHeader，将Hello World写入到响应流中，并且设置响应代码未201（Created）。
+以上示例获取**MyRequestHeader**请求头的值，并将字节数组读取形式读取请求体。在响应中添加了**MyResponseHeader**，将Hello World写入到响应流中，并且设置响应代码未201（Created）。
 
-与@RequestBody和@ResponseBody一样，Spring使用HttpMessageConverter从请求和响应流转换。有关这些转换器的更多信息，请参阅上一部分和[消息转换器](#消息转换器)。
+与**@RequestBody**和**@ResponseBody**一样，Spring使用**HttpMessageConverter**从请求和响应流转换。有关这些转换器的更多信息，请参阅上一部分和[消息转换器](#消息转换器)。
 
 ### 在方法上使用@ModelAttribute
-@ModelAttribute注解可以在方法和方法参数上使用。这节说明它的在方法上的用法，下一节说明它在方法参数上的用法。
+**@ModelAttribute**注解可以在方法和方法参数上使用。这节说明它的在方法上的用法，下一节说明它在方法参数上的用法。
 
-在方法上的@ModelAttribute表示该方法的目的是添加一个或多个Model属性。这样的方法支持与@RequestMapping方法相同的参数类型，但不能直接映射到请求上。在同一个控制器中，控制器中的@ModelAttribute方法在@RequestMapping方法之前被调用。几个例子：
+在方法上的**@ModelAttribute**表示该方法的目的是添加一个或多个**Model**属性。这样的方法支持与**@RequestMapping**方法相同的参数类型，但不能直接映射到请求上。在同一个控制器中，控制器中的**@ModelAttribute**方法在**@RequestMapping**方法之前被调用。几个例子：
 ```java
 // 添加一个属性
 // 方法的返回值类型会被在"account“名称下添加到model中
@@ -891,44 +891,44 @@ public void populateModel(@RequestParam String number, Model model) {
     // 添加更多 ...
 }
 ```
-@ModelAttribute方法用于在model中填充常用属性，例如使用state或pet类型填充下拉列表，或者检索诸如Account的命令对象，以便使用它来表示HTML表单上的数据。后一种情况在下一节进一步讨论。
+**@ModelAttribute**方法用于在model中填充常用属性，例如使用state或pet类型填充下拉列表，或者检索诸如Account的命令对象，以便使用它来表示HTML表单上的数据。后一种情况在下一节进一步讨论。
 
-注意两种样式的@ModelAttribute方法。在第一个方法中，该方法通过返回隐式地添加一个属性。在第二个方法中，该方法接受一个Model并向它添加任意数量的model属性。你可以根据在两种样式中选择。
+注意两种样式的**@ModelAttribute**方法。在第一个方法中，该方法通过返回隐式地添加一个属性。在第二个方法中，该方法接受一个**Model**并向它添加任意数量的model属性。你可以根据在两种样式中选择。
 
-控制器可以有任何数量的@ModelAttribute方法。在同一控制器所有这些方法都在@RequestMapping方法之前调用。
+控制器可以有任何数量的**@ModelAttribute**方法。在同一控制器所有这些方法都在**@RequestMapping**方法之前调用。
 
-@ModelAttribute方法也可以在@ControllerAdvice注解的类中定义，而这种方法也适用于许多控制器。有关更多详细信息，请参阅[“使用@ControllerAdvice和@RestControllerAdvice通知控制器"](使用@ControllerAdvice和@RestControllerAdvice通知控制器)一节。
+**@ModelAttribute**方法也可以在**@ControllerAdvice**注解的类中定义，而这种方法也适用于许多控制器。有关更多详细信息，请参阅[“使用@ControllerAdvice和@RestControllerAdvice通知控制器"](#使用@ControllerAdvice和@RestControllerAdvice通知控制器)一节。
 
-> 当没有明确指定model属性名称时会发生什么？在这种情况下，根据其类型将默认名称分配给model属性。例如，如果该方法返回一个类型为Account的对象，使用的默认名称是"account"。你可以通过@ModelAttribute注解的值来更改它。如果直接向model中添加属性，请使用适当的重载addAttribute(..)方法，即带有或不带有属性名称。
+> 当没有明确指定model属性名称时会发生什么？在这种情况下，根据其类型将默认名称分配给model属性。例如，如果该方法返回一个类型为Account的对象，使用的默认名称是"account"。你可以通过**@ModelAttribute**注解的值来更改它。如果直接向model中添加属性，请使用合适的**addAttribute(..)**重载方法，即带有或不带有属性名称。
 
-@ModelAttribute注解也可以在@RequestMapping方法中使用。在这种情况下，@RequestMapping方法的返回值将被解释为model属性而不是视图名称。然后视图名称根据视图名称惯例推导出，这非常类似于返回void的方法 - 见第22.13.3节“视图 - RequestToViewNameTranslator"。
+**@ModelAttribute**注解也可以在**@RequestMapping**方法中使用。在这种情况下，**@RequestMapping**方法的返回值将被解释为model属性而不是视图名称。然后视图名称根据视图名称惯例推导出，这非常类似于返回void的方法 - 见第[13.3节“视图 - RequestToViewNameTranslator"](#视图 - RequestToViewNameTranslator)。
 
 ### 在方法参数上使用@ModelAttribute
-如上一节所述，@ModelAttribute可以在方法或方法参数上使用。本节介绍了其在方法参数中的用法。
+如上一节所述，**@ModelAttribute**可以在方法或方法参数上使用。本节介绍了其在方法参数中的用法。
 
-方法参数上的@ModelAttribute表示这个参数应该从model中检索。如果model中不存在，参数首先被实例化，然后添加到model中。一旦model中存在，这个参数字段会从所有名称相匹配的请求参数中填充。这在Spring MVC中被称为的数据绑定，这是一个非常有用的机制，可以节省您逐个解析每个表单字段时间。
+方法参数上的**@ModelAttribute**表示这个参数应该从model中检索。如果model中不存在，参数首先被实例化，然后添加到model中。一旦model中存在，这个参数的字段会从所有名称相匹配的请求参数中填充。这在Spring MVC中被称为的数据绑定，这是一个非常有用的机制，可以节省您逐个解析每个表单字段时间。
 ```java
 @PostMapping("/owners/{ownerId}/pets/{petId}/edit")
 public String processSubmit(@ModelAttribute Pet pet) { }
 ```
 上面给定的示例中，Pet示例可以才能够哪里获得？这有几个选项：
-- 由于使用@SessionAttributes，它可能已经在model中— 请参阅[“使用@SessionAttributes在请求之间的HTTP session中存储model属性"](#使用@SessionAttributes在请求之间的HTTP session中存储model属性)一节。
-- 由于同一控制器中的@ModelAttribute方法，它可能已经在model中- 如前一节所述。
+- 由于**@SessionAttributes**的使用，它可能已经在model中— 请参阅[“使用@SessionAttributes在请求之间的HTTP session中存储模型属性"](#使用@SessionAttributes在请求之间的HTTP session中存储模型属性)一节。
+- 由于同一控制器中的**@ModelAttribute**方法，它可能已经在model中- 如前一节所述。
 - 它可以基于URI模板变量和类型转换器（下面更详细地解释）来检索。
 - 它可以使用其默认构造函数实例化。
 
-@ModelAttribute方法是从数据库检索属性的常用方式，可以通过使用@SessionAttributes来选择性地存储在请求之间。在某些情况下，通过使用URI模板变量和类型转换器来检索属性可能很方便。这是一个例子：
+**@ModelAttribute**方法是从数据库检索属性的常用方式，可以通过使用**@SessionAttributes**来选择性地存储在请求之间。在某些情况下，通过使用URI模板变量和类型转换器来检索属性可能很方便。下面一个例子：
 ```java
 @PutMapping("/accounts/{account}")
 public String save(@ModelAttribute("account") Account account) {
     // ...
 }
 ```
-在此示例中，model属性（即“account"）的名称与URI模板变量的名称相匹配。如果你注册可以将String类型的account值转换为Account实例的Converter&lt;String,Account>，那么上面的例子不需要一个@ModelAttribute方法也可以工作。
+在此示例中，model属性（即“account"）的名称与URI模板变量的名称相匹配。如果你注册可以将**String**类型的account值转换为**Account**实例的**Converter&lt;String,Account>**，那么上面的例子不需要@ModelAttribute方法也可以工作。
 
-下一步是数据绑定。WebDataBinder类按照名称将请求参数名称（包括查询字符串参数和表单字段）匹配到model属性字段上。匹配的字段在必要的类型转换（从String到目标字段类型）应用后被填充。数据绑定和验证在第9章"验证，数据绑定，和类型转换“中一经介绍。自定义控制器级别的数据绑定过程将在[“自定义WebDataBinder初始化"](#自定义WebDataBinder初始化)一节中介绍。
+下一步是数据绑定。**WebDataBinder**类按照名称将请求参数名称（包括查询字符串参数和表单字段）匹配到模型属性字段上。匹配的字段在必要的类型转换（从String到目标字段类型）应用后被填充。数据绑定和验证在第9章"验证，数据绑定，和类型转换“中一经介绍。自定义控制器级别的数据绑定过程将在[“自定义WebDataBinder初始化"](#自定义WebDataBinder初始化)一节中介绍。
 
-数据绑定可能会出现错误，比如缺少必须字段或类型转换错误。要检查这样的错误，，请在@ModelAttribute参数之后立即添加BindingResult参数：
+数据绑定可能会出现错误，比如缺少必须字段或类型转换错误。要检查这样的错误，请在**@ModelAttribute**参数之后立即添加**BindingResult**参数：
 ```java
 @PostMapping("/owners/{ownerId}/pets/{petId}/edit")
 public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result) {
@@ -941,7 +941,7 @@ public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result
 
 }
 ```
-使用BindingResult可以检查是否发现错误，在通常呈现相同表单的情况吓,这里可以在Spring的&lt;errors>表单标签的帮助下显示错误。
+使用**BindingResult**可以检查是否发现错误，在通常呈现相同表单的情况吓,这里可以在Spring的&lt;errors>表单标签的帮助下显示错误。
 
 注意，在某些情况下，不使用数据绑定来获取访问modle中的属性可能是有用的。对于这种情况，您可以将**Model**注入控制器，或者作为选择的在注解上使用**binding**标志：
 ```java
@@ -962,7 +962,7 @@ public String update(@Valid AccountUpdateForm form, BindingResult result,
     // ...
 }
 ```
-除了数据绑定之外，你还可以使用你自己的自定义验证器传递相同的用于记录数据绑定错误的BindingResult来调用验证。这允许数据绑定和验证的错误在同一个地方累积，并随后向用户报告：
+除了数据绑定之外，你还可以使用你自己的自定义验证器传递相同的用于记录数据绑定错误的**BindingResult**来调用验证。这允许数据绑定和验证的错误在同一个地方累积，并随后向用户报告：
 ```java
 @PostMapping("/owners/{ownerId}/pets/{petId}/edit")
 public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result) {
@@ -976,7 +976,7 @@ public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result
 
 }
 ```
-或者您可以通过添加JSR-303 @Valid注解来自动调用验证：
+或者您可以通过添加JSR-303 **@Valid**注解来自动调用验证：
 ```java
 @PostMapping("/owners/{ownerId}/pets/{petId}/edit")
 public String processSubmit(@Valid @ModelAttribute("pet") Pet pet, BindingResult result) {
@@ -991,10 +991,10 @@ public String processSubmit(@Valid @ModelAttribute("pet") Pet pet, BindingResult
 ```
 有关如何配置和使用验证的详细信息，请参见第9.8节[“Spring验证"](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#validation-beanvalidation)和[第9章“验证，数据绑定和类型转换“](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#validation)。
 
-### 使用@SessionAttributes在请求之间的HTTP session中存储model属性
-类型级@SessionAttributes注解声明指定处理器使用的session属性。这通常将列出model属性名称或模型属性的类型，这些模型属性或类型应该透明地存储在会话或某些会话存储中，作为后续请求之间的表单支持bean。
+### 使用@SessionAttributes在请求之间的HTTP session中存储模型属性
+类型级**@SessionAttributes**注解声明特定处理器使用的session属性。这通常将列出模型属性名称或模型属性的类型，这些模型属性或类型应该透明地存储在会话或某些会话存储中，作为后续请求之间的表单支持bean。
 
-下面的代码片段展示了这个注解的用法，指定model属性名称：
+下面的代码片段展示了这个注解的用法，指定模型属性名称：
 ```java
 @Controller
 @RequestMapping("/editPet.do")
@@ -1004,7 +1004,7 @@ public class EditPetForm {
 }
 ```
 ### 使用@SessionAttribute访问预先存在的全局session属性
-如果您需要访问全局管理的预先存在的session属性，即控制器之外的（如一个过滤器），并且它可能或不存在，则可以在方法参数上使用@SessionAttribute注解：
+如果您需要访问全局管理的预先存在的session属性，即控制器之外的（如一个过滤器），并且它可能或不存在，则可以在方法参数上使用**@SessionAttribute**注解：
 ```java
 @RequestMapping("/")
 public String handle(@SessionAttribute User user) {
@@ -1013,10 +1013,10 @@ public String handle(@SessionAttribute User user) {
 ```
 对于需要添加或删除session属性的用例，请考虑将**org.springframework.web.context.request.WebRequest**或**javax.servlet.http.HttpSession**注入到控制器方法中。
 
-对于作为控制器工作流程中的一部分，临时存储在session中的model属性，请考虑使用SessionAttributes，如上面“使用@SessionAttributes在请求之间的HTTP session中存储model属性"一节中所述。
+对于作为控制器工作流程中的一部分，在session中的模型属性的临时存储，请考虑使用**SessionAttributes**，如上面“使用@SessionAttributes在请求之间的HTTP session中存储模型属性"一节中所述。
 
 ### 使用@RequestAttribute来访问请求属性
-与@SessionAttribute类似，@RequestAttribute注解可用于访问由过滤器或拦截器创建的预先存在的请求属性：
+与**@SessionAttribute**类似，**@RequestAttribute**注解可用于访问由过滤器或拦截器创建的预先存在的请求属性：
 ```java
 @RequestMapping("/")
 public String handle(@RequestAttribute Client client) {
@@ -1025,9 +1025,9 @@ public String handle(@RequestAttribute Client client) {
 ```
 
 ### 使用“application/x-www-form-urlencoded"数据
-前面的部分介绍了使用@ModelAttribute来支持来自浏览器客户端的表单提交请求。建议来自非浏览器客户端的请求使用同样的注解。然而，在使用HTTP PUT请求时，会有一个显着的区别。浏览器可以通过HTTP GET或HTTP POST提交表单数据。非浏览器客户端还可以通过HTTP PUT提交表单。这提出了一个挑战，因为Servlet规范要求**ServletRequest.getParameter *()**系列方法仅支持HTTP POST的表单字段访问，而不支持HTTP PUT。
+前面的部分介绍了使用**@ModelAttribute**来支持来自浏览器客户端的表单提交请求。建议来自非浏览器客户端的请求使用同样的注解。然而，在使用HTTP PUT请求时，会有一个显着的区别。浏览器可以通过HTTP GET或HTTP POST提交表单数据。非浏览器客户端还可以通过HTTP PUT提交表单。这提出了一个挑战，因为Servlet规范要求**ServletRequest.getParameter *()**系列方法仅支持HTTP POST的表单字段访问，而不支持HTTP PUT。
 
-为了支持HTTP PUT和PATCH请求，**spring-web**模块提供了过滤器HttpPutFormContentFilter，它可以在web.xml中配置：
+为了支持HTTP PUT和PATCH请求，**spring-web**模块提供了过滤器**HttpPutFormContentFilter**，它可以在**web.xml**中配置：
 ```xml
 <filter>
     <filter-name>httpPutFormFilter</filter-name>
@@ -1044,15 +1044,15 @@ public String handle(@RequestAttribute Client client) {
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 </servlet>
 ```
-上述过滤器拦截内容类型为application/x-www-form-urlencoded的HTTP PUT和PATCH请求，从请求的正文中读取表单数据，并包装成ServletRequest，以便可以通过ServletRequest.getParameter *()系列方法使表单数据。
+上述过滤器拦截内容类型为**application/x-www-form-urlencoded**的HTTP PUT和PATCH请求，从请求的正文中读取表单数据，并包装成**ServletRequest**，以便可以通过**ServletRequest.getParameter \*()**系列方法使用表单数据。
 
-> 由于HttpPutFormContentFilter消耗了请求的正文，所以不应该为PUT或PATCH URLs配置依赖其他的按application/x-www-form-urlencoded的转换器。这包括@RequestBody MultiValueMap&lt;String，String>和HttpEntity&lt;MultiValueMap&lt;String，String >>。
+> 由于**HttpPutFormContentFilter**消耗了请求的正文，所以不应该为PUT或PATCH URLs配置依赖其他的按**application/x-www-form-urlencoded**的转换器。这包括**@RequestBody MultiValueMap&lt;String，String>**和**HttpEntity&lt;MultiValueMap&lt;String，String >>**。
 
 ### 使用@CookieValue注解映射Cookie值
-@CookieValue注解允许将方法参数被绑定到HTTP cookie的值上。
+**@CookieValue**注解允许将方法参数被绑定到HTTP cookie的值上。
 
 让我们考虑下面从一个http请求中接收的cookie：
-JSESSIONID=415A4AC178C59DACE0B2C9CA727CDD84
+*JSESSIONID=415A4AC178C59DACE0B2C9CA727CDD84*
 以下代码示例演示如何获取JSESSIONID cookie的值：
 ```java
 @RequestMapping("/displayHeaderInfo.do")
@@ -1087,24 +1087,24 @@ public void displayHeaderInfo(@RequestHeader("Accept-Encoding") String encoding,
 ```
 如果方法参数类型不是String，则会自动应用类型转换。请参阅[“方法参数和类型转换"](#方法参数和类型转换)一节。
 
-当在Map&lt;String,String>，MultiValueMap&lt;String,String>或HttpHeaders参数上使用@RequestHeader注解时，map会被填充所有头值。
+当在**Map&lt;String,String>**，**MultiValueMap&lt;String,String>**或**HttpHeaders**参数上使用**@RequestHeader**注解时，map会被填充所有头值。
 
 > 内置支持可用于将一个逗号分割的字符串转换为一个字符串或类型转换系统已知的其他类型的数组/集合。例如，使用@RequestHeader（“Accept"）注解的方法参数可以是String类型，但也可以是String []或List <String>。
 
 Servlet和Portlet环境中的注解处理器方法支持此注解。
 
 ### 方法参数和类型转换
-从请求中提取的基于字符串的值包括请求参数，路径变量，请求头和cookie值，它们可能需要转换为它们要绑定到的方法参数或字段的目标类型（例如，将请求参数绑定到@ModelAttribute参数中的字段）。如果目标类型不是String，则Spring将自动转换为适当的类型。所有简单的类型，如int，long，Date等都被支持。您可以通过WebDataBinder进一步自定义转换过程（请参阅“自定义WebDataBinder初始化"一节），或者使用FormattingConversionService注册Formatter（参见第9.6节“Spring字段格式化"）。
+从请求中提取的基于字符串的值包括请求参数，路径变量，请求头和cookie值，它们可能需要转换为它们要绑定到的方法参数或字段的目标类型（例如，将请求参数绑定到@ModelAttribute参数中的字段）。如果目标类型不是String，则Spring将自动转换为适当的类型。所有简单的类型，如int，long，Date等都被支持。你可以通过**WebDataBinder**进一步自定义转换过程（请参阅“自定义WebDataBinder初始化"一节），或者使用**FormattingConversionService**注册**Formatter**（参见第9.6节“Spring字段格式化"）。
 
 ### 自定义WebDataBinder初始化
-要通过Spring的WebDataBinder将自定义请求参数绑定到PropertyEditors，你可以在你的控制器中使用@InitBinder注解方法，在@ControllerAdvice类中使用@InitBinder方法，或提供自定义WebBindingInitializer。有关更多详细信息，请参阅“使用@ControllerAdvice和@RestControllerAdvice的通知控制器"一节。
+要通过Spring的**WebDataBinder**定制使用**PropertyEditors**的请求参数绑定，你可以在你的控制器中使用**@InitBinder**注解方法，在**@ControllerAdvice**类中使用**@InitBinder**方法，或提供自定义**WebBindingInitializer**。有关更多详细信息，请参阅“使用@ControllerAdvice和@RestControllerAdvice的通知控制器"一节。
 
 ### 使用@InitBinder自定义数据绑定
-使用@InitBinder的注解方法允许你直接在你的控制器类中配置web数据绑定。@InitBinder标识初始化WebDataBinder的方法，WebDataBinder将用于填充注解处理器方法的命令和表单对象参数。
+使用**@InitBinder**的注解方法允许你直接在你的控制器类中配置web数据绑定。**@InitBinder**标识初始化**WebDataBinder**的方法，**WebDataBinder**将用于填充注解处理器方法的命令和表单对象参数。
 
 这种init-binder方法支持@RequestMapping方法支持的所有参数，除了命令/表单对象和相应的验证结果对象。Init-binder方法不能有返回值。因此，它们通常被声明为void。典型的参数包括WebDataBinder与WebRequest或java.util.Locale的组合，允许代码注册上下文特定的编辑器。
 
-以下示例演示如何使用@InitBinder为所有java.util.Date表单属性配置CustomDateEditor。
+以下示例演示如何使用**@InitBinder**为所有**java.util.Date**表单属性配置**CustomDateEditor**。
 ```java
 @Controller
 public class MyFormController {
@@ -1119,4 +1119,212 @@ public class MyFormController {
     // ...
 }
 ```
-或者，从Spring 4.2起，考虑使用addCustomFormatter来指定Formatter实现而不是PropertyEditor实例。
+或者，从Spring 4.2起，考虑使用**addCustomFormatter**来指定**Formatter**实现而不是**PropertyEditor**实例。如果你恰好在一个共享的**FormattingConversionService**中有一个基于**Formatter**的设置，这个会特别有用，用相同的方式重用控制器特定的绑定规则的调整。
+```java
+@Controller
+public class MyFormController {
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.addCustomFormatter(new DateFormatter("yyyy-MM-dd"));
+    }
+
+    // ...
+}
+```
+
+### 配置一个自定义的WebBindingInitializer
+要在外部执行数据绑定初始化，你可以提供一个**WebBindingInitializer**接口的自定义实现，然后通过为**AnnotationMethodHandlerAdapter**提供自定义bean配置来启用它，从而覆盖默认配置。
+
+PetClinic应用程序的以下示例显示了使用**WebBindingInitializer**接口（org.springframework.samples.petclinic.web.ClinicBindingInitializer）的自定义实现的配置，它配置了几个PetClinic控制器所需的PropertyEditor。
+```xml
+<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+    <property name="cacheSeconds" value="0"/>
+    <property name="webBindingInitializer">
+        <bean class="org.springframework.samples.petclinic.web.ClinicBindingInitializer"/>
+    </property>
+</bean>
+```
+**@InitBinder**方法也可以在**@ControllerAdvice**注解的类中定义，在这种情况下，它们适用于匹配控制器。这提供了使用WebBindingInitializer的替代方法。有关更多详细信息，请参阅[“使用@ControllerAdvice和@RestControllerAdvice通知控制器"](#使用@ControllerAdvice和@RestControllerAdvice通知控制器)一节。
+
+### 使用@ControllerAdvice和@RestControllerAdvice通知控制器
+@ControllerAdvice注解是组件注解，允许通过类路径扫描自动检测实现类。当使用MVC命名空间或MVC Java配置时，它将自动启用。
+
+使用**@ControllerAdvice**注解的类可以包含**@ExceptionHandler**，**@InitBinder**和**@ModelAttribute**注解方法，并且这些方法将应用于所有控制器层次结构中的**@RequestMapping**方法，而不是声明它们的控制器层次结构。
+
+**@RestControllerAdvice**是默认使用**@ResponseBody**语义的**@ExceptionHandler**方法的替代方案。
+
+**@ControllerAdvice**和**@RestControllerAdvice**都可以针对控制器的一个子集：
+```java
+// 针对所有使用@RestController注释的Controller
+@ControllerAdvice(annotations = RestController.class)
+public class AnnotationAdvice {}
+
+// 针对特定包中的所有Controller
+@ControllerAdvice("org.example.controllers")
+public class BasePackageAdvice {}
+
+// 针对可分配给指定类的所有Controller
+@ControllerAdvice(assignableTypes = {ControllerInterface.class, AbstractController.class})
+public class AssignableTypesAdvice {}
+```
+查看@ControllerAdvice[文档](http://docs.spring.io/spring-framework/docs/4.3.10.RELEASE/javadoc-api/org/springframework/web/bind/annotation/ControllerAdvice.html)了解更多详细信息。
+
+### Jackson序列化视图支持
+有时根据上下文过滤将被序列化到HTTP响应主体的对象是有用的。为了提供这样的功能，Spring MVC内置了对Jackson的Serialization Views进行渲染的支持。
+
+要将它与使用@ResponseBody控制器方法或返回ResponseEntity的控制器方法一起使用，只需使用指定要使用的视图类或接口的类参数添加@JsonView注解：
+```java
+@RestController
+public class UserController {
+
+    @GetMapping("/user")
+    @JsonView(User.WithoutPasswordView.class)
+    public User getUser() {
+        return new User("eric", "7!jd#h23");
+    }
+}
+
+public class User {
+
+    public interface WithoutPasswordView {};
+    public interface WithPasswordView extends WithoutPasswordView {};
+
+    private String username;
+    private String password;
+
+    public User() {
+    }
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    @JsonView(WithoutPasswordView.class)
+    public String getUsername() {
+        return this.username;
+    }
+
+    @JsonView(WithPasswordView.class)
+    public String getPassword() {
+        return this.password;
+    }
+}
+```
+> 请注意，尽管@JsonView允许指定多个类，但用在控制器方法上只支持一个类参数。如果需要启用多个视图，请考虑使用复合接口。
+
+对于依赖于视图解析的控制器，只需将序列化视图类添加到模型中：
+```java
+@Controller
+public class UserController extends AbstractController {
+
+    @GetMapping("/user")
+    public String getUser(Model model) {
+        model.addAttribute("user", new User("eric", "7!jd#h23"));
+        model.addAttribute(JsonView.class.getName(), User.WithoutPasswordView.class);
+        return "userView";
+    }
+}
+```
+### Jackson JSONP支持
+为了启用对**@ResponseBody**和**ResponseEntity**方法的JSONP支持，声明一个**@ControllerAdvice** bean，它继承自**AbstractJsonpResponseBodyAdvice**，如下所示，这里构造函数参数表示JSONP查询参数的名称：
+```java
+@ControllerAdvice
+public class JsonpAdvice extends AbstractJsonpResponseBodyAdvice {
+
+    public JsonpAdvice() {
+        super("callback");
+    }
+}
+```
+对于依赖于视图解析的控制器，当请求具有名为**jsonp**或**callback**的查询参数时，将自动启用JSONP。这些参数名称可以通过jsonpParameterNames属性自定义。
+
+## 异步请求处理
+***
+Spring MVC 3.2引入了基于Servlet 3的异步请求处理。相比往常返回一个值，控制器方法现在可以返回一个java.util.concurrent.Callable并从Spring MVC管理的线程生成返回值。与此同时，Servlet容器主线程被退出和释放并且允许处理其他请求。Spring MVC在TaskExecutor的帮助下在一个单独的线程中调用Callable，当Callable返回时，该请求将被分派回到Servlet容器，以使用这个Callable对象的返回值来恢复处理这个请求。这有一个这样一个控制器方法的例子：
+```java
+@PostMapping
+public Callable<String> processUpload(final MultipartFile file) {
+
+    return new Callable<String>() {
+        public String call() throws Exception {
+            // ...
+            return "someView";
+        }
+    };
+
+}
+```
+这个控制器方法也可以是返回一个DeferredResult的实例。在这种情况下，返回值也将从任何线程生成，即不由Spring MVC管理的线程。例如，结果可能是由于某些外部事件而产生的，例如JMS消息，计划任务等。这有一个这样一个控制器方法的例子：
+```java
+@RequestMapping("/quotes")
+@ResponseBody
+public DeferredResult<String> quotes() {
+    DeferredResult<String> deferredResult = new DeferredResult<String>();
+    // 将deferredResult保存在某个地方..
+    return deferredResult;
+}
+
+// 在其他线程中...
+deferredResult.setResult(data);
+```
+在不了解任何Servlet 3.0异步请求处理功能知识的情况下，这可能很难理解。阅读这些肯定会有帮助。以下是有关底层机制的几个基本事实：
+- 可以通过调用**request.startAsync()**将**ServletRequest**置于异步模式。这样做的主要作用是Servlet以及任何Filter都可以退出，但响应将保持开放状态，以便稍后完成处理。
+- 对**request.startAsync()**的调用返回**AsyncContext**，它可用于进一步控制异步处理。例如，它提供了**dispatch**方法，除了允许应用程序在Servlet容器线程上恢复请求处理这点外，它类似于Servlet API的转发。
+- **ServletRequest**提供对当前**DispatcherType**的访问，它可用于区分处理初始请求，异步调度，转发和其他调度器类型。
+
+考虑到上述情况，以下是使用**Callable**进行异步请求处理的事件序列：
+- 控制器返回一个**Callable**。
+- Spring MVC启动异步处理，并将**Callable**提交给**TaskExecutor**，以在单独的线程中进行处理。
+- **DispatcherServlet**和所有**Filter**都退出Servlet容器线程，但响应保持打开状态。
+- **Callable**产生一个结果，Spring MVC将请求返回给Servlet容器以恢复处理。
+- **DispatcherServlet**再次被调用，并且从**Callable**异步生成的结果开始继续处理。
+
+这与**DeferredResult**的顺序非常相似，除了它可以在应用程序中任何线程生成异步结果：
+- 控制器返回一个**DeferredResult**并将其保存在某些可以访问的内存中的queue或list 中。
+- Spring MVC启动异步处理。
+- **DispatcherServlet**和所有**Filter**都退出Servlet容器线程，但响应保持打开状态。
+- 应用程序从一些线程设置DeferredResult，Spring MVC将请求发回到Servlet容器。
+- **DispatcherServlet**再次被调用，并且从异步生成的结果开始继续处理。
+
+### 异步请求的异常处理
+如果从控制器方法返回的**Callable**在执行时引发异常，会发生什么？简答是这与控制器方法引发异常时发生的情况一样。它经历了常规异常处理机制。更长的解释是，当**Callable**引发一个异常，Spring MVC以这个**Exception**为结果调度回Servlet容器，并导致以异常而不是控制器方法返回值为开始恢复请求处理。当使用**DeferredResult**时，您可以选择是否使用**Exception**实例调用**setResult**或**setErrorResult**。
+
+### 拦截异步请求
+**HandlerInterceptor**为了实现**afterConcurrentHandlingStarted**回调，还可以实现**AsyncHandlerInterceptor**，当异步处理开始时，这个回调被调用而不是**postHandle**和**afterCompletion**。
+
+**HandlerInterceptor**还可以注册**CallableProcessingInterceptor**或**DeferredResultProcessingInterceptor**，以便更深入地整合异步请求的生命周期，例如处理超时事件。有关更多详细信息，请参阅**AsyncHandlerInterceptor**的Javadoc。
+
+**DeferredResult**类型同样提供了诸如**onTimeout(Runnable)**和**onCompletion(Runnable)**等方法。有关详细信息，请参阅DeferredResult的Javadoc。
+
+当使用**Callable**时，您可以使用**WebAsyncTask**的实例来包装它，该实例还提供了timeout和completion的注册方法。
+
+### HTTP Streaming
+控制器方法可以使用DeferredResult和Callable异步生成其返回值，并且可以用于实现诸如[long polling](https://spring.io/blog/2012/05/08/spring-mvc-3-2-preview-techniques-for-real-time-updates/)的技术，这里服务器可以尽快将事件推送到客户端。
+
+如果你想在单个HTTP响应中推送多个事件怎么办？这是一个与“Long Polling”相关的技术，也被称为“HTTP Streaming”。Spring MVC可以通过**ResponseBodyEmitter**返回值类型来实现，该类型可以用于发送多个对象，而不是像**@ResponseBody**的一样，发送的每个对象都使用**HttpMessageConverter**写入响应。
+
+这有一个示例：
+```java
+@RequestMapping("/events")
+public ResponseBodyEmitter handle() {
+    ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+    // 将emitter保存在某处..
+    return emitter;
+}
+
+// 在其他一些线程
+emitter.send("Hello once");
+
+// 并且之后再一次
+emitter.send("Hello again");
+
+// 并在某些时候完成
+emitter.complete();
+```
+请注意，**ResponseBodyEmitter**也可以用作**ResponseEntity**中的正文，以便自定义响应的状态和响应头
+
+###。
+
+
