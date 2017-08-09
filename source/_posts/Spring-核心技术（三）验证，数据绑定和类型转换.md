@@ -27,8 +27,8 @@ strong {
 ***
 <div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">*JSR-303/JSR-349 Bean 验证*   
 Spring Framework 4.0在安装支持方面支持Bean Validation 1.0（JSR-303）和Bean Validation 1.1（JSR-349），也适用于Spring的Validator接口。</br>
-应用程序可以选择一次全局启用Bean验证，如[第8节“Spring验证”](#pring验证)中所述，并专门用于所有验证需求。</br>
-应用程序还可以为每个DataBinder实例注册额外的Spring Validator实例，如[第8.3节“配置DataBinder”](#配置DataBinder)中所述。这可能有助于不使用注解来插入验证逻辑。
+应用程序可以选择一次全局启用Bean验证，如[第8节“Spring验证"](#pring验证)中所述，并专门用于所有验证需求。</br>
+应用程序还可以为每个DataBinder实例注册额外的Spring Validator实例，如[第8.3节“配置DataBinder"](#配置DataBinder)中所述。这可能有助于不使用注解来插入验证逻辑。
 </div> 
 将验证视为业务逻辑有利有弊，而Spring提供了一种验证（和数据绑定）的设计，不排除任何一种。明确的的验证不应该与Web层相关联，应该易于本地化，并且应该可以插入任何可用的验证器。考虑到上述情况，Spring已经提出了一个**Validator**接口，它对应用程序的每一层都是基本和非常可用的。
 
@@ -36,7 +36,7 @@ Spring Framework 4.0在安装支持方面支持Bean Validation 1.0（JSR-303）�
 
 **BeanWrapper**是Spring框架中的一个基本概念，并且用于很多地方。但是，你可能不需要直接使用BeanWrapper。因为这是参考文档，我们觉得有些解释可能需要按顺序来。我们将在本章中解释BeanWrapper，如果你要使用它，你最可能在尝试绑定数据到对象的时候这么做。
 
-Spring的**DataBinder**和较低级别的**BeanWrapper**都使用**PropertyEditor**来解析和格式化属性值。**PropertyEditor**概念是JavaBeans规范的一部分，本章还将对此进行说明。Spring 3引入了一个“**core.convert**”包，它提供一个通用的类型转换工具，而且还有一个更高级的“format”包,用于格式化UI字段值。这些新的包可能被用作**PropertyEditor**的更简单的替代方法，本章还将讨论这些新的包。
+Spring的**DataBinder**和较低级别的**BeanWrapper**都使用**PropertyEditor**来解析和格式化属性值。**PropertyEditor**概念是JavaBeans规范的一部分，本章还将对此进行说明。Spring 3引入了一个“**core.convert**"包，它提供一个通用的类型转换工具，而且还有一个更高级的“format"包,用于格式化UI字段值。这些新的包可能被用作**PropertyEditor**的更简单的替代方法，本章还将讨论这些新的包。
 
 ***
 # 使用Spring Validator接口验证
@@ -247,7 +247,7 @@ Spring有一些内置的PropertyEditor，使工作变得轻松。其中的每个
 |**StringTrimmerEditor**|修剪字符串的属性编辑器。可选的允许将空字符串转换为null值。默认情况下未注册;必须根据需要进行用户注册。|
 |**URLEditor**|能够将URL的String表示形式解析为实际的URL对象。由BeanWrapperImpl默认注册。|
 
-Spring使用**java.beans.PropertyEditorManager**设置可能需要的属性编辑器的搜索路径。搜索路径中还包括sun.bean.editors，它包括用于诸如Font，Color和大多数原始类型之类的PropertyEditor实现。还要注意的是，标准的JavaBeans基础框架会自动发现**PropertyEditor**类（不需要显示地注册它们），如果它们与他们处理的类在同一个包中，并且具有与该类相同的附加“Editor”的名称;例如，可能有如下类和包结构，这足以使FooEditor类被识别并用作Foo类型属性的PropertyEditor。
+Spring使用**java.beans.PropertyEditorManager**设置可能需要的属性编辑器的搜索路径。搜索路径中还包括sun.bean.editors，它包括用于诸如Font，Color和大多数原始类型之类的PropertyEditor实现。还要注意的是，标准的JavaBeans基础框架会自动发现**PropertyEditor**类（不需要显示地注册它们），如果它们与他们处理的类在同一个包中，并且具有与该类相同的附加“Editor"的名称;例如，可能有如下类和包结构，这足以使FooEditor类被识别并用作Foo类型属性的PropertyEditor。
 ```
 com
   chank
@@ -545,9 +545,9 @@ ConversionService是一种无状态对象，并且被设计为在应用程序启
     </property>
 </bean>
 ```
-在Spring MVC应用程序中使用ConversionService也很常见。参见Spring MVC章节的[第16.3节“转换和格式化”]()。
+在Spring MVC应用程序中使用ConversionService也很常见。参见Spring MVC章节的[第16.3节“转换和格式化"]()。
 
-在某些情况下，您可能希望在转换期间应用格式化。有关使用**FormattingConversionServiceFactoryBean**的详细信息，请参见[第6.3节“FormatterRegistry SPI”](#FormatterRegistry SPI)。
+在某些情况下，您可能希望在转换期间应用格式化。有关使用**FormattingConversionServiceFactoryBean**的详细信息，请参见[第6.3节“FormatterRegistry SPI"](#FormatterRegistry SPI)。
 
 ## 编程式使用ConversionService
 ***
@@ -769,7 +769,7 @@ public interface FormatterRegistrar {
 
 ## 在Spring MVC中配置格式化
 ***
-参见Spring MVC章节的[第16.3节“转换和格式化”](#)。
+参见Spring MVC章节的[第16.3节“转换和格式化"](#)。
 
 ***
 配置全局日期和时间格式
@@ -779,7 +779,7 @@ public interface FormatterRegistrar {
 你将需要确保Spring不注册默认格式化器，而应手动注册所有格式化器。根据您是否使用Joda Time库，使用**org.springframework.format.datetime.joda.JodaTimeFormatterRegistrar**或**org.springframework.format.datetime.DateFormatterRegistrar**类。
 
 
-例如，以下Java配置会注册一个全局“yyyyMMdd”格式。此示例不依赖于Joda Time库：
+例如，以下Java配置会注册一个全局“yyyyMMdd"格式。此示例不依赖于Joda Time库：
 ```java
 @Configuration
 public class AppConfig {
@@ -835,7 +835,7 @@ public class AppConfig {
 
 > Joda Time提供单独的不同类型来表示date,time和date-time值。JodaTimeFormatterRegistrar的dateFormatter, timeFormatter和dateTimeFormatter属性应该用来配置每个类型的不同格式。DateTimeFormatterFactoryBean提供了一种便捷的方式来创建格式化器。
 
-如果你使用Spring MVC，请记住要显示配置所使用的 conversion service。对于基于Java的@Configuration，这意味着扩展WebMvcConfigurationSupport类并覆盖mvcConversionService()方法。对于XML，你应该使用mvc:annotation-driven元素的'conversion-service'属性。更多细节参见Spring MVC章节的[第16.3节“转换和格式化”](#)。
+如果你使用Spring MVC，请记住要显示配置所使用的 conversion service。对于基于Java的@Configuration，这意味着扩展WebMvcConfigurationSupport类并覆盖mvcConversionService()方法。对于XML，你应该使用mvc:annotation-driven元素的'conversion-service'属性。更多细节参见Spring MVC章节的[第16.3节“转换和格式化"](#)。
 
 ***
 # Spring 验证
@@ -965,7 +965,7 @@ DataBinder还可以通过**dataBinder.addValidators**和**dataBinder.replaceVali
 
 ## Spring MVC 3验证
 ***
-参见Spring MVC章节的[第16.4节“验证”]()。
+参见Spring MVC章节的[第16.4节“验证"]()。
 
 
 
