@@ -31,9 +31,7 @@ table:first-of-type th:first-of-type {
 table:first-of-type th:nth-of-type(2),table:first-of-type th:nth-of-type(3),table:first-of-type th:nth-of-type(4),table:first-of-type th:nth-of-type(5),table:first-of-type th:nth-of-type(6),table:first-of-type th:nth-of-type(7),table:first-of-type th:nth-of-type(8),table:first-of-type th:nth-of-type(9){
     width: 20px;
 }
-table:first-of-type th:nth-of-type(10) {
-    width:250px;
-}
+
 </style>
 
 |类或枚举|年|月|日|小时|分钟|秒|时区偏移|时区ID|toString Output|Where Discussed|

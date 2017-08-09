@@ -1325,6 +1325,199 @@ emitter.complete();
 ```
 请注意，**ResponseBodyEmitter**也可以用作**ResponseEntity**中的正文，以便自定义响应的状态和响应头
 
-###。
+### HTTP Streaming与Server-Sent Events
+SseEmitter是ResponseBodyEmitter的子类，提供对[Server-Sent Events](https://www.w3.org/TR/eventsource/)的支持。Server-sent event只是同一个“HTTP Streaming”技术的另一个变体，除了从服务器推送的事件根据 W3C Server-Sent Events规范进行格式化的。
+
+Server-Sent Events可用于预期的用途，即将事件从服务器推送到客户端。在Spring MVC中这很容易做到，只需返回一个SseEmitter类型的值。
+
+请注意，Internet Explorer不支持Server-Sent Events，而对于更高级的Web应用程序消息传递场景（如在线游戏，协作，财务应用程序和其他），最好考虑Spring的WebSocket支持，它包括SockJS风格的WebSocket模拟，能够广泛地支持各种浏览器（包括Internet Explorer），同时支持在以消息作为核心的应用架构中，使用发布-订阅模型来在客户端间进行交互的更高层次的消息模式。如需了解更多，请参阅[这个博客的文章](http://blog.pivotal.io/pivotal/products/websocket-architecture-in-spring-4-0)。
+
+### HTTP Streaming直接写到OutputStream中
+ **ResponseBodyEmitter**可以使用**HttpMessageConverter**来把对象写入到响应中，并发送这个事件。比如:写入JSON数据这种较为普遍的情况。然而，有些时候，比如像文件下载这种，分流消息的转换和直接写到相应的OutputStream中是很有用的。可以通过**StreamingResponseBody**返回的值类型来实现。
+ 
+下面是一个例子:
+```java
+@RequestMapping("/download")
+public StreamingResponseBody handle() {
+    return new StreamingResponseBody() {
+        @Override
+        public void writeTo(OutputStream outputStream) throws IOException {
+            // write...
+        }
+    };
+}
+```
+请注意，**ResponseBodyEmitter**也同样能作为**ResponseEntity**的主体，来自定义响应的status（状态）和报头。
+	  
+### 配置异步的请求处理
+#### Servlet容器配置
+对于使用web.xml配置的应用程序，请确保升级到了3.0，如下所示:
+```xml
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            http://java.sun.com/xml/ns/javaee
+            http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+    ...
+
+</web-app>
+```
+异步支持必须在**DispatcherServlet**上开启,通过**web.xml**中的**&lt;async-supported>true&lt;/async-supported>**子元素。另外，任何参与异步请求处理的**Filter**都必须配置为支持ASYNC dispatcher类型。为Spring Framework提供的所有过滤器启用ASYNC dispatcher类型应该是安全的，因为它们通常继承自**OncePerRequestFilter**，并且具有关于过滤器是否需要参与异步调度的运行时期检查。
+
+以下是一些web.xml配置示例：
+```xml
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+            http://java.sun.com/xml/ns/javaee
+            http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+    <filter>
+        <filter-name>Spring OpenEntityManagerInViewFilter</filter-name>
+        <filter-class>org.springframework.~.OpenEntityManagerInViewFilter</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>Spring OpenEntityManagerInViewFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
+    </filter-mapping>
+
+</web-app>
+```
+如果使用Servlet 3，基于Java的配置，例如通过**WebApplicationInitializer**，你同样需要像**web.xml**一样设置“asyncSupported”标志以及ASYNC dispatcher 类型。为了简化所有这些配置，请考虑继承**AbstractDispatcherServletInitializer**或更好的**AbstractAnnotationConfigDispatcherServletInitializer**，它会自动设置这些选项，并使其注册**Filter**实例变得非常简单。
+
+#### Spring MVC配置
+MVC Java配置和MVC命名空间提供了配置异步请求处理的选项。**WebMvcConfigurer**有**configureAsyncSupport**方法，而**&lt;mvc:annotation-driven>**有一个**&lt;async-support>**子元素。
+
+这些允许你配置用于异步请求的默认超时值，如果未设置，则取决于底层的Servlet容器（例如Tomcat上为10秒）。你还可以配置一个AsyncTaskExecutor用于执行从控制器方法返回的Callable实例。强烈建议配置此属性，因为默认情况下，Spring MVC使用**SimpleAsyncTaskExecutor**。MVC的Java配置和MVC命名空间还允许你注册**CallableProcessingInterceptor**和**DeferredResultProcessingInterceptor**实例。
 
 
+如果需要覆盖特定**DeferredResult**的默认超时值，可以使用适当的类构造函数。类似地，对于**Callable**，你可以将其包装在**WebAsyncTask**中，并使用适当的类构造函数自定义超时值。**WebAsyncTask**的类构造函数也允许提供一个**AsyncTaskExecutor**。
+
+## 测试控制器
+spring-test模块对于测试带注解的控制器提供一流的支持。请参见[第15.6节“Spring MVC测试框架”](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#spring-mvc-test-framework)。
+
+
+***
+# 处理器映射
+***
+在以前的Spring版本中，用户需要在Web应用程序上下文中定义一个或多个HandlerMapping bean，以将传入的Web请求映射到适当的处理器。随着注解控制器的引入，你一般不需要再这样做，因为**RequestMappingHandlerMapping**会自动在所有的**@Controller** bean上查找**@RequestMapping**注解。但是，请记住，从**AbstractHandlerMapping**扩展的所有**HandlerMapping**类都具有以下可用于自定义其行为的属性：
+
+- **interceptors**：要使用的拦截器列表。HandlerInterceptors在第4.1节“使用HandlerInterceptor拦截请求”中讨论。
+- **defaultHandler**：当映射器处理器在一次映射处理器时没有映射结果，默认使用的处理器，
+- **order**：基于order属性的值（请参阅org.springframework.core.Ordered接口），Spring会排序上下文中可用的所有处理器映射器，并应用第一个匹配的处理器。
+- **alwaysUseFullPath**：如果为true，Spring将使用当前Servlet上下文中的完整路径来查找适当的处理程序。如果为false（默认值），则使用当前Servlet映射中的路径。例如，如果一个Servlet使用/testing/\*映射，并且将alwaysUseFullPath属性设置为true，则使用/testing/viewPage.html，而如果属性设置为false，则使用/viewPage.html。
+- **urlDecode**：默认为true，从Spring 2.5开始。如果您喜欢比较编码路径，请将此标志设置为false。但是，HttpServletRequest始终以解码形式公开Servlet路径。请注意，当与编码路径比较时，Servlet路径将不匹配。
+
+以下示例说明如何配置拦截器
+```xml
+<beans>
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+        <property name="interceptors">
+            <bean class="example.MyInterceptor"/>
+        </property>
+    </bean>
+<beans>
+```
+
+## 用HandlerInterceptor拦截请求
+***
+Spring的处理器映射机制包括处理器拦截器，当你希望将特定功能应用于某些请求时很有用，例如，检查主体。
+
+位于处理器映射器中的拦截器必须实现**org.springframework.web.servlet**包中**HandlerInterceptor**。这个接口定义了三个方法：**preHandle(..)**在处理器实际执行之前调用;**postHandle(..)**在处理器执行后调用;**afterCompletion(..)**在完整的请求完成后调用。这三种方法应提供足够的灵活性进行各种预处理和后处理。
+
+**preHandle(..)**方法返回一个布尔值。你可以使用此方法来中断或继续处理执行链。当此方法返回true时，处理器执行链将继续;当它返回**false**时，**DispatcherServlet**假定拦截器本身已经处理了请求（例如渲染了适当的视图），并且不会继续执行其他拦截器和执行链中的实际处理器。
+
+拦截器可以使用interceptors属性进行配置，该属性存在于从**AbstractHandlerMapping**继承的所有HandlerMapping类上。这在下面的示例中显示：
+```xml
+<beans>
+    <bean id="handlerMapping"
+            class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <ref bean="officeHoursInterceptor"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="officeHoursInterceptor"
+            class="samples.TimeBasedAccessInterceptor">
+        <property name="openingTime" value="9"/>
+        <property name="closingTime" value="18"/>
+    </bean>
+</beans>
+```
+```java
+package samples;
+
+public class TimeBasedAccessInterceptor extends HandlerInterceptorAdapter {
+
+    private int openingTime;
+    private int closingTime;
+
+    public void setOpeningTime(int openingTime) {
+        this.openingTime = openingTime;
+    }
+
+    public void setClosingTime(int closingTime) {
+        this.closingTime = closingTime;
+    }
+
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+            Object handler) throws Exception {
+        Calendar cal = Calendar.getInstance();
+        int hour = cal.get(HOUR_OF_DAY);
+        if (openingTime <= hour && hour < closingTime) {
+            return true;
+        }
+        response.sendRedirect("http://host.com/outsideOfficeHours.html");
+        return false;
+    }
+}
+```
+由此映射器处理的任何请求都将被**TimeBasedAccessInterceptor**拦截。如果当前时间在办公时间之外，用户将被重定向到静态HTML文件，例如，您只能在办公时间内访问该网站。
+
+> 当使用**RequestMappingHandlerMapping**时，实际的处理器是**HandlerMethod**的一个实例，它标识将被调用的特定控制器方法。
+
+你可以看到，Spring适配器类**HandlerInterceptorAdapter**使得更容易扩展**HandlerInterceptor**接口。
+
+> 在上面的示例中，配置的拦截器将应用于使用注解控制器方法处理的所有请求。如果要缩小拦截器应用的URL路径，你可以使用MVC命名空间或MVC Java配置，或声明类型为MappedInterceptor的bean实例来执行此操作。请参见第[16.1节“启用MVC Java配置或MVC XML命名空间”](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#mvc-config-enable)。
+
+请注意，**HandlerInterceptor的postHandle**方法并不总是适用于**@ResponseBody**和**ResponseEntity**方法。在这种情况下，**HttpMessageConverter**在调用**postHandle**之前写入并提交响应，这使得不可能再更改响应，例如添加一个响应头。相反，应用程序可以实现**ResponseBodyAdvice**，并将其声明为**@ControllerAdvice** bean或直接在**RequestMappingHandlerAdapter**上进行配置。
+
+***
+# 解析视图
+***
+用于Web应用程序的所有MVC框架提供了一种解决视图的方法。Spring提供视图解析器，它使你可以在浏览器中渲染模型，而不需要将你和特定的视图技术捆绑起来。开箱即用，例如，Spring可以使用JSP，Velocity模板和XSLT视图。有关如何集成和使用多种不同视图技术的讨论，请参阅第[“视图技术”]()。
+
+对于Spring处理视图的方式来说，两个重要的接口是**ViewResolver**和**View**。**ViewResolver**提供了视图名称和实际视图之间的映射。**View**接口解决了请求的准备，并将请求转交给其中一种视图技术。
+
+## 使用ViewResolver接口解析视图
+***
+如[第3节“实现控制器”](#实现控制器)中所述，Spring Web MVC控制器中的所有处理器方法必须解析为逻辑视图名称,要么明确指出（例如，通过返回**String**，**View**或**ModelAndView**）要么隐式地（即基于约定）。Spring中的视图由逻辑视图名称编址，并由视图解析器解析。Spring自带很少几个视图解析器。这张表列出了大部分;以下几个例子。这张表列出了大部分;以下几个例子
+
+|ViewResolver|描述|
+|-----------|---------|
+|**AbstractCachingViewResolver**|缓存视图的抽象视图解析器。通常视图在它能使用前需要准备;扩展此视图解析器提供缓存。|
+|**XmlViewResolver**|ViewResolver的实现，它使用与Spring的XML bean工厂相同的DTD来接受用XML编写的配置文件。默认配置文件为/WEB-INF/views.xml。|
+|**ResourceBundleViewResolver**|ViewResolver的实现，它使用ResourceBundle中的bean定义，由bundle基本名称指定。|
+|**UrlBasedViewResolver**||
+|**InternalResourceViewResolver**||
+|**VelocityViewResolver / FreeMarkerViewResolver**||
+|**ContentNegotiatingViewResolver**||
+
+
+
+
+
+
+
+
+
+
+The ViewResolver provides a mapping between view names and actual views.
