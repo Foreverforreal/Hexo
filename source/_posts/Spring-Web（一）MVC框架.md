@@ -108,7 +108,7 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 ```
 在上面的例子中，所有以/example开示的请求都会由名为example的DispatcherServlet实例处理。
 
-**WebApplicationInitializer**是一个由Spring MVC提供的接口，它确保你的基于代码的配置被检测到，并且自动用于初始化任何Servlet 3 容器。一个这个接口的抽象基类实现名称叫**AbstractAnnotationConfigDispatcherServletInitializer**，它通过简单地指定其servlet映射和列出配置类来更容易地注册**DispatcherServlet**-它是设置你的Spring MVC应用程序最推荐的方式。更多详细信息，请参阅[“基于代码的Servlet容器初始化"](#基于代码的Servlet容器初始化)。
+**WebApplicationInitializer**是一个由Spring MVC提供的接口，它确保你的基于代码的配置被检测到，并且自动用于初始化任何Servlet 3 容器。一个这个接口的名为**AbstractAnnotationConfigDispatcherServletInitializer**的抽象基类实现，它通过简单地指定其servlet映射和列出配置类来更容易地注册**DispatcherServlet**-它是设置你的Spring MVC应用程序最推荐的方式。更多详细信息，请参阅[“基于代码的Servlet容器初始化"](#基于代码的Servlet容器初始化)。
 
 **DispatcherServlet**实际上是一个**Servlet**（它继承自HttpServlet基类），并因此在你的web应用程序的**web.xml**中声明。你需要在相同的**web.xml**文件中通过使用URL映射，来映射你想要**DispatcherServlet**处理的请求。这是标准的Java EE Servlet配置。以下示例显示了这样的**DispatcherServlet**的声明和映射：
 
@@ -1252,7 +1252,7 @@ public class JsonpAdvice extends AbstractJsonpResponseBodyAdvice {
 
 ## 异步请求处理
 ***
-Spring MVC 3.2引入了基于Servlet 3的异步请求处理。相比往常返回一个值，控制器方法现在可以返回一个java.util.concurrent.Callable并从Spring MVC管理的线程生成返回值。与此同时，Servlet容器主线程被退出和释放并且允许处理其他请求。Spring MVC在TaskExecutor的帮助下在一个单独的线程中调用Callable，当Callable返回时，该请求将被分派回到Servlet容器，以使用这个Callable对象的返回值来恢复处理这个请求。这有一个这样一个控制器方法的例子：
+Spring MVC 3.2引入了基于Servlet 3的异步请求处理。相比往常返回一个值，控制器方法现在可以返回一个**java.util.concurrent.Callable**并从Spring MVC管理的线程生成返回值。与此同时，Servlet容器主线程被退出和释放并且允许处理其他请求。Spring MVC在TaskExecutor的帮助下在一个单独的线程中调用**Callable**，当**Callable**返回时，该请求将被分派回到Servlet容器，以使用这个**Callable**对象的返回值来恢复处理这个请求。这有一个这样一个控制器方法的例子：
 ```java
 @PostMapping
 public Callable<String> processUpload(final MultipartFile file) {
@@ -1266,7 +1266,7 @@ public Callable<String> processUpload(final MultipartFile file) {
 
 }
 ```
-这个控制器方法也可以是返回一个DeferredResult的实例。在这种情况下，返回值也将从任何线程生成，即不由Spring MVC管理的线程。例如，结果可能是由于某些外部事件而产生的，例如JMS消息，计划任务等。这有一个这样一个控制器方法的例子：
+这个控制器方法也可以是返回一个**DeferredResult**的实例。在这种情况下，返回值也将从任何线程生成，即不由Spring MVC管理的线程。例如，结果可能是由于某些外部事件而产生的，例如JMS消息，计划任务等。这有一个这样一个控制器方法的例子：
 ```java
 @RequestMapping("/quotes")
 @ResponseBody
@@ -1441,9 +1441,9 @@ Spring的处理器映射机制包括处理器拦截器，当你希望将特定�
 
 位于处理器映射器中的拦截器必须实现**org.springframework.web.servlet**包中**HandlerInterceptor**。这个接口定义了三个方法：**preHandle(..)**在处理器实际执行之前调用;**postHandle(..)**在处理器执行后调用;**afterCompletion(..)**在完整的请求完成后调用。这三种方法应提供足够的灵活性进行各种预处理和后处理。
 
-**preHandle(..)**方法返回一个布尔值。你可以使用此方法来中断或继续处理执行链。当此方法返回true时，处理器执行链将继续;当它返回**false**时，**DispatcherServlet**假定拦截器本身已经处理了请求（例如渲染了适当的视图），并且不会继续执行其他拦截器和执行链中的实际处理器。
+**preHandle(..)**方法返回一个布尔值。你可以使用此方法来中断或继续处理执行链。当此方法返回**true**时，处理器执行链将继续;当它返回**false**时，**DispatcherServlet**假定拦截器本身已经处理了请求（例如渲染了适当的视图），并且不会继续执行其他拦截器和执行链中的实际处理器。
 
-拦截器可以使用interceptors属性进行配置，该属性存在于从**AbstractHandlerMapping**继承的所有HandlerMapping类上。这在下面的示例中显示：
+拦截器可以使用**interceptors**属性进行配置，该属性存在继承**AbstractHandlerMapping**的所有**HandlerMapping**类上。这在下面的示例中显示：
 ```xml
 <beans>
     <bean id="handlerMapping"
@@ -2215,7 +2215,7 @@ public class RegistrationController implements Controller {
 
 </beans>
 ```
-注意在**handleRequest(..)**方法实现中，没有在返回的**ModelAndView**上设置任何**View**或逻辑视图名。**DefaultRequestToViewNameTranslator**负责从请求的URL生成逻辑视图名。上面例子中，**RegistrationController**与**ControllerClassNameHandlerMapping**结合使用，一个请求URL{%raw%}http://localhost/registration.html{%endrow%}导致一个逻辑视图名**registration**被**DefaultRequestToViewNameTranslator**生成。然后，该逻辑视图名称由**InternalResourceViewResolver** bean解析为**/WEB-INF/jsp/registration.jsp**视图。
+注意在**handleRequest(..)**方法实现中，没有在返回的**ModelAndView**上设置任何**View**或逻辑视图名。**DefaultRequestToViewNameTranslator**负责从请求的URL生成逻辑视图名。上面例子中，**RegistrationController**与**ControllerClassNameHandlerMapping**结合使用，一个请求URL{%raw%}http://localhost/registration.html{%endraw%}导致一个逻辑视图名**registration**被**DefaultRequestToViewNameTranslator**生成。然后，该逻辑视图名称由**InternalResourceViewResolver** bean解析为**/WEB-INF/jsp/registration.jsp**视图。
 
 > 您不需要显示定义一个**DefaultRequestToViewNameTranslator** bean。如果你喜欢**DefaultRequestToViewNameTranslator**的默认设置，则可以依靠Spring Web MVC **DispatcherServlet**来实例化此类的实例，如果未明确配置该实例的话。
 
@@ -2284,9 +2284,176 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 ## 在控制器中支持的Cache-Control，ETag和Last-Modified响应头
 ***
-控制器可以支持**'Cache-Control'**, **'ETag'**和/或**'If-Modified-Since'**HTTP请求;如果要在响应上设置'Cache-Control'报头，则建议使用此选项。
+控制器可以支持**'Cache-Control'**, **'ETag'**和/或**'If-Modified-Since'**HTTP请求;如果要在响应上设置'Cache-Control'报头，强烈建议使用这类支持。这涉及到为指定的请求计算**lastModified**参数的**long**型值，和/或一个Etag的值，然后与请求中的’If-Modified-Since’报头值进行对比，并有可能返回一个状态代码为**304 (Not Modified)**的响应。
 
+如[“使用HttpEntity”](#使用HttpEntity)一节所述，控制器可以使用**HttpEntity**类型与请求/响应进行交互。控制器返回**ResponseEntity**可以在响应中包含HTTP缓存信息，如下：
+```java
+@GetMapping("/book/{id}")
+public ResponseEntity<Book> showBook(@PathVariable Long id) {
 
+    Book book = findBook(id);
+    String version = book.getVersion();
+
+    return ResponseEntity
+                .ok()
+                .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS))
+                .eTag(version) // lastModified同样可用
+                .body(book);
+}
+```
+这样做不仅会在响应中包含**'ETag'**和**'Cache-Control'**报头，如果客户端发送的条件报头与控制器设置的缓存信息集相匹配，它还会将响应转换为带有空白正文的**HTTP 304 Not Modified**响应。
+
+**@RequestMapping**方法也可能希望支持相同的行为。这可以实现如下：
+```java
+@RequestMapping
+public String myHandleMethod(WebRequest webRequest, Model model) {
+
+    long lastModified = // 1. 应用程序特定的计算
+
+    if (request.checkNotModified(lastModified)) {
+        // 2. 快捷退出 - 无需进一步处理
+        return null;
+    }
+
+    // 3. 或者进一步请求处理，实际准备内容
+    model.addAttribute(...);
+    return "myViewName";
+}
+```
+这里有两个关键元素：调用**request.checkNotModified(lastModified)**并返回**null**。前者在返回true之前设置适当的响应状态和响应头。后者与前者相结合使用，使Spring MVC不再进一步处理请求。
+
+请注意，对这种有3种变体处理：
+- **request.checkNotModified(lastModified)**将lastModified与**'If-Modified-Since'**或**'If-Unmodified-Since'**请求头进行比较
+- **request.checkNotModified(eTag)**将eTag与**'If-None-Match'**请求头进行比较
+- **request.checkNotModified(eTag,lastModified)**同时执行上面两个，意味着两个条件都应该是有效。
+
+当接收到有条件的**'GET'/'HEAD'**请求时，**checkNotModified**将检查资源是否尚未被修改，如果是，则会产生**HTTP 304 Not Modified**响应。在有条件的**'POST'/'PUT'/'DELETE'**请求的情况下，**checkNotModified**将检查资源是否尚未被修改，如果已经被修改，将导致**HTTP 409 Precondition Failed**响应以防止并发修改。
+
+## Shallow ETag支持
+***
+ETags的支持是由Servlet过滤器**ShallowEtagHeaderFilter**提供。它是一个简单的Servlet过滤器，因此可以与任何Web框架结合使用。**ShallowEtagHeaderFilter**过滤器创建了所谓的浅层ETag（而不是深层的ETag，关于深层ETag稍后介绍更多）。过滤器缓存渲染的JSP（或其他内容）的内容，生成一个MD5哈希，并将其作为响应中的一个ETag头返回。下一次客户端发送对同一资源的请求时，它将使用这个哈希值作为**If-None-Match**值。过滤器会探测到这一点，再次渲染视图，并比较两个哈希值。如果它们相等，则返回**304**。
+
+请注意，此策略可节省网络带宽但不节省CPU，因为必须为每个请求计算完整的响应。在控制器级别的其他策略（如上所述）可以节省网络带宽并避免计算。
+
+该过滤器有一个**writeWeakETag**参数，它配置过滤器写入Weak ETags，如这个所示：**W/"02a2d595e6ed9a0b24f027f2b63b134d6"**，如RFC 7232第2.3节中所定义。
+
+你在web.xml中配置ShallowEtagHeaderFilter：
+```xml
+<filter>
+    <filter-name>etagFilter</filter-name>
+    <filter-class>org.springframework.web.filter.ShallowEtagHeaderFilter</filter-class>
+    <!-- 可选参数，用来配置过滤器写入weak ETags
+    <init-param>
+        <param-name>writeWeakETag</param-name>
+        <param-value>true</param-value>
+    </init-param>
+    -->
+</filter>
+
+<filter-mapping>
+    <filter-name>etagFilter</filter-name>
+    <servlet-name>petclinic</servlet-name>
+</filter-mapping>
+```
+或者在Servlet 3.0+环境中，
+```java
+public class MyWebAppInitializer extends AbstractDispatcherServletInitializer {
+
+    // ...
+
+    @Override
+    protected Filter[] getServletFilters() {
+        return new Filter[] { new ShallowEtagHeaderFilter() };
+    }
+
+}
+```
+
+***
+# 基于代码的Servlet容器初始化
+***
+在Servlet 3.0+环境中，你可以选择以编程式配置Servlet容器作为替代方案，或与**web.xml**文件组合使用。以下是注册**DispatcherServlet**的示例：
+```java
+import org.springframework.web.WebApplicationInitializer;
+
+public class MyWebApplicationInitializer implements WebApplicationInitializer {
+
+    @Override
+    public void onStartup(ServletContext container) {
+        XmlWebApplicationContext appContext = new XmlWebApplicationContext();
+        appContext.setConfigLocation("/WEB-INF/spring/dispatcher-config.xml");
+
+        ServletRegistration.Dynamic registration = container.addServlet("dispatcher", new DispatcherServlet(appContext));
+        registration.setLoadOnStartup(1);
+        registration.addMapping("/");
+    }
+
+}
+```
+**WebApplicationInitializer**是由Spring MVC提供的接口，可确保你的实现被检测并自动用于初始化任何Servlet 3容器。**WebApplicationInitializer**的一个名为**AbstractDispatcherServletInitializer**的抽象基类实现使注册**DispatcherServlet**更容易，只需要简单的重写方法以指定Servlet映射和**DispatcherServlet**配置的位置。
+
+对于应用程序推荐使用基于Java的Spring配置：
+```java
+public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        return null;
+    }
+
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class[] { MyWebConfig.class };
+    }
+
+    @Override
+    protected String[] getServletMappings() {
+        return new String[] { "/" };
+    }
+
+}
+```
+如果使用基于XML的Spring配置，你应该直接从**AbstractDispatcherServletInitializer**扩展：
+```java
+public class MyWebAppInitializer extends AbstractDispatcherServletInitializer {
+
+    @Override
+    protected WebApplicationContext createRootApplicationContext() {
+        return null;
+    }
+
+    @Override
+    protected WebApplicationContext createServletApplicationContext() {
+        XmlWebApplicationContext cxt = new XmlWebApplicationContext();
+        cxt.setConfigLocation("/WEB-INF/spring/dispatcher-config.xml");
+        return cxt;
+    }
+
+    @Override
+    protected String[] getServletMappings() {
+        return new String[] { "/" };
+    }
+
+}
+```
+**AbstractDispatcherServletInitializer**还提供了一种方便的方法来添加**Filter**实例，并将它们自动映射到**DispatcherServlet**上：
+```java
+public class MyWebAppInitializer extends AbstractDispatcherServletInitializer {
+
+    // ...
+
+    @Override
+    protected Filter[] getServletFilters() {
+        return new Filter[] { new HiddenHttpMethodFilter(), new CharacterEncodingFilter() };
+    }
+
+}
+```
+每个过滤器根据基于具体类型的默认名称被添加，并自动映射到**DispatcherServlet**。
+
+**AbstractDispatcherServletInitializer**的**isAsyncSupported **protected方法提供了一个单独的位置来启用**DispatcherServlet**上的异步支持并且所有的过滤器映射到它。默认情况下，该标志设置为true。
+
+最后，如果需要进一步自定义**DispatcherServlet**本身，可以覆盖**createDispatcherServlet**方法。
 
 
 
