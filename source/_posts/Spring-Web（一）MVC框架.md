@@ -1990,14 +1990,301 @@ Spring **HandlerExceptionResolver**实现处理在控制器执行期间发生的
 
 ## @ExceptionHandler
 ***
+**HandlerExceptionResolver**接口和**SimpleMappingExceptionResolver**实现允许你将异常映射到指定的视图上，并且可以在转发到这些视图前，声明地附带一些可选Java逻辑。然而，在某些情况下，特别是当依赖于**@ResponseBody**方法而不是视图解析器时，直接设置响应状态并且选择性将错误内容写入响应体中可能更加方便。
 
+你可以用**@ExceptionHandler**方法来做到这一点。当在控制器内声明时，这样的方法将适用这个控制器（或任何它的子类）内**@RequestMapping**方法产生的异常。你可以在**@ControllerAdvice**类中声明一个**@ExceptionHandler**方法，在这种情况下，它处理来自许多控制器的**@RequestMapping**方法的异常。以下是一个控制器本地的**@ExceptionHandler**方法的示例：
+```java
+@Controller
+public class SimpleController {
 
+    // @RequestMapping方法忽略 ...
 
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<String> handleIOException(IOException ex) {
+        // 准备responseEntity  
+        return responseEntity;
+    }
 
+}
+```
+@ExceptionHandler的值可以设置为异常类型的数组。如果一个异常被抛出，并且该异常与列表中的类型之一相匹配，那么使用相匹配@ExceptionHandler注解的方法就会被调用。如果没有设置注解值，则使用列为方法参数的异常类型。
 
+很像使用@RequestMapping注解注解的标准控制器方法，@ExceptionHandler方法的方法参数和返回值也是很灵活的。例如，可以在Servlet环境中访问HttpServletRequest，并在Portlet环境中访问PortletRequest。返回类型可以是一个String，它会被解释为一个视图名称，也可以是一个ModelAndView对象，一个ResponseEntity，或者你也可以添加@ResponseBody，使方法返回值被消息转换器转换并写入到响应流。
 
+## 处理标准的Spring MVC异常
+***
+Spring MVC可能会在处理请求时引发许多异常。**SimpleMappingExceptionResolver**可以根据需要轻松将任何异常映射到默认的错误视图。然而，当需要运行于一些自动解析响应的客户端的时候，你可能会想要在响应里设置特定的状态码。根据异常产生的状态码来代表客户端的4xx错误和服务器的5xx错误。
 
+**DefaultHandlerExceptionResolver**将Spring MVC异常转换为特定的错误状态代码。它默认被MVC名称空间，MVC Java配置以及DispatcherServlet注册（即不使用MVC命名空间或Java配置时）注册。下面列出了这个解析器处理的一些异常和相应的状态代码：
 
+|异常|HTTP状态码|
+|-----|-------|
+|**BindException**|	400 (Bad Request)|
+|**ConversionNotSupportedException**|500 (Internal Server Error)|
+|**HttpMediaTypeNotAcceptableException**|406 (Not Acceptable)|
+|**HttpMediaTypeNotSupportedException**|415 (Unsupported Media Type)|
+|**HttpMessageNotReadableException**|400 (Bad Request)|
+|**HttpMessageNotWritableException**|500 (Internal Server Error)|
+|**HttpRequestMethodNotSupportedException**|405 (Method Not Allowed)|
+|**MethodArgumentNotValidException**|400 (Bad Request)|
+|**MissingPathVariableException**|500 (Internal Server Error)|
+|**MissingServletRequestParameterException**|400 (Bad Request)|
+|**MissingServletRequestPartException**|400 (Bad Request)|
+|**NoHandlerFoundException**|404 (Not Found)|
+|**NoSuchRequestHandlingMethodException**|404 (Not Found)|
+|**TypeMismatchException**|400 (Bad Request)|
+
+**DefaultHandlerExceptionResolver**通过设置响应的状态来透明地工作。然而，当你的应用程序可能需要添加开发者友好内容到每个错误响应时（比如，提供REST API时），它会由于响应的主体中缺少错误内容而停止。你可以准备一个**ModelAndView**并且通过视图解析器 —  也就是通过配置一个**ContentNegotiatingViewResolver**,**MappingJackson2JsonView**等等，来渲染错误内容。但是，你可能更喜欢使用**@ExceptionHandler**方法。
+
+如果你喜欢通过**@ExceptionHandler**方法编写错误内容，你可以可以扩展**ResponseEntityExceptionHandler**来代替。这是**@ControllerAdvice**类的方便的基础，它提供一个**@ExceptionHandler**方法来处理标准的Spring MVC异常并返回**ResponseEntity**。这允许你自定义响应并使用消息转换器写入错误内容。有关更多详细信息，请参阅ResponseEntityExceptionHandler javadocs。
+
+## 用@ResponseStatus注解业务异常
+***
+可以使用**@ResponseStatus**注解业务异常。当产生异常时，**ResponseStatusExceptionResolver**通过设置相应地响应的状态来处理它。默认情况下，**DispatcherServlet**注册**ResponseStatusExceptionResolver**，它可以使用。
+
+## 自定义默认Servlet容器错误页面
+***
+当响应的状态被设置错误状态码并且响应的正文为空时，Servlet容器通常会呈现一个HTML格式的错误页面。要自定义容器的默认错误页面，可以在**web.xml**中声明一个**&lt;error-page>**元素。在Servlet 3之前，该元素必须映射到特定的状态码或异常类型。从Servlet 3开始，不需要映射错误页面，这表示默认的Servlet容器错误页面可以被自定义为特定的地址了。
+```xml
+<error-page>
+    <location>/error</location>
+</error-page>
+```
+请注意，错误页面的实际位置可以是JSP页面或容器中的一些其他URL，包括通过**@Controller**方法处理的一个URL：
+
+编写错误信息时，**HttpServletResponse**上设置的状态码和错误消息可以通过控制器中的请求属性访问：
+```java
+@Controller
+public class ErrorController {
+
+    @RequestMapping(path = "/error", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public Map<String, Object> handle(HttpServletRequest request) {
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("status", request.getAttribute("javax.servlet.error.status_code"));
+        map.put("reason", request.getAttribute("javax.servlet.error.message"));
+
+        return map;
+    }
+
+}
+```
+或在JSP中：
+```jsp
+<%@ page contentType="application/json" pageEncoding="UTF-8"%>
+{
+    status:<%=request.getAttribute("javax.servlet.error.status_code") %>,
+    reason:<%=request.getAttribute("javax.servlet.error.message") %>
+}
+```
+
+***
+# Web安全
+***
+[Spring Security](http://projects.spring.io/spring-security/)项目提供了保护Web应用程序免受恶意攻击的功能。请参阅“[CSRF保护]()”，“[安全响应头]()”以及“[Spring MVC集成]()”部分中的参考文档。请注意，使用Spring Security来保护应用程序并不一定需要它的所有功能。例如CSRF保护可以只需添加CsrfFilter 和CsrfRequestDataValueProcessor到你的配置中。参见[Spring MVC演示示例](https://github.com/spring-projects/spring-mvc-showcase/commit/361adc124c05a8187b84f25e8a57550bb7d9f8e4)。
+
+另一个选择是使用专门用于Web Security的框架。HDIV就是一个这样的框架，并且可以与Spring MVC集成。
+
+***
+# “约定优先于配置“的支持
+***
+ 对于很多项目，坚持既定的约定并且有合力的默认值是它们（项目）所需的。SpringWeb MVC现在明确支持”约定优先于配置”。这意味着如果你建立了一套命名约定等等，你可以大幅度减少设置处理器映射，视图解析，**ModelAndView**实例等所需的配置量。这对于快速成型是一个伟大的福音，并且这也可以在代码库中提供一定程度的（总是很好的）一致性，你应该选择把它推进生产环境。
+ 
+ 约定优先于配置的支持解决了MVC的三个核心领域：模型，视图和控制器。
+ 
+## ControllerClassNameHandlerMapping控制器
+***
+ControllerClassNameHandlerMapping类是一个HandlerMapping实现，它使用约定来确定请求URL和要处理这些请求的Controller实例之间的映射。
+
+考虑以下简单的Controller实现。请特别注意类的名称。
+```java
+public class ViewShoppingCartController implements Controller {
+
+    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) {
+        // 对于这个例子，实现并不重要...
+    }
+
+}
+```
+以下是相应的Spring Web MVC配置文件的片段：
+```xml
+<bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
+
+<bean id="viewShoppingCart" class="x.y.z.ViewShoppingCartController">
+    <!-- 注入需要的依赖... -->
+</bean>
+```
+**ControllerClassNameHandlerMapping**在其应用程序上下文中找到所有定义的各种处理器（或**Controller**）bean，并且用**Controller**实例的名字来定义它的处理器映射。因此，**ViewShoppingCartController**映射到**/viewshoppingcart\***请求URL。
+
+我们再来看一些更多的例子，熟悉这个核心思想。（注意URL中的全部小写，与驼峰式Controller类名称形成对比）。
+
+- **WelcomeController**映射到**/welcome\***请求URL
+- **HomeController**映射到**/home\***请求URL
+- **IndexController**映射到**/index\***请求URL
+- **RegisterController**映射到**/register\***请求URL
+
+在MultiActionController处理器类的情况下，生成的映射稍微复杂一点。以下示例中的Controller名称假定为MultiActionController实现：
+- **AdminController**映射到**/admin/\***请求URL
+- **CatalogController**映射到**/catalog/***请求URL
+
+如果你遵循将Controller实现命名为xxxController的惯例，ControllerClassNameHandlerMapping会将你从定义和维护一个潜在的无聊SimpleUrlHandlerMapping（或类似的）中解救出来。
+
+## ModelMap模型（ModelAndView）
+***
+**ModelMap**类本质上是一个更强大的**Map**，它可以使需要添加并在（或）**View**中显示的对象遵循常见的命名约定。考虑下面的**Controller**实现;注意，要被添加到**ModelAndView**中的对象并没有指定任何关联的名称。
+```java
+public class DisplayShoppingCartController implements Controller {
+
+    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) {
+
+        List cartItems = // 获取一个CartItem对象列表
+        User user = // 获取正在购物的User对象。
+
+        ModelAndView mav = new ModelAndView("displayShoppingCart"); <-- 逻辑视图名
+
+        mav.addObject(cartItems); <--看，没有名称，只有对象
+        mav.addObject(user); <-- 再一次这样
+
+        return mav;
+    }
+}
+```
+**ModelAndView**类使用一个**ModelMap**类，ModelMap是一个自定义的**Map**实现，当对象被添加到它时，它为对象自动生成一个键。对于决定添加对象的名称的策略是，在诸如User之类的标量对象的情况下，使用对象类的短类名。下面示例是为标量对象生成并放入到**ModelMap**实例中的名称。
+- **x.y.User**实例，添加时会生成一个**user**名称。
+- **x.y.Registration**实例，添加时会生成一个**registration**名称。
+- **x.y.Foo**实例，添加时会生成一个**foo**名称。
+- **java.util.HashMap**，添加时实例会生成一个**hashMap**名称。在这种情况下，您可能想要明确指定名称，因为**hashMap**不太直观。
+- 添加null会导致一个**IllegalArgumentException**被抛出。如果要添加的对象可以为null，你也需要显式地指定其名。
+
+<div class="quote">什么？居然没有自动多元？
+Spring Web MVC的 约定优先于配置的支持并不支持自动多元化。也就是，你添加一个Person对象的List到ModelAndView中时，不会生成一个people名称。
+
+这个决定是经过一番辩论，最后还是“风险最小原则（Principle of Least Surprise）”获胜。
+</div>
+
+在添加一个Set或List之后名称生成策略是：窥视（peek）集合，取在集合中第一个对象的短类名，并使用List附加到名称后。这同样适用于数组，尽管数组不需要窥视数组内容。下面几个例子会使集合的名称生成语义更加清晰。
+
+- 一个**x.y.User[]**数组，有零个或更多**x.y.User**元素，添加时会生成**userList**名称。
+-  一个**x.y.Foo[]**数组，有零个或更多**x.y.Foo**元素，添加时会生成**fooList**名称。
+-  一个**java.util.ArrayList**，有零个或更多**x.y.Use**r元素，添加时会生成**userList**名称。
+-  一个**java.util.HashSet**，有零个或更多**x.y.Foo**元素，添加时会生成**fooList**名称。
+-  一个**空的java.util.ArrayList**不会被添加（实际上，**addObject(..)**调用本质上是一个no-op）。
+
+## 关于RequestToViewNameTranslator视图
+***
+当没有显式提供逻辑视图名时，**RequestToViewNameTranslator**接口会决定这样一个逻辑**View**名称。它只有一个实现，**DefaultRequestToViewNameTranslator**类。
+
+DefaultRequestToViewNameTranslator将请求URL映射到逻辑视图名上，就如此示例：
+```java
+public class RegistrationController implements Controller {
+
+    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) {
+        // 处理请求...
+        ModelAndView mav = new ModelAndView();
+        // 根据需要添加数据到model中...
+        return mav;
+        // 注意，这里没有设置View或逻辑视图名
+    }
+
+}
+```
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 这就是那个众所周知的，用来生成视图名的bean -->
+    <bean id="viewNameTranslator"
+            class="org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator"/>
+
+    <bean class="x.y.RegistrationController">
+        <!-- 根据需要注入依赖 -->
+    </bean>
+
+    <!-- 映射请求URL到Controller名上 -->
+    <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+</beans>
+```
+注意在**handleRequest(..)**方法实现中，没有在返回的**ModelAndView**上设置任何**View**或逻辑视图名。**DefaultRequestToViewNameTranslator**负责从请求的URL生成逻辑视图名。上面例子中，**RegistrationController**与**ControllerClassNameHandlerMapping**结合使用，一个请求URL{%raw%}http://localhost/registration.html{%endrow%}导致一个逻辑视图名**registration**被**DefaultRequestToViewNameTranslator**生成。然后，该逻辑视图名称由**InternalResourceViewResolver** bean解析为**/WEB-INF/jsp/registration.jsp**视图。
+
+> 您不需要显示定义一个**DefaultRequestToViewNameTranslator** bean。如果你喜欢**DefaultRequestToViewNameTranslator**的默认设置，则可以依靠Spring Web MVC **DispatcherServlet**来实例化此类的实例，如果未明确配置该实例的话。
+
+当然，如果你需要更改默认设置，那么你需要显示配置自己的**DefaultRequestToViewNameTranslator** bean。有关可配置的各种属性的详细信息，请参阅综合的**DefaultRequestToViewNameTranslator** javadocs。
+
+***
+# HTTP缓存支持
+***
+一个好的HTTP缓存策略可以显着提高Web应用程序的性能和客户段体验。**'Cache-Control'** HTTP响应头主要负责这一点，还有诸如**“Last-Modified”**和**“ETag”**之类的条件报头。
+
+**'Cache-Control'** HTTP响应头建议私有缓存（例如浏览器）和公共缓存（例如代理）它们如何缓存HTTP响应以进一步重用。
+
+[ETag](https://en.wikipedia.org/wiki/HTTP_ETag)（实体标签）是由HTTP/1.1兼容的Web服务器返回的HTTP响应头，用于确定给定URL中的内容更改。它可以被认为是**Last-Modified**头的更复杂的继承者。当服务器返回带有ETag响应头的表示时，客户端可以在随后含有**If-None-Match**报头的GET请求中使用这个报头。如果内容没有改变，服务器返回**304: Not Modified**。
+
+本节介绍在Spring Web MVC应用程序中配置HTTP缓存的不同可用选择。
+
+## Cache-Control HTTP响应头
+***
+Spring Web MVC支持许多用例和方式为应用程序配置**“Cache-Control”**报头。虽然RFC 7234第5.2.2节完全描述了这个报头及其可能的指令，但是有几种方法可以解决最常见的情况。
+
+Spring Web MVC在几个它的API中使用一个配置约定：setCachePeriod(int seconds)：
+- **-1**值不会生成**'Cache-Control'**响应头。
+- **0**值会使用**'Cache-Control: no-store'**指令阻止缓存。
+- **n> 0**值将使用**'Cache-Control: max-age=n'**指令在响应n秒内缓存给出的响应。
+
+CacheControl构建器类简单描述了可用的“Cache-Control”指令，并使得构建你自己的HTTP缓存策略更加容易。一旦构建，就可以在几个Spring Web MVC API中接受CacheControl实例作为参数。
+```java
+// 缓存1小时- "Cache-Control: max-age=3600"
+CacheControl ccCacheOneHour = CacheControl.maxAge(1, TimeUnit.HOURS);
+
+// 阻止缓存 - "Cache-Control: no-store"
+CacheControl ccNoStore = CacheControl.noStore();
+
+// 在公有和私有缓存中缓存10天,
+// 公有缓存不能转为响应  
+// "Cache-Control: max-age=864000, public, no-transform"
+CacheControl ccCustom = CacheControl.maxAge(10, TimeUnit.DAYS)
+                                    .noTransform().cachePublic();
+```
+
+## 静态资源的HTTP缓存支持
+***
+应使用适当的**'Cache-Control'**和条件报头来提供静态资源以实现最佳性能。配置一个**ResourceHttpRequestHandler**来处理静态资源，不仅可以在本地通过读取文件的元数据来写入**'Last-Modified'**头，，而且可以在属性被配置的情况下写入**'Cache-Control'**报头。
+
+你可以在**ResourceHttpRequestHandler**上设置**cachePeriod**属性，也可以使用**CacheControl**实例，它支持更具体的指令：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/resources/**")
+                .addResourceLocations("/public-resources/")
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
+    }
+
+}
+``
+在XML中：
+```xml
+<mvc:resources mapping="/resources/**" location="/public-resources/">
+    <mvc:cache-control max-age="3600" cache-public="true"/>
+</mvc:resources>
+```
+
+## 在控制器中支持的Cache-Control，ETag和Last-Modified响应头
+***
+控制器可以支持**'Cache-Control'**, **'ETag'**和/或**'If-Modified-Since'**HTTP请求;如果要在响应上设置'Cache-Control'报头，则建议使用此选项。
 
 
 
