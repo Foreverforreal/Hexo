@@ -1302,16 +1302,16 @@ deferredResult.setResult(data);
 如果从控制器方法返回的**Callable**在执行时引发异常，会发生什么？简答是这与控制器方法引发异常时发生的情况一样。它经历了常规异常处理机制。更长的解释是，当**Callable**引发一个异常，Spring MVC以这个**Exception**为结果调度回Servlet容器，并导致以异常而不是控制器方法返回值为开始恢复请求处理。当使用**DeferredResult**时，您可以选择是否使用**Exception**实例调用**setResult**或**setErrorResult**。
 
 ### 拦截异步请求
-**HandlerInterceptor**为了实现**afterConcurrentHandlingStarted**回调，还可以实现**AsyncHandlerInterceptor**，当异步处理开始时，这个回调被调用而不是**postHandle**和**afterCompletion**。
+一个**HandlerInterceptor**还可以实现**AsyncHandlerInterceptor**，是为了能够实现**afterConcurrentHandlingStarted**回调，，当异步处理开始时，该回调被调用，而不是**postHandle**和**afterCompletion**方法。
 
 **HandlerInterceptor**还可以注册**CallableProcessingInterceptor**或**DeferredResultProcessingInterceptor**，以便更深入地整合异步请求的生命周期，例如处理超时事件。有关更多详细信息，请参阅**AsyncHandlerInterceptor**的Javadoc。
 
 **DeferredResult**类型同样提供了诸如**onTimeout(Runnable)**和**onCompletion(Runnable)**等方法。有关详细信息，请参阅DeferredResult的Javadoc。
 
-当使用**Callable**时，您可以使用**WebAsyncTask**的实例来包装它，该实例还提供了timeout和completion的注册方法。
+当使用**Callable**时，你可以使用**WebAsyncTask**的实例来包装它，该实例还提供了timeout和completion的注册方法。
 
 ### HTTP Streaming
-控制器方法可以使用DeferredResult和Callable异步生成其返回值，并且可以用于实现诸如[long polling](https://spring.io/blog/2012/05/08/spring-mvc-3-2-preview-techniques-for-real-time-updates/)的技术，这里服务器可以尽快将事件推送到客户端。
+控制器方法可以使用**DeferredResult**和**Callable**异步生成其返回值，并且可以用于实现诸如[long polling](https://spring.io/blog/2012/05/08/spring-mvc-3-2-preview-techniques-for-real-time-updates/)的技术，这里服务器可以尽快将事件推送到客户端。
 
 如果你想在单个HTTP响应中推送多个事件怎么办？这是一个与“Long Polling”相关的技术，也被称为“HTTP Streaming”。Spring MVC可以通过**ResponseBodyEmitter**返回值类型来实现，该类型可以用于发送多个对象，而不是像**@ResponseBody**的一样，发送的每个对象都使用**HttpMessageConverter**写入响应。
 
@@ -1336,7 +1336,7 @@ emitter.complete();
 请注意，**ResponseBodyEmitter**也可以用作**ResponseEntity**中的正文，以便自定义响应的状态和响应头
 
 ### HTTP Streaming与Server-Sent Events
-SseEmitter是ResponseBodyEmitter的子类，提供对[Server-Sent Events](https://www.w3.org/TR/eventsource/)的支持。Server-sent event只是同一个“HTTP Streaming”技术的另一个变体，除了从服务器推送的事件根据 W3C Server-Sent Events规范进行格式化的。
+**SseEmitter**是**ResponseBodyEmitter**的子类，提供对[Server-Sent Events](https://www.w3.org/TR/eventsource/)的支持。Server-sent event只是同一个“HTTP Streaming”技术的另一个变体，除了从服务器推送的事件根据 W3C Server-Sent Events规范进行格式化的。
 
 Server-Sent Events可用于预期的用途，即将事件从服务器推送到客户端。在Spring MVC中这很容易做到，只需返回一个SseEmitter类型的值。
 
@@ -1373,7 +1373,7 @@ public StreamingResponseBody handle() {
 
 </web-app>
 ```
-异步支持必须在**DispatcherServlet**上开启,通过**web.xml**中的**&lt;async-supported>true&lt;/async-supported>**子元素。另外，任何参与异步请求处理的**Filter**都必须配置为支持ASYNC dispatcher类型。为Spring Framework提供的所有过滤器启用ASYNC dispatcher类型应该是安全的，因为它们通常继承自**OncePerRequestFilter**，并且具有关于过滤器是否需要参与异步调度的运行时期检查。
+在**web.xml**中异步支持必须在**DispatcherServlet**上开启,通过它的的**&lt;async-supported>true&lt;/async-supported>**子元素。另外，任何参与异步请求处理的**Filter**都必须配置为支持ASYNC dispatcher类型。为Spring Framework提供的所有过滤器启用ASYNC dispatcher类型应该是安全的，因为它们通常继承自**OncePerRequestFilter**，并且具有关于过滤器是否需要参与异步调度的运行时期检查。
 
 以下是一些web.xml配置示例：
 ```xml
@@ -2274,7 +2274,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     }
 
 }
-``
+```
 在XML中：
 ```xml
 <mvc:resources mapping="/resources/**" location="/public-resources/">
@@ -2454,6 +2454,145 @@ public class MyWebAppInitializer extends AbstractDispatcherServletInitializer {
 **AbstractDispatcherServletInitializer**的**isAsyncSupported **protected方法提供了一个单独的位置来启用**DispatcherServlet**上的异步支持并且所有的过滤器映射到它。默认情况下，该标志设置为true。
 
 最后，如果需要进一步自定义**DispatcherServlet**本身，可以覆盖**createDispatcherServlet**方法。
+
+***
+# 配置Spring MVC
+***
+[第2.1节“WebApplicationContext中的特殊Bean类型”](#WebApplicationContext中的特殊Bean类型)和[第2.2节“默认DispatcherServlet配置”](#默认DispatcherServlet配置)介绍了Spring MVC的特殊bean以及**DispatcherServlet**使用的默认实现。在本节中，你将了解配置Spring MVC的两种额外方法。即MVC Java配置和MVC XML命名空间。
+
+MVC Java配置和MVC命名空间提供了类似的默认配置，它覆盖**DispatcherServlet**的默认值。这样做的目的是，让大多数应用不得不有一致的配置，并且可从较高级别的架构来配置Spring MVC，这个架构可以作为简单易用的配置起始点，并且基本不需这些配置背后所需的知识。
+
+你可以根据自己的喜好选择MVC Java配置或MVC命名空间。另外，你将在下面进一步看到，使用MVC Java配置，可以更容易地查看底层配置，以及直接对创建的Spring MVC bean进行细粒度的自定义。但是让我们从起点就开始。
+
+## 启用MVC Java Config或MVC XML命名空间
+***
+要启用MVC Java配置，将@EnableWebMvc注解添加到你的一个@Configuration类中：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig {
+
+}
+```
+要在XML中实现相同的操作，请使用**DispatcherServlet**上下文中的**mvc:annotation-driven**元素（如果你没有定义**DispatcherServlet**上下文，则在根上下文中）：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <mvc:annotation-driven/>
+
+</beans>
+```
+以上注册了一个**RequestMappingHandlerMapping**，一个**RequestMappingHandlerAdapter**和一个**ExceptionHandlerExceptionResolver**（以及其他的），以支持使用注解（如**@RequestMapping**，**@ExceptionHandler**等）的注解控制器方法处理请求。
+
+同时，以下行为也会启用:
+1. 除了用于数据绑定的JavaBeans PropertyEditor之外，还可以通过ConversionService实例进行Spring 3样式类型转换。
+2. 通过**ConversionService**使用**@NumberFormat**注解支持Number字段格式化。
+3. 使用**@DateTimeFormat**注解支持**Date** ,**Calendar**, **Long**以及Joda Time字段格式化。
+4.  支持使用**@Valid**验证**@Controller**输入，如果类路径中存在JSR-303 Provider 的话。
+5.  **HttpMessageConverter**支持**@RequestBody**方法参数和**@ResponseBody**方法从**@RequestMapping**或**@ExceptionHandler**方法返回值。
+下面是通过mvc:annotation-driven设置的完整HttpMessageConverters列表
+	1. **ByteArrayHttpMessageConverter** 转换字节数组。
+	- **StringHttpMessageConverter** 转换字符串。
+	- **ResourceHttpMessageConverter** 为所有媒体类型转换为/从**org.springframework.core.io.Resource**。
+	- **SourceHttpMessageConverter** 转换为/从**javax.xml.transform.Source**.
+	- **FormHttpMessageConverter** 将表单数据转换为/从**MultiValueMap&lt;String，String>**。
+	- **Jaxb2RootElementHttpMessageConverter** 将Java对象转换为/从XML
+ — 如果JAXB2存在，并且类别路径中不存在Jackson 2 XML extension ，则会添加。
+	- **MappingJackson2HttpMessageConverter** 转换为/从JSON— 如果类路径上存在Jackson 2，则添加。
+	- **MappingJackson2XmlHttpMessageConverter** 转换为/从XML — 如果类路径上存在Jackson 2 XML extension，则添加。
+	- **AtomFeedHttpMessageConverter** 转换Atom feeds  — 如果类路径上存在Rome ，则添加。
+	- **RssChannelHttpMessageConverter** 转换RSS feeds — 如果类路径上存在Rome ，则添加。
+
+有关如何自定义这些默认转换器的更多信息，请参见[第16.12节“消息转换器”](#消息转换器)。
+
+> Jackson JSON和XML转换器使用由**Jackson2ObjectMapperBuilder**创建的**ObjectMapper**实例创建，以提供更好的默认配置。
+此构建器使用以下命令自定义Jackson的默认属性：
+1. **DeserializationFeature.FAIL\_ON\_UNKNOWN\_PROPERTIES**被禁用。
+2. **DeserializationFeature.FAIL\_ON\_UNKNOWN\_PROPERTIES**被禁用。
+如果在类路径中检测到它们，它也会自动注册以下众所周知的模块：
+1. [jackson-datatype-jdk7](https://github.com/FasterXML/jackson-datatype-jdk7): 支持Java 7类型，如java.nio.file.Path。
+2. [jackson-datatype-joda](https://github.com/FasterXML/jackson-datatype-joda): 支持Joda-Time类型。
+3. [jackson-datatype-jsr310](https://github.com/FasterXML/jackson-datatype-jsr310): 支持Java 8 Date＆Time API类型。
+4. [jackson-datatype-jdk8](https://github.com/FasterXML/jackson-datatype-jdk8): 支持其他Java 8类型，如**Optional**。
+
+## 自定义已提供的配置
+***
+要在Java中自定义默认配置，你只需实现**WebMvcConfigurer**接口，或者更有可能继承**WebMvcConfigurerAdapter**类，并覆盖所需的方法：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    // Override configuration methods...
+
+}
+```
+要自定义**&lt;mvc:annotation-driven/>**的默认配置，请检查它支持哪些属性和子元素。你可以查看[Spring MVC XML schema ](http://schema.spring.io/mvc/spring-mvc.xsd)模式或使用IDE的代码完成功能来发现哪些属性和子元素可用。
+
+## 转换和格式化
+***
+默认情况下，已安装了针对Number和Date类型的格式化器，包括对**@NumberFormat**和**@DateTimeFormat**注解的支持。如果类路径上存在Joda Time，还安装了对Joda Time格式化库的完全支持。要注册自定义格式化器和转换器，请覆盖**addFormatters**方法：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        // Add formatters and/or converters
+    }
+
+}
+```
+在MVC命名空间中，当**&lt;mvc:annotation-driven/>**被添加时时，同样应用相同的默认设置。要注册自定义格式化器`和转换器，只需提供一个ConversionService：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <mvc:annotation-driven conversion-service="conversionService"/>
+
+    <bean id="conversionService"
+            class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="org.example.MyConverter"/>
+            </set>
+        </property>
+        <property name="formatters">
+            <set>
+                <bean class="org.example.MyFormatter"/>
+                <bean class="org.example.MyAnnotationFormatterFactory"/>
+            </set>
+        </property>
+        <property name="formatterRegistrars">
+            <set>
+                <bean class="org.example.MyFormatterRegistrar"/>
+            </set>
+        </property>
+    </bean>
+
+</beans>
+```
+
+> 
+
+
+
 
 
 
