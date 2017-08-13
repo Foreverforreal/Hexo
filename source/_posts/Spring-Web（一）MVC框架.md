@@ -2552,7 +2552,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 }
 ```
-在MVC命名空间中，当**&lt;mvc:annotation-driven/>**被添加时时，同样应用相同的默认设置。要注册自定义格式化器`和转换器，只需提供一个ConversionService：
+在MVC命名空间中，当添加**&lt;mvc:annotation-driven/>**时，同样应用相同的默认设置。要想注册自定义格式化器和转换器，只需提供一个ConversionService：
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -2589,12 +2589,17 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 </beans>
 ```
 
+> 有关何时使用FormatterRegistrars的更多信息，请参见{% post_link Spring-核心技术（三）验证，数据绑定和类型转换 FormatterRegistrar SPI
+ %}和FormattingConversionServiceFactoryBean。
+
+## 验证
+***
+Spring提供了一个**Validator**接口，可用于在应用程序的所有层中进行验证。在Spring MVC中，你可以将其配置为用作全局**Validator**实例，和/或通过**@InitBinder**方法作为控制器中的本地Validator，以便在哪遇到**@Valid**或**@Validated**控制器方法参数都可以使用。可以将全局和本地验证器实例组合使用以提供复合验证。
+
+Spring还通过**LocalValidatorFactoryBean**支持JSR-303 / JSR-349 Bean验证，它将Spring **org.springframework.validation.Validator**接口适配为Bean Validation **javax.validation.Validator**规范。这个类可以插入Spring MVC作为下面描述的全局验证器。
+
+默认情况下，当在类路径中检测到一个Bean Validation provider （如Hibernate Validator）时，使用**@EnableWebMvc**或**&lt;mvc:annotation-driven/>**会在Spring MVC中通过**LocalValidatorFactoryBean**自动注册Bean Validation支持。
+
 > 
-
-
-
-
-
-
 
 
