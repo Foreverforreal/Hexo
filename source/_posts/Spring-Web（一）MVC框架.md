@@ -110,7 +110,7 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
 **WebApplicationInitializer**是一个由Spring MVC提供的接口，它确保你的基于代码的配置被检测到，并且自动用于初始化任何Servlet 3 容器。一个这个接口的名为**AbstractAnnotationConfigDispatcherServletInitializer**的抽象基类实现，它通过简单地指定其servlet映射和列出配置类来更容易地注册**DispatcherServlet**-它是设置你的Spring MVC应用程序最推荐的方式。更多详细信息，请参阅[“基于代码的Servlet容器初始化"](#基于代码的Servlet容器初始化)。
 
-**DispatcherServlet**实际上是一个**Servlet**（它继承自HttpServlet基类），并因此在你的web应用程序的**web.xml**中声明。你需要在相同的**web.xml**文件中通过使用URL映射，来映射你想要**DispatcherServlet**处理的请求。这是标准的Java EE Servlet配置。以下示例显示了这样的**DispatcherServlet**的声明和映射：
+**DispatcherServlet**实际上是一个**Servlet**（它继承自HttpServlet基类），并因此在你的web应用程序的**web.xml**中声明。你需要在同一个**web.xml**文件中通过使用URL映射，来映射你想要**DispatcherServlet**处理的请求。这是标准的Java EE Servlet配置。以下示例显示了这样的**DispatcherServlet**的声明和映射：
 
 以下是等同于上面基于代码的配置的web.xml：
 ```xml
@@ -128,12 +128,12 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
 </web-app>
 ```
-如第7.15节[“ApplicationContext的附加功能"](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#context-introduction)中所述，Spring中的**ApplicationContext**实例可以被限定作用域。在Web MVC框架中，每个**DispatcherServlet**都有它自己的**WebApplicationContext**，这个上下文继承了在根**WebApplicationContext**中定义的所有bean。根WebApplicationContext应该包含应该在其他上下文和Servlet实例之间共享的所有的基础框架bean。这些继承的bean可以在特定servlet域内被覆盖，并且你可以在给定的Servlet实例本地定义一个新的特定域bean。
+如第7.15节[“ApplicationContext的附加功能"](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#context-introduction)中所述，Spring中的**ApplicationContext**实例可以被限定作用域。在Web MVC框架中，每个**DispatcherServlet**都有它自己的**WebApplicationContext**，这个上下文继承了在根**WebApplicationContext**中定义的所有bean。根**WebApplicationContext**应该包含应该在其他上下文和Servlet实例之间共享的所有的基础框架bean。这些继承的bean可以在特定servlet域内被覆盖，并且你可以在给定的Servlet实例本地定义一个新的特定域bean。
 
 *Spring Web MVC中的典型上下文层次结构*
 ![mvc](/images/spring/mvc-context-hierarchy.png)
 
-在初始化**DispatcherServlet**时，Spring MVC将在Web应用程序的**WEB-INF**目录中查找名为[servlet-name] -servlet.xml的文件，并创建在那里定义的bean，覆盖在全局域内任何使用相同名称定义的bean的定义。
+在初始化**DispatcherServlet**时，Spring MVC将在Web应用程序的**WEB-INF**目录中查找名为**[servlet-name] -servlet.xml**的文件，并创建在那里定义的bean，覆盖在全局域内任何使用相同名称定义的bean的定义。
 
 请考虑以下DispatcherServlet Servlet配置（在web.xml文件中）：
 ```xml
@@ -2714,9 +2714,341 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 ```
 如果不使用MVC Java配置或MVC命名空间，则需要创建一个**ContentNegotiationManager**的实例，并使用它来配置**RequestMappingHandlerMapping**以进行请求映射，以及**RequestMappingHandlerAdapter**和**ExceptionHandlerExceptionResolver**进行内容协商。
 
-请注意，ContentNegotiatingViewResolver现在也可以使用ContentNegotiationManager配置，因此你可以在Spring MVC中使用一个共享实例。
+请注意，**ContentNegotiatingViewResolver**现在也可以使用**ContentNegotiationManager**配置，因此你可以在Spring MVC中使用一个共享实例。
 
-在更高级的情况下，配置多个ContentNegotiationManager实例可能有用，而这些实例又可能包含自定义的ContentNegotiationStrategy实现。例如，你可以使用ContentNegotiationManager配置一个ExceptionHandlerExceptionResolver，它始终将请求的媒体类型解析为“application/json”。或者，如果没有请求内容类型，你可能希望插入具有某种逻辑选择默认内容类型（例如XML或JSON）的自定义策略。
+在更高级的情况下，配置多个**ContentNegotiationManager**实例可能有用，而这些实例又可能包含自定义的**ContentNegotiationStrategy**实现。例如，你可以使用**ContentNegotiationManager**配置一个**ExceptionHandlerExceptionResolver**，它始终将请求的媒体类型解析为“application/json”。或者，如果请求中没有内容类型的化，你可能希望插入具有某种逻辑的自定义策略来选择一种默认内容类型（例如XML或JSON）。
+
+## 视图控制器
+***
+这有一个定义ParameterizableViewController的快捷方式，这个视图控制器会在被调用时立即转发到视图。在静态资源中使用该控制器，当视图生成响应之前没有Java控制器逻辑需要执行时。
+
+下面是一个在java中将“/”的请求转发到一个名为“home”上的示例：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("home");
+    }
+
+}
+```
+同样的在XML中使用&lt;mvc:view-controller>元素：
+```xml
+<mvc:view-controller path="/" view-name="home"/>
+```
+
+## 视图解析器
+***
+MVC配置简化了视图解析器的注册。
+
+下面使一个Java配置示例，它使用FreeMarker HTML模板配置内容协商视图解析器，并将Jackson作为JSON渲染的默认View：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        registry.enableContentNegotiation(new MappingJackson2JsonView());
+        registry.jsp();
+    }
+
+}
+```
+同样在XML中
+```xml
+<mvc:view-resolvers>
+    <mvc:content-negotiation>
+        <mvc:default-views>
+            <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>
+        </mvc:default-views>
+    </mvc:content-negotiation>
+    <mvc:jsp/>
+</mvc:view-resolvers>
+```
+不过请注意，FreeMarker，Velocity，Tiles，Groovy Markup和脚本模板也需要配置底层视图技术。
+
+MVC命名空间提供专用元素。例如与FreeMarker：
+```xml
+<mvc:view-resolvers>
+    <mvc:content-negotiation>
+        <mvc:default-views>
+            <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>
+        </mvc:default-views>
+    </mvc:content-negotiation>
+    <mvc:freemarker cache="false"/>
+</mvc:view-resolvers>
+
+<mvc:freemarker-configurer>
+    <mvc:template-loader-path location="/freemarker"/>
+</mvc:freemarker-configurer>
+```
+在Java配置中，只需添加相应的“Configurer”bean：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        registry.enableContentNegotiation(new MappingJackson2JsonView());
+        registry.freeMarker().cache(false);
+    }
+
+    @Bean
+    public FreeMarkerConfigurer freeMarkerConfigurer() {
+        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
+        configurer.setTemplateLoaderPath("/WEB-INF/");
+        return configurer;
+    }
+
+}
+```
+
+## 资源服务
+***
+这个选项运行遵循一个特定URL模式的静态资源请求由**ResourceHttpRequestHandler**从任何Resource位置的列表中服务。这提供了一种方便的方式来从除Web应用程序根路径以外的位置（包括类路径上的位置）提供静态资源。**cache-period**属性可用于设置久远到期报头（1年是一些如Page Speed和YSlow的优化工具的推荐值），以便客户端更有效地利用它们。处理器还可以正确地评估**Last-Modified**报头（如果存在），以便适当地返回304状态代码，从而避免对客户端已缓存资源的不必要开销。例如，要从Web应用程序根目录中的**public-resources**目录中提供具有**/resources /\*\***的URL模式的资源请求，你将使用：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/resources/**").addResourceLocations("/public-resources/");
+    }
+
+}
+```
+同样在XMl中:
+```xml
+<mvc:resources mapping="/resources/**" location="/public-resources/"/>
+```
+为了在未来1年的时间内为这些资源提供服务，以确保最大限度地利用浏览器缓存并减少浏览器发出的HTTP请求：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/resources/**").addResourceLocations("/public-resources/").setCachePeriod(31556926);
+    }
+
+}
+```
+同样在XML中：
+```xml
+<mvc:resources mapping="/resources/**" location="/public-resources/" cache-period="31556926"/>
+```
+有关详细信息，请参阅[静态资源的HTTP缓存支持](#HTTP缓存支持)。
+
+**mapping**属性必须是可以由**SimpleUrlHandlerMapping**使用的Ant模式，**location**属性必须指定一个或多个有效的资源目录位置。多个资源位置可以使用一个逗号分隔的值列表来指定。指定的位置将按照指定的顺序检查是否存在任何给定请求的资源。如，要从web应用程序根目录和一个在类路径中任何jar中的已知的路径/META-INF/public-web-resources/开启资源服务，请使用：
+```java
+@EnableWebMvc
+@Configuration
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/resources/**")
+                .addResourceLocations("/", "classpath:/META-INF/public-web-resources/");
+    }
+```
+同样在XML中：
+```xml
+<mvc:resources mapping="/resources/**" location="/, classpath:/META-INF/public-web-resources/"/>
+```
+当部署新版本的应用程序时可能会更改的资源时，建议您将版本字符串合并到用于请求资源的映射模式中，以便你可以强制客户端请求新部署的应用程序资源版本。版本化URL的支持内置在框架中，可以通过在资源处理器上配置资源链来启用。该链包含一个**ResourceResolver**实例，后跟一个或多个**ResourceTransformer**实例。他们一起可以提供资源的任意解析和转换。
+
+内置的**VersionResourceResolver**可以配置不同的策略。例如，**FixedVersionStrategy**可以使用属性，日期或其他作为版本。**ContentVersionStrategy**使用从资源内容计算的MD5哈希值（称为“指纹识别”URL）。注意，当提供资源服务时，**VersionResourceResolver**会自动使用这个解析的version字符串作为HTTP ETag头
+
+ContentVersionStrategy是一个很好的默认选择，除非不能使用（例如使用JavaScript模块加载器）。你可以针对不同的模式配置不同的版本策略，如下所示。请记住，计算基于内容的版本是昂贵的，因此在生产中应该启用资源链缓存。
+
+Java配置示例：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/resources/**")
+                .addResourceLocations("/public-resources/")
+                .resourceChain(true).addResolver(
+                    new VersionResourceResolver().addContentVersionStrategy("/**"));
+    }
+
+}
+```
+XML示例：
+```xml
+<mvc:resources mapping="/resources/**" location="/public-resources/">
+	<mvc:resource-chain>
+		<mvc:resource-cache/>
+		<mvc:resolvers>
+			<mvc:version-resolver>
+				<mvc:content-version-strategy patterns="/**"/>
+			</mvc:version-resolver>
+		</mvc:resolvers>
+	</mvc:resource-chain>
+</mvc:resources>
+```
+为了使上述工作，应用程序还必须使用版本来呈现URL。最简单的方法是配置**ResourceUrlEncodingFilter**，它包装响应并重写其**encodeURL**方法。这将在JSP，FreeMarker，Velocity以及调用响应**encodeURL**方法的任何其他视图技术中起作用。或者，应用程序还可以直接注入并使用**ResourceUrlProvider** bean，该bean通过MVC Java配置和MVC命名空间自动声明。
+
+**WebJarsResourceResolver**也支持Webjars，当**"org.webjars:webjars-locator"**库在类路径中时，它会自动注册。此解析器允许资源链从HTTP GET请求中解析版本不可知库**“GET /jquery/jquery.min.js”**将返回资源**“/jquery/1.2.0/jquery.min.js”**。它也可以通过在模板**&lt;script src="/jquery/jquery.min.js"/> →&lt;script src="/jquery/1.2.0/jquery.min.js"/>**中重写资源URL。
+
+## 在”默认“Servlet上回退到资源服务
+***
+
+## 路径匹配
+***
+这允许自定义与URL映射和路径匹配相关的各种设置。有关各个选项的详细信息，请查看[PathMatchConfigurer API](http://docs.spring.io/spring-framework/docs/4.3.10.RELEASE/javadoc-api/org/springframework/web/servlet/config/annotation/PathMatchConfigurer.html)。
+
+下面时在Java配置中的示例：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer
+            .setUseSuffixPatternMatch(true)
+            .setUseTrailingSlashMatch(false)
+            .setUseRegisteredSuffixPatternMatch(true)
+            .setPathMatcher(antPathMatcher())
+            .setUrlPathHelper(urlPathHelper());
+    }
+
+    @Bean
+    public UrlPathHelper urlPathHelper() {
+        //...
+    }
+
+    @Bean
+    public PathMatcher antPathMatcher() {
+        //...
+    }
+
+}
+```
+同样在XML，使用&lt;mvc:path-matching>元素：
+```java
+<mvc:annotation-driven>
+    <mvc:path-matching
+        suffix-pattern="true"
+        trailing-slash="false"
+        registered-suffixes-only="true"
+        path-helper="pathHelper"
+        path-matcher="pathMatcher"/>
+</mvc:annotation-driven>
+
+<bean id="pathHelper" class="org.example.app.MyPathHelper"/>
+<bean id="pathMatcher" class="org.example.app.MyPathMatcher"/>
+```
+
+## 消息转换器
+***
+可以通过重写configureMessageConverters()来实现Java配置中的HttpMessageConverter的自定义，如果你想替换由Spring MVC创建的默认转换器的话，或者重写extendMessageConverters()方法，你只想自定义它们或添加额外的转换器到默认的转换器中，
+
+以下是使用自定义的ObjectMapper而不是默认值添加Jackson JSON和XML转换器的示例：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfiguration extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder()
+                .indentOutput(true)
+                .dateFormat(new SimpleDateFormat("yyyy-MM-dd"))
+                .modulesToInstall(new ParameterNamesModule());
+        converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
+        converters.add(new MappingJackson2XmlHttpMessageConverter(builder.xml().build()));
+    }
+
+}
+```
+在这个例子中，**Jackson2ObjectMapperBuilder**用于为**MappingJackson2HttpMessageConverter**和**MappingJackson2XmlHttpMessageConverter**创建一个通用配置，并带有缩进功能，自定义日期格式以及jackson-module-parameter-names的注册，这些参数添加了对访问参数名称的支持（在Java 8中添加的功能） 。
+
+> 使用Jackson XML支持实现缩进，除了jackson-dataformat-xml之外，还需要woodstox-core-asl依赖。
+
+其他可用的有趣的Jackson模块：
+1. [jackson-datatype-money](https://github.com/zalando/jackson-datatype-money)：支持javax.money类型（非官方模块）
+2. [jackson-datatype-hibernate](https://github.com/FasterXML/jackson-datatype-hibernate)：支持Hibernate的特定类型和属性（包括延迟加载方面）
+
+也可以在XML中执行相同的操作：
+```xml
+<mvc:annotation-driven>
+    <mvc:message-converters>
+        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+            <property name="objectMapper" ref="objectMapper"/>
+        </bean>
+        <bean class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter">
+            <property name="objectMapper" ref="xmlMapper"/>
+        </bean>
+    </mvc:message-converters>
+</mvc:annotation-driven>
+
+<bean id="objectMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
+      p:indentOutput="true"
+      p:simpleDateFormat="yyyy-MM-dd"
+      p:modulesToInstall="com.fasterxml.jackson.module.paramnames.ParameterNamesModule"/>
+
+<bean id="xmlMapper" parent="objectMapper" p:createXmlMapper="true"/>
+```
+
+## 使用MVC Java Config进行高级自定义
+***
+从上面的例子中可以看出，MVC Java配置和MVC命名空间提供了高级别构造，它不需要深入了解为你创建的底层bean。相反，它可以帮助您专注于你的应用程序需求。但是，在某些时候，您可能需要更细致的控制，或者您可能只想了解底层配置。
+
+更精细控制的第一步是查看为你创建的底层bean。在MVC Java配置中，你可以在WebMvcConfigurationSupport中看到javadocs和@Bean方法。这个类中的配置是通过@EnableWebMvc注解自动导入。事实上，如果你打开@EnableWebMvc你可以看到@Import语句。
+
+更精细控制的下一步是在WebMvcConfigurationSupport中创建的一个bean上自定义一个属性，或者提供自己的实例。这需要两件事情 - 移除@EnableWebMvc注解，以防止导入，然后从DelegateWebMvcConfiguration（WebMvcConfigurationSupport的子类）扩展。。这有一个例子：
+```java
+@Configuration
+public class WebConfig extends DelegatingWebMvcConfiguration {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry){
+        // ...
+    }
+
+    @Override
+    @Bean
+    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
+        // 创建或者用"super" 创建适配器
+        // 然后自定义它的属性之一
+    }
+
+}
+```
+
+> 应用程序应该只有一个配置继承**DelegatingWebMvcConfiguration**或一个**@EnableWebMvc**注解类，因为它们都注册了相同的底层bean。以这种方式修改bean不会阻止您使用本节之前显示的任何更高级别的构造。 **WebMvcConfigurerAdapter**子类和**WebMvcConfigurer**实现仍在使用中。
+
+## 使用MVC命名空间进行高级自定义
+***
+使用MVC命名空间对于为你创建的配置进行更细粒度的控制有一点困难。
+
+如果你确实需要这样做，而不是复制它提供的配置，请考虑配置一个**BeanPostProcessor**，以探测你要按类型自定义的bean，然后根据需要修改其属性。例如：
+```java
+@Component
+public class MyPostProcessor implements BeanPostProcessor {
+
+    public Object postProcessBeforeInitialization(Object bean, String name) throws BeansException {
+        if (bean instanceof RequestMappingHandlerAdapter) {
+            // 修改适配器属性
+        }
+    }
+
+}
+```
+请注意，**MyPostProcessor**需要包含在**&lt;component scan />**中才能被检测到，或者你喜欢可以使用XML bean声明显示声明。
+
 
 
 

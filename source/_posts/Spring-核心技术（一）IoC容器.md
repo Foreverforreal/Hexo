@@ -2613,10 +2613,10 @@ AutowireCandidateResolver通过以下方式确定自动装配候选者：
 当多个bean符合自动装配候选者时，决定哪一个为“primary"方式如下：如果候选人中只有一个bean定义的primary 属性设置为true，它会被选择。
 
 ## @Resource
-**
-Spring还支持使用JSR-250 @Resource注解对字段或bean属性的setter方法进行注入。这是Java EE 5和6中的常见模式，例如在JSF 1.2管理的bean或JAX-WS 2.0的端点中。Spring也对Spring管理的对象支持这种模式。
+***
+Spring还支持使用JSR-250 **@Resource**注解对字段或bean属性的setter方法进行注入。这是Java EE 5和6中的常见模式，例如在JSF 1.2管理的bean或JAX-WS 2.0的端点中。Spring也对Spring管理的对象支持这种模式。
 
-@Resource接收一个name属性，并且默认情况下，Spring将该值作为要注入的bean名称进行解释。换而言之，它遵循按名称语义，如下示例说明：
+**@Resource**接收一个**name**属性，并且默认情况下，Spring将该值作为要注入的bean名称进行解释。换而言之，它遵循按名称语义，如下示例说明：
 ```java
 public class SimpleMovieLister {
 
@@ -2642,11 +2642,11 @@ public class SimpleMovieLister {
 
 }
 ```
-> 该注解提供的name通过CommonAnnotationBeanPostProcessor感知的ApplicationContext解析为一个bean名称。如果明确配置Spring的SimpleJndiBeanFactory，可以通过JNDI解析名称。但是，建议您依赖默认行为，只需使用Spring的JNDI查找功能来保留间接级别。
+> 该注解提供的name通过**CommonAnnotationBeanPostProcessor**感知的**ApplicationContext**解析为一个bean名称。如果明确配置Spring的**SimpleJndiBeanFactory**，可以通过JNDI解析名称。但是，建议您依赖默认行为，只需使用Spring的JNDI查找功能来保留间接级别。
 
-在@Resource使用没有指定明确的名称的情况下，类似与@Autowires，@Resource查找一个主类型匹配，而不是一个指定的命名bean，并解析众所周知的可解析依赖：BeanFactory，ApplicationContext，ResourceLoader，ApplicationEventPublisher和MessageSource接口。
+在**@Resource**使用没有指定明确的名称的情况下，类似于**@Autowires**，**@Resource**查找一个主类型匹配，而不是一个指定的命名bean，并解析众所周知的可解析依赖：**BeanFactory**，**ApplicationContext**，**ResourceLoader**，**ApplicationEventPublisher**和**MessageSource**接口。
 
-因此在下面的示例中，customerPreferenceDao 字段首先查找一个命名为customerPreferenceDao的bean，然后回退到类型为CustomerPreferenceDao的主类型匹配。“context"字段是基于已知的可解析依赖类型ApplicationContext来注入的。
+因此在下面的示例中，**customerPreferenceDao** 字段首先查找一个命名为**customerPreferenceDao的bean**，然后回退到类型为**CustomerPreferenceDao**的主类型匹配。“context"字段是基于已知的可解析依赖类型ApplicationContext来注入的。
 ```java
 public class MovieRecommender {
 
@@ -2693,13 +2693,13 @@ public class CachingMovieLister {
 
 ## @Component和更多模型注解
 ***
-@Repository注解是任何满足存储库（也称为数据访问对象或DAO）角色或原型的类的标记。该标记的用途是自动翻译异常，如第20.2.2节[“异常翻译"](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#orm-exception-translation)所述。
+**@Repository**注解是任何满足存储库（也称为数据访问对象或DAO）角色或原型的类的标记。该标记的用途是自动翻译异常，如第20.2.2节[“异常翻译"](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#orm-exception-translation)所述。
 
-Spring提供了更多的模型注解：@Componect，@Service和@Controller。@Component是对任何Spring管理的组件的通用模型。@Repository，@Service和@Controller是针对更具体使用场景的专用化@Component例如，分别用于持久化，服务和表示层中。因此，你可以使用@Component对组件类进行注解，但通过使用@Repository，@Service或@Controller注解它们，你的类更适合于通过工具或相关方面进行处理。例如，这些模型注解是切面点的理想目标。还有可能@Repository，@Service和@Controller可能会在未来的Spring框架发布版中带来额外的语义。因此，如果你在你的服务层在@Component和@Service中选择，@Service显然是更好的选择。类似的，如上所述，@Repository已被支持作为持久层中自动异常转换的标记。
+Spring提供了更多的模型注解：**@Component**，**@Service**和**@Controller**。**@Component**是对任何Spring管理的组件的通用模型。**@Repository**，**@Service**和**@Controller**是针对更具体使用场景的专用化**@Component**例如，分别用于持久化，服务和表示层中。因此，你可以使用**@Component**对组件类进行注解，但通过使用**@Repository**，**@Service**或**@Controller**注解它们，你的类更适合于通过工具或相关方面进行处理。例如，这些模型注解是切面点的理想目标。还有可能@Repository，@Service和@Controller可能会在未来的Spring框架发布版中带来额外的语义。因此，如果你在你的服务层在@Component和@Service中选择，@Service显然是更好的选择。类似的，如上所述，@Repository已被支持作为持久层中自动异常转换的标记。
 
 ## 元注解
 ***
-许多Spring提供的注解可以在你自己的代码中用作元注解。元注解只是可以应用于其他注解的注解。例如，上面提到的@Service注解是使用@Componect进行元注解的：
+许多Spring提供的注解可以在你自己的代码中用作元注解。元注解只是可以应用于其他注解的注解。例如，上面提到的**@Service**注解是使用**@Component**进行元注解的：
 ```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -2710,9 +2710,9 @@ public @interface Service {
     // ....
 }
 ```
-元注解也可以组合起来创建组合注解。例如，Spring MVC中的@RestController注解由@Controller和@ResponseBody组成。
+元注解也可以组合起来创建组合注解。例如，Spring MVC中的**@RestController**注解由**@Controller**和**@ResponseBody**组成。
 
-此外，组合注解可以可选地从元注解重新声明属性以允许用户自定义。当你只想暴露这个元注解属性的子集的时候，这特别有用。例如，Spring的@SessionScope注解将域名称硬编码为session，但人允许定制proxyMode。
+此外，组合注解可以可选地从元注解重新声明属性以允许用户自定义。当你只想暴露这个元注解属性的子集的时候，这特别有用。例如，Spring的**@SessionScope**注解将域名称硬编码为session，但人允许定制proxyMode。
 ```java
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -2750,7 +2750,7 @@ public class SessionScopedUserService implements UserService {
 
 ## 自动检测类和注册bean定义
 ***
-Spring可以自动探测模型类并且在ApplicationContext中注册相应的BeanDefinition。如下，以下两个类有资格进行这种自动检测：
+Spring可以自动探测模型类并且在**ApplicationContext**中注册相应的**BeanDefinition**。如下，以下两个类有资格进行这种自动检测：
 ```java
 @Service
 public class SimpleMovieLister {
@@ -2770,7 +2770,7 @@ public class JpaMovieFinder implements MovieFinder {
     // implementation elided for clarity
 }
 ```
-要自动探测这些类并且注册相应的bean，你需要添加@ComponentScan到你的@Configuration类，其中basePackages属性是两个类的公共父包。（或者，你可以指定包含每个类的父包的逗号/分号/空格分隔列表。）
+要自动探测这些类并且注册相应的bean，你需要添加**@ComponentScan**到你的**@Configuration**类，其中**basePackages**属性是两个类的公共父包。（或者，你可以指定包含每个类的父包的逗号/分号/空格分隔列表。）
 ```java
 @Configuration
 @ComponentScan(basePackages = "org.example")
@@ -2797,17 +2797,17 @@ public class AppConfig  {
 </beans>
 ```
 
-> 使用&lt;context:component-scan>隐式启用&lt;context:annotation-config>的功能。当使用&lt;context:component-scan>时通常不需要包含&lt;context:annotation-config>元素。
+> 使用**&lt;context:component-scan>**隐式启用**&lt;context:annotation-config>**的功能。当使用**&lt;context:component-scan>**时通常不需要包含**&lt;context:annotation-config>**元素。
 
 > classpath包的扫描需要在类路径中存在相应的目录条目。使用Ant构建JAR时，请确保不激活JAR任务的仅文件切换。此外，classpath目录基于安全策略可能不会在某些环境中暴露出来，例如JDK 1.7.0_45及更高版本的独立app（这需要您的清单中的“受信任的库"设置;请参阅http://stackoverflow.com/questions/19394570/java-jre-7u45-breaks-classloader-getresources）。
 
-此外，当您使用component-scan元素时，AutowiredAnnotationBeanPostProcessor和CommonAnnotationBeanPostProcessor都将被隐式包含。这意味着这两个组件是一起被自动检测和装配的，它们都都没有XML中提供的任何bean配置元数据。
+此外，当你使用**component-scan**元素时，**AutowiredAnnotationBeanPostProcessor**和**CommonAnnotationBeanPostProcessor**都将被隐式包含。这意味着这两个组件是一起被自动检测和装配的，它们都都没有XML中提供的任何bean配置元数据。
 
-> 您可以通过包含值为false的annotation-config属性来禁用AutowiredAnnotationBeanPostProcessor和CommonAnnotationBeanPostProcessor的注册。
+> 您可以通过包含值为**false**的**annotation-config**属性来禁用**AutowiredAnnotationBeanPostProcessor**和**CommonAnnotationBeanPostProcessor**的注册。
 
 ## 使用过滤器来自定义扫描
 ***
-默认情况下，使用@Component，@Repository，@Service，@Controller，或其自身用@Component注解的自定义注解，注解的类是唯一被检测到的候选组件。然而，你只需要通过应用自定义过滤器就可以修改和拓展这个行为。将它们添加为@ComponentScan注解的includeFilters或excludeFilters参数（或者作为component-scan元素的include-filter或exclude-filter子元素）。每个过滤器元素需要type和expression属性。下面表格描述了过滤选项。
+默认情况下，使用**@Component**，**@Repository**，**@Service**，**@Controller**，或其自身用**@Component**注解的自定义注解，注解的类是唯一被检测到的候选组件。然而，你只需要通过应用自定义过滤器就可以修改和拓展这个行为。将它们添加为**@ComponentScan**注解的**includeFilters**或**excludeFilters**参数（或者作为**component-scan**元素的**include-filter**或**exclude-filter**子元素）。每个过滤器元素需要**type**和**expression**属性。下面表格描述了过滤选项。
 
 |过滤器type|expression示例|描述|
 |-------------------|------------------|-------|
@@ -2838,11 +2838,11 @@ public class AppConfig {
     </context:component-scan>
 </beans>
 ```
-> 你还可以通过在注解上设置useDefaultFilters=false或将use-default-filters=“false"作为&lt;component-scan/>元素的属性来禁用默认过滤器。这将实际上禁用使用@Component，@Repository，@Service，@Controller或@Configuration注解的类的自动检测。
+> 你还可以通过在注解上设置**useDefaultFilters=false**或将**use-default-filters=“false"**作为**&lt;component-scan/>**元素的属性来禁用默认过滤器。这将实际上禁用使用**@Component**，**@Repository**，**@Service**，**@Controller**或**@Configuration**注解的类的自动检测。
 
 ## 在组件中定义bean元数据
 ***
-Spring组件还可以向容器提供bean定义元数据。你可以使用与@Configuration注解类中定义bean元数据相同的@Bean注解来执行此操作。这有一个简单示例：
+Spring组件还可以向容器提供bean定义元数据。你可以使用与**@Configuration**注解类中定义bean元数据相同的**@Bean**注解来执行此操作。这有一个简单示例：
 ```java
 @Component
 public class FactoryMethodComponent {
