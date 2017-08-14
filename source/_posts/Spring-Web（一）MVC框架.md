@@ -2600,6 +2600,123 @@ Spring还通过**LocalValidatorFactoryBean**支持JSR-303 / JSR-349 Bean验证�
 
 默认情况下，当在类路径中检测到一个Bean Validation provider （如Hibernate Validator）时，使用**@EnableWebMvc**或**&lt;mvc:annotation-driven/>**会在Spring MVC中通过**LocalValidatorFactoryBean**自动注册Bean Validation支持。
 
-> 
+> 有时，将LocalValidatorFactoryBean注入到控制器或其他类中带来很多便利。最简单的方法是声明自己的@Bean，并使用@Primary标记它，以避免与MVC Java配置提供的冲突。
+如果你喜欢使用MVC Java配置中的一个，则需要从WebMvcConfigurationSupport重写mvcValidator方法，并声明该方法以显式返回LocalValidatorFactory而不是Validator。有关如何切换扩展提供的配置的信息，请参见第[16.13节“使用MVC Java Config进行高级自定义”](#使用MVC Java Config进行高级自定义)。
+
+或者，你可以配置自己的全局Validator实例：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public Validator getValidator(); {
+        // 返回"全局" validator
+    }
+
+}
+```
+在XML中
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <mvc:annotation-driven validator="globalValidator"/>
+
+</beans>
+```
+要将全局和本地验证结合起来，只需添加一个或多个本地验证器：
+```java
+@Controller
+public class MyController {
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.addValidators(new FooValidator());
+    }
+
+}
+```
+使用这种最小配置，每当遇到**@Valid**或@**Validated**方法参数时，它将被配置的验证器验证。任何验证违规将自动暴露为**BindingResult**中的错误，作为方法参数可访问，并且可在Spring MVC HTML视图中呈现。
+
+## 拦截器
+***
+你可以将**HandlerInterceptors**或**WebRequestInterceptors**配置为适用于所有传入请求或限制在指定的URL路径模式。
+
+在Java中注册拦截器的示例：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LocaleInterceptor());
+        registry.addInterceptor(new ThemeInterceptor()).addPathPatterns("/**").excludePathPatterns("/admin/**");
+        registry.addInterceptor(new SecurityInterceptor()).addPathPatterns("/secure/*");
+    }
+
+}
+```
+在XML中使用&lt;mvc:interceptors>元素：
+```xml
+<mvc:interceptors>
+    <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"/>
+    <mvc:interceptor>
+        <mvc:mapping path="/**"/>
+        <mvc:exclude-mapping path="/admin/**"/>
+        <bean class="org.springframework.web.servlet.theme.ThemeChangeInterceptor"/>
+    </mvc:interceptor>
+    <mvc:interceptor>
+        <mvc:mapping path="/secure/*"/>
+        <bean class="org.example.SecurityInterceptor"/>
+    </mvc:interceptor>
+</mvc:interceptors>
+```
+
+## 内容协商
+***
+你可以配置Spring MVC如何根据请求确定所请求的媒体类型（media types）。可用的选项是检查URL路径查找文件扩展名，检查“Accept”请求头，特定查询参数，或者在没有请求中没有时回退到一个默认的内容类型。默认情况下，首先检查请求URI中的路径扩展名，其次检查“Accept”请求头。
+
+MVC Java配置和MVC命名空间默认注册**json**，**xml**，**rss**，**atom**，如果有相应的依赖在类路径上的话。额外的路径extension-to-media type映射也可以显示地注册，并且还有将它们列为安全拓展名白名单的效果，用于探测RFD攻击的意图。（有关详细信息，请参阅“后缀模式匹配和RFD”部分）。
+
+以下是通过MVC Java配置自定义内容协商选项的示例：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer.mediaType("json", MediaType.APPLICATION_JSON);
+    }
+}
+```
+在MVC命名空间中，**&lt;mvc:annotation-driven>**元素有一个**content-negotiation-manager**属性，该属性需要**ContentNegotiationManager**，而**ContentNegotiationManager**又可以通过**ContentNegotiationManagerFactoryBean**创建：
+```xml
+<mvc:annotation-driven content-negotiation-manager="contentNegotiationManager"/>
+
+<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+    <property name="mediaTypes">
+        <value>
+            json=application/json
+            xml=application/xml
+        </value>
+    </property>
+</bean>
+```
+如果不使用MVC Java配置或MVC命名空间，则需要创建一个**ContentNegotiationManager**的实例，并使用它来配置**RequestMappingHandlerMapping**以进行请求映射，以及**RequestMappingHandlerAdapter**和**ExceptionHandlerExceptionResolver**进行内容协商。
+
+请注意，ContentNegotiatingViewResolver现在也可以使用ContentNegotiationManager配置，因此你可以在Spring MVC中使用一个共享实例。
+
+在更高级的情况下，配置多个ContentNegotiationManager实例可能有用，而这些实例又可能包含自定义的ContentNegotiationStrategy实现。例如，你可以使用ContentNegotiationManager配置一个ExceptionHandlerExceptionResolver，它始终将请求的媒体类型解析为“application/json”。或者，如果没有请求内容类型，你可能希望插入具有某种逻辑选择默认内容类型（例如XML或JSON）的自定义策略。
+
 
 
