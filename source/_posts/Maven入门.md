@@ -155,7 +155,7 @@ target目录由Maven创建。它包含由Maven生成的所有编译的类，JAR�
 Maven中的外部依赖是一个不在Maven仓库（既不在本地仓库，也不在中央仓库，远程仓库）中的依赖（JAR文件）。它可能位于本地硬盘上的某个位置，例如位于webapp的lib目录或其他位置。因此，“外部”一词意味着在Maven仓库系统的外部 - 而不仅仅是项目外部。大多数依赖都在在项目外部，但在仓库系统外部（不在仓库中）的很少。
 
 你可以在像这样配置外部依赖
-```
+```xml
 <dependency>
   <groupId>mydependency</groupId>
   <artifactId>mydependency</artifactId>

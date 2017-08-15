@@ -840,9 +840,9 @@ public class AppConfig {
 ***
 # Spring 验证
 ***
-Spring 3对其验证支持进行了几个增强。首先，JSR-303 Bean Validation API现在完全支持。其次，当使用编程方式时，Spring的DataBinder现在可以验证对象并且绑定到它们。第三，Spring MVC现在支持声明性地验证@Controller输入。
+Spring 3对其验证支持进行了几个增强。首先，现在已经完全支持JSR-303 Bean Validation API。其次，当使用编程方式时，Spring的**DataBinder**现在可以验证对象并且绑定到它们。第三，Spring MVC现在支持声明性地验证**@Controller**输入。
 
-## JSR-303 Bean Bean Validation API概述
+## JSR-303 Bean Validation API概述
 ***
 JSR-303标准化Java平台的验证约束声明和元数据。使用此API，您可以使用声明性验证约束来注解域模型属性，并且运行时会强制执行它们。这有一些你可以利用的内置约束。你也可以定义自己的自定义约束。
 
@@ -874,12 +874,12 @@ public class PersonForm {
 ***
 Spring提供对Bean Validation Provider的全面支持。这还包含对将JSR-303/JSR-349 Bean Validation provider 作为Spring bean引导的便捷支持。这允许将**javax.validation.ValidatorFactory**或**javax.validation.Validator**注入到你的应用程序需要验证的地方。
 
-使用**LocalValidatorFactoryBean**以Spring bean形式配置一个默认的Validato：
+使用**LocalValidatorFactoryBean**以Spring bean形式配置一个默认的Validator：
 ```java
 <bean id="validator"
     class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 ```
-上述基本配置将触发Bean Validation以使用其默认引导机制进行初始化。一个JSR-303/JSR-349 provider，如Hibernate Validator，被希望出现在类路径中并且会被自动探测到。
+上述基本配置将触发Bean Validation，使用它的默认引导机制进行初始化。这期望一个JSR-303/JSR-349提供商，如Hibernate Validator存在于类路径中，它会被自动探测到。
 
 ### 注入一个Validator
 **LocalValidatorFactoryBean**实现了**javax.validation.ValidatorFactory**和**javax.validation.Validator**，以及Spring的**org.springframework.validation.Validator**。你可以将这些接口中的任一个注入到需要调用验证逻辑的bean中。

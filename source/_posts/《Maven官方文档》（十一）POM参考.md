@@ -124,7 +124,7 @@ POM的基石是它的依赖列表。大多数项目都依赖其他项目来正�
 	- **groupId, artifactId: **依赖的直接对应坐标。
 	- **version: **一个依赖的版本说明规范，这将用来计算依赖的有效版本。
   
-自从依赖由Maven坐标来描述，你可能会想：“这意味着我的项目只能依靠Maven artifact”，而答案是“当然，但这是一件好时期”。这迫使您完全依靠于Maven可以管理的依赖关系。有时候，不幸的是，当一个项目无法从Maven中央库中下载时。例如，一个项目可能依赖于具有封闭源许可证的jar，该jar禁止它在中央仓库中。处理这种情况有三种方法。
+自从依赖由Maven坐标来描述，你可能会想：“这意味着我的项目只能依靠Maven artifact”，而答案是“当然，但这是一件好事情”。这迫使您完全依靠于Maven可以管理的依赖关系。有时候，不幸的是，当一个项目无法从Maven中央库中下载时。例如，一个项目可能依赖于具有封闭源许可证的jar，该jar禁止它在中央仓库中。处理这种情况有三种方法。
 1. 使用install插件本地安装依赖。该方法是最简单的推荐方法。比如
 ```
 mvn install:install-file -Dfile=non-maven-proj.jar -DgroupId=some.group -DartifactId=non-maven-proj -Dversion=1 -Dpackaging=jar

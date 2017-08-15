@@ -1540,7 +1540,7 @@ public class TimeBasedAccessInterceptor extends HandlerInterceptorAdapter {
     <property name="defaultParentView" value="parentView"/>
 </bean>
 ```
-**ResourceBundleViewResolver**检查由basename标识的**ResourceBundle**，对于每个应该解析的视图，它使用属性[viewname].(class)的值作为视图类，并且属性[viewname] .url的值为视图url。示例可以在涵盖视图技术的下一章中找到。如你看到的，你可以识别一个父视图，它时这个属性文件中所有视图"拓展"自的。这样，您可以指定默认视图类。
+**ResourceBundleViewResolver**检查由basename标识的**ResourceBundle**，对于每个应该解析的视图，它使用属性**[viewname].(class)**的值作为视图类，并且属性**[viewname] .url**的值为视图url。示例可以在涵盖视图技术的下一章中找到。如你看到的，你可以识别一个父视图，它时这个属性文件中所有视图"拓展"自的。这样，您可以指定默认视图类。
 
 > **AbstractCachingViewResolver**的子类缓存它们解析的视图实例。缓存提高了某些视图技术的性能。可以通过将cache属性设置为false来关闭缓存。此外，如果你必须在运行时刷新某个视图（例如，当Velocity模板被修改时），可以使用**removeFromCache(String viewName，Locale loc)**方法。
 
@@ -2720,7 +2720,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 ## 视图控制器
 ***
-这有一个定义ParameterizableViewController的快捷方式，这个视图控制器会在被调用时立即转发到视图。在静态资源中使用该控制器，当视图生成响应之前没有Java控制器逻辑需要执行时。
+这有一个定义**ParameterizableViewController**的快捷方式，这个视图控制器会在被调用时立即转发到视图。在静态资源中使用该控制器，当视图生成响应之前没有Java控制器逻辑需要执行时。
 
 下面是一个在java中将“/”的请求转发到一个名为“home”上的示例：
 ```java
@@ -2735,7 +2735,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 }
 ```
-同样的在XML中使用&lt;mvc:view-controller>元素：
+同样的在XML中使用**&lt;mvc:view-controller>**元素：
 ```xml
 <mvc:view-controller path="/" view-name="home"/>
 ```
