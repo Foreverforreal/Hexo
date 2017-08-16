@@ -110,7 +110,7 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
 **WebApplicationInitializer**是一个由Spring MVC提供的接口，它确保你的基于代码的配置被检测到，并且自动用于初始化任何Servlet 3 容器。一个这个接口的名为**AbstractAnnotationConfigDispatcherServletInitializer**的抽象基类实现，它通过简单地指定其servlet映射和列出配置类来更容易地注册**DispatcherServlet**-它是设置你的Spring MVC应用程序最推荐的方式。更多详细信息，请参阅[“基于代码的Servlet容器初始化"](#基于代码的Servlet容器初始化)。
 
-**DispatcherServlet**实际上是一个**Servlet**（它继承自HttpServlet基类），并因此在你的web应用程序的**web.xml**中声明。你需要在同一个**web.xml**文件中通过使用URL映射，来映射你想要**DispatcherServlet**处理的请求。这是标准的Java EE Servlet配置。以下示例显示了这样的**DispatcherServlet**的声明和映射：
+**DispatcherServlet**实际上是一个**Servlet**（它继承自HttpServlet基类），并因此在你的web应用程序的**web.xml**中声明。你需要在同一个**web.xml**文件中通过使用URL映射，来映射你想要**DispatcherServlet**处理的请求。这是标准的Java EE Servlet配置。以下示例显式了这样的**DispatcherServlet**的声明和映射：
 
 以下是等同于上面基于代码的配置的web.xml：
 ```xml
@@ -284,7 +284,7 @@ public class HelloWorldController {
 
 **@Controller**注解对于被注解的类作为模板，表明被注解类的角色。调度器扫描这些注解的类用于映射方法，并且自动探测**@RequestMapping**注解（请参阅下一节）。
 
-你可以显示定义注解的控制器bean，通过在调度器的上下文中使用标准的Spring bean定义。然而，**@Controller**模型还允许自动检测，这与Spring对在类路径中探测组件类和从他们中自动注册bena定义的支持对齐。
+你可以显式定义注解的控制器bean，通过在调度器的上下文中使用标准的Spring bean定义。然而，**@Controller**模型还允许自动检测，这与Spring对在类路径中探测组件类和从他们中自动注册bena定义的支持对齐。
 
 要开启对这样的注解控制器自动探测的支持，你要向你的配置中添加组件扫描。如下面XML片段那样使用spring-context schema：
 ```xml
@@ -310,7 +310,7 @@ public class HelloWorldController {
 ***
 你使用**@RequestMapping**注解将诸如/appointments的URL映射到整个类或指定的处理器方法上。通常，类级注解将特定请求路径（或路径模式）映射到表单控制器上，并且使用另外的方法级注解缩小了对特定HTTP方法的请求方法（“GET"，“POST"等）或HTTP请求参数条件的主映射。
 
-Petcare示例中的以下例子显示了使用此注解的Spring MVC应用程序中的控制器：
+Petcare示例中的以下例子显式了使用此注解的Spring MVC应用程序中的控制器：
 ```java
 @Controller
 @RequestMapping("/appointments")
@@ -350,9 +350,9 @@ public class AppointmentsController {
 ```
 在上面的例子中，**@RequestMapping**用在了很多地方。第一个用法是在类型（类）级别，它表示此控制器中的所有处理器方法都是相对于/appointments路径。get()方法上还有一个更细化的**@RequestMapping**：它只接收GET请求，这意味着对/appointments的HTTP GET会调用此方法。add()有一个类似的细化注解，而getNewForm()将HTTP方法和路径的定义组合成一个，这样对于appointments/new的GET请求将会由这个方法处理。
 
-getForDay()方法显示了@RequestMapping的另一种用法：URI模板。（参见[“URI模板"](#URI模板)一节）。
+getForDay()方法显式了@RequestMapping的另一种用法：URI模板。（参见[“URI模板"](#URI模板)一节）。
 
-在类级别上的**@RequestMapping**不是必须的。没有它，所有的路径都是绝对的，而不是相对。PetClinic示例应用程序的以下例子显示了使用**@RequestMapping**的multi-action控制器：
+在类级别上的**@RequestMapping**不是必须的。没有它，所有的路径都是绝对的，而不是相对。PetClinic示例应用程序的以下例子显式了使用**@RequestMapping**的multi-action控制器：
 ```java
 @Controller
 public class ClinicController {
@@ -385,7 +385,7 @@ Spring框架4.3引入了**@RequestMapping**注解的以下方法级组合变体�
 - **@DeleteMapping**
 - **@PatchMapping**
 
-以下示例通过组合的**@RequestMapping**注解进行简化，显示了上一节中的AppointmentsController的修改版本。
+以下示例通过组合的**@RequestMapping**注解进行简化，显式了上一节中的AppointmentsController的修改版本。
 ```java
 @Controller
 @RequestMapping("/appointments")
@@ -424,10 +424,10 @@ public class AppointmentsController {
 }
 ```
 ### @Controller和AOP代理
-在某些情况下，控制器可能需要在运行时期用AOP代理进行装饰。一个例子是如果你选择在控制器上直接使用**@Transactional**注解。在这种情况下，对于控制器，我们建议使用基于类的代理。这通常是控制器的默认选择。但是，如果控制器必须实现一个不是Spring Context回调（例如**InitializingBean**，**\*Aware**等）的接口，你可能需要显示配置基于类的代理。例如，使**&lt;tx:annotation-driven/>**，更改为**&lt;tx:annotation-driven proxy-target-class ="true"/>**。
+在某些情况下，控制器可能需要在运行时期用AOP代理进行装饰。一个例子是如果你选择在控制器上直接使用**@Transactional**注解。在这种情况下，对于控制器，我们建议使用基于类的代理。这通常是控制器的默认选择。但是，如果控制器必须实现一个不是Spring Context回调（例如**InitializingBean**，**\*Aware**等）的接口，你可能需要显式配置基于类的代理。例如，使**&lt;tx:annotation-driven/>**，更改为**&lt;tx:annotation-driven proxy-target-class ="true"/>**。
 
 ### Spring MVC 3.1中对@RequestMapping方法的新支持类
-Spring 3.1为**@RequestMapping**方法引入了一组新的支持类，分别叫做**RequestMappingHandlerMapping**和**RequestMappingHandlerAdapter**。推荐使用它们，即使需要使用Spring MVC 3.1和之后版本的新功能。MVC命名空间和MVC Java配置默认启用这些新的支持类，但是如果你不使用，则必须显示配置。本节介绍旧支持类和新支持类之间的一些重要区别。
+Spring 3.1为**@RequestMapping**方法引入了一组新的支持类，分别叫做**RequestMappingHandlerMapping**和**RequestMappingHandlerAdapter**。推荐使用它们，即使需要使用Spring MVC 3.1和之后版本的新功能。MVC命名空间和MVC Java配置默认启用这些新的支持类，但是如果你不使用，则必须显式配置。本节介绍旧支持类和新支持类之间的一些重要区别。
 
 在Spring 3.1之前，类型和方法级请求映射是在两个不同的阶段进行了检查— 首先由**DefaultAnnotationHandlerMapping**选择一个控制器，然后通过**AnnotationMethodHandlerAdapter**缩小实际方法调用范围。
 
@@ -693,7 +693,7 @@ public class RelativePathUriTemplateController {
 ### HTTP HEAD和HTTP OPTIONS
 映射到“GET"的**@RequestMapping**方法也隐式映射到“HEAD"，即不需要明确声明“HEAD"。处理一个HTTP HEAD请求就和处理HTTP GET一样，除了它仅统计响应体的字节数，并且设置在"Content-Length" 响应头中，而不写入响应体。
 
-**@RequestMapping**方法内置支持HTTP OPTIONS。默认情况下，HTTP OPTIONS请求通过在HTTP方法（明确声明在所有与URL模式匹配的@RequestMapping方法上的）上设置“Allow"响应头来处理。当没有HTTP方法被显示声明“Allow"，头被设置为"GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"。理想地总是声明**@RequestMapping**方法要处理的HTTP方法，或者使用专用的组合**@RequestMapping**变体之一（请参阅[“组合@RequestMapping变体"](#组合@RequestMapping变体)一节）。
+**@RequestMapping**方法内置支持HTTP OPTIONS。默认情况下，HTTP OPTIONS请求通过在HTTP方法（明确声明在所有与URL模式匹配的@RequestMapping方法上的）上设置“Allow"响应头来处理。当没有HTTP方法被显式声明“Allow"，头被设置为"GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"。理想地总是声明**@RequestMapping**方法要处理的HTTP方法，或者使用专用的组合**@RequestMapping**变体之一（请参阅[“组合@RequestMapping变体"](#组合@RequestMapping变体)一节）。
 
 
 尽管不需要**@RequestMapping**方法可以映射到HTTP HEAD或HTTP OPTIONS，或同时两者。
@@ -756,7 +756,7 @@ public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result
 - 一个**View**对象，model通过命令对象和**@ModelAttribute**注解引用数据访问器方法隐式确定。这个处理器方法也可以通过声明一个Model参数（见上文）以编程方式富化model。
 - 一个**String**值，它被解释为逻辑视图名，model通过命令对象和**@ModelAttribute**注解引用数据访问器方法隐式确定。这个处理器方法也可以通过声明一个Model参数（见上文）以编程方式富化model。
 - **void**，如果方法自己处理响应（通过直接写入响应内容，为此目的声明一个ServletResponse/HttpServletResponse类型的参数）或者视图名称应该通过RequestToViewNameTranslator隐式确定（不在处理器方法签名中声明响应参数）。
-- 如果方法被@ResponseBody注解，返回的类型被写入到响应HTTP体中。返回值将使用HttpMessageConverters转换为声明的方法参数类型。请参阅[“使用@ResponseBody注解映射响应体"](#使用@ResponseBody注解映射响应体)一节。
+- 如果方法被**@ResponseBody**注解，返回的类型被写入到响应HTTP体中。返回值将使用HttpMessageConverters转换为声明的方法参数类型。请参阅[“使用@ResponseBody注解映射响应体"](#使用@ResponseBody注解映射响应体)一节。
 - 一个**HttpEntity&lt;>**或**ResponseEntity&lt;>**对象,以提供对Servlet响应HTTP头和内容的访问。实体将使用HttpMessageConverters转换为响应流。请参阅[“使用HttpEntity"](#使用HttpEntity)一节。
 - 一个**HttpHeaders**对象，它返回没有响应体的响应。
 - 一个**Callable&lt;?>**，当应用程序想要在由Spring MVC管理的线程中异步生成返回值时，可以返回它。
@@ -770,7 +770,7 @@ public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result
 ### 使用@RequestParam将请求参数绑定到方法参数
 在控制器中使用**@RequestParam**注解将请求参数绑定到方法参数
 
-以下代码片段显示用法：
+以下代码片段显式用法：
 ```java
 @Controller
 @RequestMapping("/pets")
@@ -812,7 +812,7 @@ public void handle(@RequestBody String body, Writer writer) throws IOException {
 
 有关这些转换器的更多信息，请参阅["消息转换器"](#消息转换器)。另请注意，如果使用MVC命名空间或MVC Java配置，默认情况下会注册更广泛的消息转换器。有关详细信息，请参见[第16.1节“启用MVC Java配置或MVC XML命名空间"](#启用MVC Java配置或MVC XML命名空间)。
 
-如果您打算读写XML，则需要使用**org.springframework.oxm**包中的具体的**Marshaller**和**Unmarshaller**实现配置**MarshallingHttpMessageConverter**。下面的示例显示了如何直接在配置中执行此操作，但是如果您的应用程序通过MVC命名空间或MVC Java配置进行配置，请参阅[第16.1节“启用MVC Java配置或MVC XML命名空间"](#启用MVC Java配置或MVC XML命名空间)。
+如果您打算读写XML，则需要使用**org.springframework.oxm**包中的具体的**Marshaller**和**Unmarshaller**实现配置**MarshallingHttpMessageConverter**。下面的示例显式了如何直接在配置中执行此操作，但是如果您的应用程序通过MVC命名空间或MVC Java配置进行配置，请参阅[第16.1节“启用MVC Java配置或MVC XML命名空间"](#启用MVC Java配置或MVC XML命名空间)。
 
 ```xml
 <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
@@ -951,7 +951,7 @@ public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result
 
 }
 ```
-使用**BindingResult**可以检查是否发现错误，在通常呈现相同表单的情况吓,这里可以在Spring的&lt;errors>表单标签的帮助下显示错误。
+使用**BindingResult**可以检查是否发现错误，在通常呈现相同表单的情况吓,这里可以在Spring的&lt;errors>表单标签的帮助下显式错误。
 
 注意，在某些情况下，不使用数据绑定来获取访问modle中的属性可能是有用的。对于这种情况，您可以将**Model**注入控制器，或者作为选择的在注解上使用**binding**标志：
 ```java
@@ -1146,7 +1146,7 @@ public class MyFormController {
 ### 配置一个自定义的WebBindingInitializer
 要在外部执行数据绑定初始化，你可以提供一个**WebBindingInitializer**接口的自定义实现，然后通过为**AnnotationMethodHandlerAdapter**提供自定义bean配置来启用它，从而覆盖默认配置。
 
-PetClinic应用程序的以下示例显示了使用**WebBindingInitializer**接口（org.springframework.samples.petclinic.web.ClinicBindingInitializer）的自定义实现的配置，它配置了几个PetClinic控制器所需的PropertyEditor。
+PetClinic应用程序的以下示例显式了使用**WebBindingInitializer**接口（org.springframework.samples.petclinic.web.ClinicBindingInitializer）的自定义实现的配置，它配置了几个PetClinic控制器所需的PropertyEditor。
 ```xml
 <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
     <property name="cacheSeconds" value="0"/>
@@ -1443,7 +1443,7 @@ Spring的处理器映射机制包括处理器拦截器，当你希望将特定�
 
 **preHandle(..)**方法返回一个布尔值。你可以使用此方法来中断或继续处理执行链。当此方法返回**true**时，处理器执行链将继续;当它返回**false**时，**DispatcherServlet**假定拦截器本身已经处理了请求（例如渲染了适当的视图），并且不会继续执行其他拦截器和执行链中的实际处理器。
 
-拦截器可以使用**interceptors**属性进行配置，该属性存在继承**AbstractHandlerMapping**的所有**HandlerMapping**类上。这在下面的示例中显示：
+拦截器可以使用**interceptors**属性进行配置，该属性存在继承**AbstractHandlerMapping**的所有**HandlerMapping**类上。这在下面的示例中显式：
 ```xml
 <beans>
     <bean id="handlerMapping"
@@ -1509,14 +1509,14 @@ public class TimeBasedAccessInterceptor extends HandlerInterceptorAdapter {
 
 ## 使用ViewResolver接口解析视图
 ***
-如[第3节“实现控制器”](#实现控制器)中所述，Spring Web MVC控制器中的所有处理器方法必须解析为逻辑视图名称,要么显示指出（例如，通过返回**String**，**View**或**ModelAndView**）要么隐式地（即基于惯例来处理）。Spring中的视图由逻辑视图名称编址，并由视图解析器解析。Spring自带几个视图解析器。这张表列出了大部分;以下几个例子。
+如[第3节“实现控制器”](#实现控制器)中所述，Spring Web MVC控制器中的所有处理器方法必须解析为逻辑视图名称,要么显式指出（例如，通过返回**String**，**View**或**ModelAndView**）要么隐式地（即基于惯例来处理）。Spring中的视图由逻辑视图名称编址，并由视图解析器解析。Spring自带几个视图解析器。这张表列出了大部分;以下几个例子。
 
 |ViewResolver|描述|
 |-----------|---------|
 |**AbstractCachingViewResolver**|缓存视图的抽象视图解析器。通常，视图在它能使用前需要准备;扩展此视图解析器提供缓存。|
 |**XmlViewResolver**|ViewResolver的实现，它接受用XML编写的配置文件，与Spring的XML bean工厂具有相同的DTD。。默认配置文件为/WEB-INF/views.xml。|
 |**ResourceBundleViewResolver**|ViewResolver的实现，它使用ResourceBundle中的bean定义，由bundle基本名称指定。通常你在属性文件中定义bundle，该属性文件位于类路径中。默认文件名为views.properties。|
-|**UrlBasedViewResolver**|ViewResolver接口的简单实现，它直接解析逻辑视图名称到URL，而不需要定义显式的映射。这比较适合在逻辑视图名与你的视图资源名相匹配的情况下使用，这样就不用显示地指定映射了。|
+|**UrlBasedViewResolver**|ViewResolver接口的简单实现，它直接解析逻辑视图名称到URL，而不需要定义显式的映射。这比较适合在逻辑视图名与你的视图资源名相匹配的情况下使用，这样就不用显式地指定映射了。|
 |**InternalResourceViewResolver**|UrlBasedViewResolver的便利子类，支持InternalResourceView（实际上是Servlets和JSP）和子类，如JstlView和TilesView。您可以使用setViewClass(..)为此解析器生成的所有视图指定视图类。有关详细信息，请参阅UrlBasedViewResolver的javadocs。|
 |**VelocityViewResolver**/**FreeMarkerViewResolver**|UrlBasedViewResolver的便利子类，分别支持VelocityView（实际上是Velocity模板）或FreeMarkerView，以及它们的自定义子类。|
 |**ContentNegotiatingViewResolver**|ViewResolver接口的实现，它根据请求文件名或Accept头来解析视图。参见[第5.4节， “ContentNegotiatingViewResolver”](#ContentNegotiatingViewResolver)。|
@@ -1577,7 +1577,7 @@ Spring支持多个视图解析器。因此，你可以链接解析器，例如�
 ***
 如前面提到的，一个控制器通常返回一个逻辑视图名，视角解析器将其解析为特定视图技术。对于诸如JSP的视图技术，它们通过 Servlet或JSP 引擎进行处理，这种解析通常通过**InternalResourceViewResolver**和**InternalResourceView**的组合来处理，它通过Servlet API的**RequestDispatcher.forward(..)**方法或**RequestDispatcher.include()**方法发出内部转发或包含。对于其他视图技术，例如Velocity,XSLT等等，视图本身将内容直接写入响应流。
 
-有时需要视图在被渲染完成之前，将HTTP重定向先发送回客户端。例如，当一个控制器已经被POST数据调用，并且响应实际上委托给另一个控制器（例如，成功的表单提交）。在这种情况下，普通的内部转发将意味着另一个控制器也会看到相同的POST数据，如果它与其他预期数据混在一起的话，就会造成潜在的问题。在显示结果之前执行重定向的另一个原因是消除用户多次提交表单数据的可能性。在这种情况下，浏览器将首先发送初始**POST**;然后它会收到重定向到其他URL的响应;最后浏览器将为重定向响应中命名的URL执行后续的**GET**。因此，从浏览器的角度来看，当前页面不反映**POST**的结果，而是一个**GET**。最终的效果是用户无法通过执行刷新来意外重复**POST**到相同的数据。刷新会在那个结果页面强制GET，而不是重新发送初始**POST**数据。
+有时需要视图在被渲染完成之前，将HTTP重定向先发送回客户端。例如，当一个控制器已经被POST数据调用，并且响应实际上委托给另一个控制器（例如，成功的表单提交）。在这种情况下，普通的内部转发将意味着另一个控制器也会看到相同的POST数据，如果它与其他预期数据混在一起的话，就会造成潜在的问题。在显式结果之前执行重定向的另一个原因是消除用户多次提交表单数据的可能性。在这种情况下，浏览器将首先发送初始**POST**;然后它会收到重定向到其他URL的响应;最后浏览器将为重定向响应中命名的URL执行后续的**GET**。因此，从浏览器的角度来看，当前页面不反映**POST**的结果，而是一个**GET**。最终的效果是用户无法通过执行刷新来意外重复**POST**到相同的数据。刷新会在那个结果页面强制GET，而不是重新发送初始**POST**数据。
 
 ### RedirectView
 强迫重定向作为控制器响应结果的一个方式是控制器创建并返回一个Spring的**RedirectView**实例。在这种情况下，**DispatcherServlet**不使用通常的视图解析机制。而是因为该实例已经给出了（重定向）视图，**DispatcherServlet**只是指示视图来完成它的工作。反过来**RedirectView**的调用**HttpServletResponse.sendRedirect()**将HTTP重定向发送到客户端浏览器。
@@ -1592,7 +1592,7 @@ Spring支持多个视图解析器。因此，你可以链接解析器，例如�
 
 **RequestMappingHandlerAdapter**提供了一个名为“**ignoreDefaultModelOnRedirect**”的标志，可以用于指示如果控制器方法重定向，默认Model中的内容不会被使用。作为替代，控制器方法应该声明一个**RedirectAttributes**类型属性，或者没有任何属性被传递到**RedirectView**中。MVC命名空间和MVC Java配置都将此标志设置为false，以保持兼容之前的spring版本。但是，对于新的应用程序，我们建议将其设置为true。
 
-请注意，当扩展重定向URL时，当前请求中的URI模板变量可以自动使用，并不需要通过**Model**和**RedirectAttributes**来显示添加。例如：
+请注意，当扩展重定向URL时，当前请求中的URI模板变量可以自动使用，并不需要通过**Model**和**RedirectAttributes**来显式添加。例如：
 ```java
 @PostMapping("/files/{path}")
 public String upload(...) {
@@ -1605,9 +1605,9 @@ public String upload(...) {
 ### “redirect: ”前缀
 虽然**RedirectView**的使用工作良好，但如果控制器本身创建了**RedirectView**，则无法避免控制器意识到重定向发生。这并不是最佳的做法，因为这样耦合的太紧密。控制器不应该真正关心响应如何处理。一般来说，它应该只在视图名被注入到其中时才进行处理。
 
-特殊的**redirect:**前缀允许你完成这个。如果返回的视图名称带有**redirect:**前缀，**rUrlBasedViewResolver**r（和所有子类）将会将其识别为需要重定向的特殊指示。视图名称的其余部分将被视为重定向URL。
+特殊的**redirect:**前缀允许你完成这个。如果返回的视图名称带有**redirect:**前缀，**UrlBasedViewResolver**（和所有子类）将会将其识别为需要重定向的特殊指示。视图名称的其余部分将被视为重定向URL。
 
-净效果与控制器返回的RedirectView相同，但现在控制器本身可以只需要简单地按照逻辑视图名称进行操作。一个逻辑视图名称如**redirect:/myapp/some/resource**将相对于当前的Servlet上下文进行重定向，而如**redirect:{%raw%}//http://myhost.com/some/arbitrary/path{%endraw%}**这样的名称将重定向到一个绝对URL。
+净效果与控制器返回的**RedirectView**相同，但现在控制器本身可以只需要简单地按照逻辑视图名称进行操作。一个逻辑视图名称如**redirect:/myapp/some/resource**将相对于当前的Servlet上下文进行重定向，而如**redirect:{%raw%}//http://myhost.com/some/arbitrary/path{%endraw%}**这样的名称将重定向到一个绝对URL。
 
  请注意，如果控制器的处理器被**@ResponseStatus**所注解，注解的值是优先于被**RedirectView**设置的response status(响应状态)。
   
@@ -1659,9 +1659,9 @@ Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 
 在上述配置中，如果使用**.html**扩展名进行请求，则视图解析器将查找与**text/html**媒体类型匹配的视图。**InternalResourceViewResolver**提供匹配**text/html**的视图。如果请求是使用文件扩展名**.atom**，视图解析器将查找与**application/atom+xml**媒体类型匹配的视图。如果返回的视图名称是**content**，则此视图由**BeanNameViewResolver**提供，将其映射到**SampleContentAtomView**上。如果请求是使用文件扩展名**.json**，则**DefaultViews**列表中的**MappingJackson2JsonView**实例将被选中，而不管视图名称如何。另外，客户端请求可以不带文件扩展名，而是带有被设置为首选媒体类型的**Accept**请求头，请求的解析过程跟前一种方式是一样的。
 
-> 如果“ContentNegotiatingViewResolver”的ViewResolver列表未被显示配置，它会自动使用应用程序上下文中定义的任何ViewResolvers。
+> 如果“ContentNegotiatingViewResolver”的ViewResolver列表未被显式配置，它会自动使用应用程序上下文中定义的任何ViewResolvers。
 
-下面显示了相应的控制器代码，它对于URI形式为{%raw%}http://localhost/content.atom{%endraw%}或{%raw%}http://localhost/content{%endraw%},且Accept请求头值为application/atom+xml 的，返回一个Atom RSS提要。如下：
+下面显式了相应的控制器代码，它对于URI形式为{%raw%}http://localhost/content.atom{%endraw%}或{%raw%}http://localhost/content{%endraw%},且Accept请求头值为application/atom+xml 的，返回一个Atom RSS提要。如下：
 ```java
 @Controller
 public class ContentController {
@@ -1687,7 +1687,7 @@ Flash属性为一个请求存储属性提供了一种方式，这些存储的属
 
 Spring MVC有两个主要的抽象支持Flash属性。FlashMap用于保存Flash属性，FlashMapManager用于存储，检索和管理FlashMap实例。
 
-Flash属性支持始终是“开启”的，不需要显示启用，即使不使用它也一样，它不会导致HTTP session创建。对于每一个请求，会一个“输入”FlashMap，它带有前一个请求（如果有的话）传递进的属性，并且有一个“输出”FlashMap，带有储存起来用于后续请求的属性。这两个FlashMap实例都可以通过SpringContextMtils中的静态方法在Spring MVC中任何地方访问。
+Flash属性支持始终是“开启”的，不需要显式启用，即使不使用它也一样，它不会导致HTTP session创建。对于每一个请求，会一个“输入”FlashMap，它带有前一个请求（如果有的话）传递进的属性，并且有一个“输出”FlashMap，带有储存起来用于后续请求的属性。这两个FlashMap实例都可以通过SpringContextMtils中的静态方法在Spring MVC中任何地方访问。
 
 注解的控制器通常不需要直接使用**FlashMap**。相代替的，**@RequestMapping**方法可以接受**RedirectAttributes**类型的参数，并使用它来对重定向场景添加的Flash属性。通过**RedirectAttributes**添加的Flash属性将自动传播到“输出”**FlashMap**。类似地，在重定向之后，来自“输入”FlashMap的属性将自动添加到为目标URL提供服务的控制器中的Model中。
 
@@ -1861,7 +1861,7 @@ Spring的内置多部件支持处理Web应用程序中的文件上传。你可�
 ## 使用基于Commons FileUpload的MultipartResolver
 ***
 
-以下示例显示如何使用**CommonsMultipartResolver**：
+以下示例显式如何使用**CommonsMultipartResolver**：
 ```xml
 <bean id="multipartResolver"
         class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
@@ -2132,7 +2132,7 @@ public class ViewShoppingCartController implements Controller {
 
 ## ModelMap模型（ModelAndView）
 ***
-**ModelMap**类本质上是一个更强大的**Map**，它可以使需要添加并在（或）**View**中显示的对象遵循常见的命名约定。考虑下面的**Controller**实现;注意，要被添加到**ModelAndView**中的对象并没有指定任何关联的名称。
+**ModelMap**类本质上是一个更强大的**Map**，它可以使需要添加并在（或）**View**中显式的对象遵循常见的命名约定。考虑下面的**Controller**实现;注意，要被添加到**ModelAndView**中的对象并没有指定任何关联的名称。
 ```java
 public class DisplayShoppingCartController implements Controller {
 
@@ -2217,9 +2217,9 @@ public class RegistrationController implements Controller {
 ```
 注意在**handleRequest(..)**方法实现中，没有在返回的**ModelAndView**上设置任何**View**或逻辑视图名。**DefaultRequestToViewNameTranslator**负责从请求的URL生成逻辑视图名。上面例子中，**RegistrationController**与**ControllerClassNameHandlerMapping**结合使用，一个请求URL{%raw%}http://localhost/registration.html{%endraw%}导致一个逻辑视图名**registration**被**DefaultRequestToViewNameTranslator**生成。然后，该逻辑视图名称由**InternalResourceViewResolver** bean解析为**/WEB-INF/jsp/registration.jsp**视图。
 
-> 您不需要显示定义一个**DefaultRequestToViewNameTranslator** bean。如果你喜欢**DefaultRequestToViewNameTranslator**的默认设置，则可以依靠Spring Web MVC **DispatcherServlet**来实例化此类的实例，如果未明确配置该实例的话。
+> 您不需要显式定义一个**DefaultRequestToViewNameTranslator** bean。如果你喜欢**DefaultRequestToViewNameTranslator**的默认设置，则可以依靠Spring Web MVC **DispatcherServlet**来实例化此类的实例，如果未明确配置该实例的话。
 
-当然，如果你需要更改默认设置，那么你需要显示配置自己的**DefaultRequestToViewNameTranslator** bean。有关可配置的各种属性的详细信息，请参阅综合的**DefaultRequestToViewNameTranslator** javadocs。
+当然，如果你需要更改默认设置，那么你需要显式配置自己的**DefaultRequestToViewNameTranslator** bean。有关可配置的各种属性的详细信息，请参阅综合的**DefaultRequestToViewNameTranslator** javadocs。
 
 ***
 # HTTP缓存支持
@@ -2685,7 +2685,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 ***
 你可以配置Spring MVC如何根据请求确定所请求的媒体类型（media types）。可用的选项是检查URL路径查找文件扩展名，检查“Accept”请求头，特定查询参数，或者在没有请求中没有时回退到一个默认的内容类型。默认情况下，首先检查请求URI中的路径扩展名，其次检查“Accept”请求头。
 
-MVC Java配置和MVC命名空间默认注册**json**，**xml**，**rss**，**atom**，如果有相应的依赖在类路径上的话。额外的路径extension-to-media type映射也可以显示地注册，并且还有将它们列为安全拓展名白名单的效果，用于探测RFD攻击的意图。（有关详细信息，请参阅“后缀模式匹配和RFD”部分）。
+MVC Java配置和MVC命名空间默认注册**json**，**xml**，**rss**，**atom**，如果有相应的依赖在类路径上的话。额外的路径extension-to-media type映射也可以显式地注册，并且还有将它们列为安全拓展名白名单的效果，用于探测RFD攻击的意图。（有关详细信息，请参阅“后缀模式匹配和RFD”部分）。
 
 以下是通过MVC Java配置自定义内容协商选项的示例：
 ```java
@@ -2903,6 +2903,46 @@ XML示例：
 
 ## 在”默认“Servlet上回退到资源服务
 ***
+这允许将DispatcherServlet映射到“/”（从而覆盖容器的默认Servlet的映射），同时仍然允许静态资源请求由容器的默认Servlet处理。它配置一个**DefaultServletHttpRequestHandler**，其URL映射为“/ \*\*”，相对于其他URL映射为最低优先级。
+
+这个处理器会将所有的请求装发到默认的Servlet上。因此将其保持在其他所有URL HandlerMappings顺序的最后位置很重要。如果你使用&lt;mvc:annotation-driven>会是这样，或者你可以设置你的自定义HandlerMapping实例，确保它的order属性比DefaultServletHttpRequestHandler的值（它的是Integer.MAX_VALUE）低。
+
+要使用默认设置启用该功能，请使用：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        configurer.enable();
+    }
+
+}
+
+```
+或者在XML中
+```xml
+<mvc:default-servlet-handler/>
+```
+覆盖“/”Servlet映射的注意事项是，默认Servlet的RequestDispatcher必须以名称而不是路径检索。DefaultServletHttpRequestHandler会尝试在启动时自动检测容器的默认Servlet，使用大多数主要Servlet容器（包括Tomcat，Jetty，GlassFish，JBoss，Resin，WebLogic和WebSphere）的已知名称列表。如果默认的Servlet已经使用不同的名称自定义配置，或者如果使用其他Servlet容器而它的默认Servlet名称未知，那么必须显式地提供默认的Servlet名称，如下例所示：
+```java
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        configurer.enable("myCustomDefaultServlet");
+    }
+
+}
+```
+或者在XML中：
+```xml
+<mvc:default-servlet-handler default-servlet-name="myCustomDefaultServlet"/>
+```
+
 
 ## 路径匹配
 ***
@@ -3028,7 +3068,7 @@ public class WebConfig extends DelegatingWebMvcConfiguration {
 }
 ```
 
-> 应用程序应该只有一个配置继承**DelegatingWebMvcConfiguration**或一个**@EnableWebMvc**注解类，因为它们都注册了相同的底层bean。以这种方式修改bean不会阻止您使用本节之前显示的任何更高级别的构造。 **WebMvcConfigurerAdapter**子类和**WebMvcConfigurer**实现仍在使用中。
+> 应用程序应该只有一个配置继承**DelegatingWebMvcConfiguration**或一个**@EnableWebMvc**注解类，因为它们都注册了相同的底层bean。以这种方式修改bean不会阻止您使用本节之前显式的任何更高级别的构造。 **WebMvcConfigurerAdapter**子类和**WebMvcConfigurer**实现仍在使用中。
 
 ## 使用MVC命名空间进行高级自定义
 ***
@@ -3047,7 +3087,7 @@ public class MyPostProcessor implements BeanPostProcessor {
 
 }
 ```
-请注意，**MyPostProcessor**需要包含在**&lt;component scan />**中才能被检测到，或者你喜欢可以使用XML bean声明显示声明。
+请注意，**MyPostProcessor**需要包含在**&lt;component scan />**中才能被检测到，或者你喜欢可以使用XML bean声明显式声明。
 
 
 
