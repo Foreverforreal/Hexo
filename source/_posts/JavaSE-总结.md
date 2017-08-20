@@ -24,6 +24,8 @@ strong {
 }
 </style>
 
+
+[原文链接](http://docs.oracle.com/javase/tutorial/)
 ***
 # Java技术
 ***
