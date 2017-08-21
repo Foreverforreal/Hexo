@@ -5,23 +5,7 @@ date: 2017-08-17 14:26:09
 tags:
 ---
 <style>
-strong {
-    margin: 2px;
-    background-color: #f2f2f2;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 1px 3px 0;
-    text-shadow: none;
-    white-space: nowrap;
-	color: #6d180b;
-	font-weight: normal;
-}
 
-.quote{
-	border: 1px solid #ccc;
-	background-color:#f8f8f8;
-	padding:20px;
-}
 </style>
 
 
@@ -344,14 +328,155 @@ for ( ; ; ) {
 ## 类
 ***
 ### 方法
+#### 参数
 方法签名是指方法的名称和参数类型，Java通过方法签名区分两个不同的方法。Java编程语言支持方法重载，也这是方法之间可以有相同的名称，但是参数数量或类型不同。方法重载应该谨慎使用，因为它们可以使代码的可读性降低。
 Parameters和Arguments都是指参数，但是Parameters是方法声明中的变量列表，是形式参数，而Arguments是调用方法时传入的变量，是实际参数。
-当需要向一个方法传入不确定数量的参数时，可以使用可变参数*varargs *，它实际是数组参数的一种简写形式。可变参数形式如下
+当需要向一个方法传入不确定数量的参数时，可以使用可变参数*varargs*，它实际是数组参数的一种简写形式。可变参数形式如下
 ```java
 public void methodName(int... varargsName){...}
 ```
+
+#### 返回值
+一个方法在以下三种情况下返回
+- 执行方法内所有语句
+- 遇到一个return语句
+- 抛出一个异常
+
+使用void声明的方法没有返回值，不需要return语句，但也可以使用用来控制流程退出方法，此时不能有返回值，否则编译器会报错。
+
 ### 构造方法
 编译器会为没有构造方法的类提供一个默认的无参构造，这个默认无参构造会调用父类的无参构造，这时要注意，如果父类没有无参构造，会产生编译器错误。
+
+### this关键字
+在实例方法或者构造方法中，this是对当前对象（被调用实例方法或构造方法的对象）的引用。你在实例方法或构造方法中可以通过this引用当前对象的任何成员。
+#### 引用字段
+使用this引用字段一般用在字段被参数或局部变量遮蔽时，通常使用在构造方法中，不能用在静态方法中。引用字段使用**this.X**语法，如下
+```java
+public class Point {
+    public int x = 0;
+    public int y = 0;
+        
+    //constructor
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+```
+#### 引用方法
+使用this引用方法类似于引用字段，引用方法使用**this.method(arg1,arg2...)**语法,this可以引用静态方法，但是不能用在静态方法中。不过一般不使用this引用方法，而是直接调用。
+
+#### 引用构造方法
+this还可以引用构造方法，此时this语句必须在一个构造方法中引用另一个构造方法。这样的调用被称为显式构造方法调用。**当使用this调用另一个构造方法时，this语句必须方法在构造方法中的第一行**。如下：
+```java
+public class Rectangle {
+    private int x, y;
+    private int width, height;
+        
+    public Rectangle() {
+        this(0, 0, 1, 1);
+    }
+    public Rectangle(int width, int height) {
+        this(0, 0, width, height);
+    }
+    public Rectangle(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+    ...
+}
+```
+#### 引用更大域内的成员
+当使用内部类时，如果内部类的成员遮蔽了外部类的成员，要想引用外部类的成员，可以使用以下语法：
+```java
+OutClassName.this.X
+```
+
+### 类成员访问控制
+访问级别修饰符决定其他类是否可以使用一个特定字段或调用特定方法。有两个级别的访问控制：
+- 类级：public或package-private（没有明确的修饰符）
+- 成员级：public，private，protected或package-private（没有明确的修饰符）
+
+使用public修饰的类可以在任何地方可见，一个类没有修饰符（默认package-private权限）只能在本包内可见。
+
+成员级上的修饰符多了两种权限，private和protected。private修饰符指定该成员只能在本类访问，而protected修饰符指定该成员只能在它本包中进行访问（与package-private一样），另外还可以通过在其他包中的子类进行访问。
+
+下表显示了每个修饰符允许的成员访问
+
+|修饰符|同类中|同包中|子类|所有|
+|--|---|--|--|--|
+|public|O|O|O|O|
+|protected|O|O|O|X|
+|默认|O|O|X|X|
+|private|O|O|X|X|
+
+如上可见，同类中总是可以访问它的成员，同包中只有private修饰的类成员无法在类外访问，该包之外声明的类的子类可以访问public或protected权限的成员，只有public修饰的成员可以被所有类访问。
+
+### 类成员
+#### 类变量
+**类变量**也叫**静态字段**，也就是使用**static**关键字修饰的字段，静态字段被该类的所有的实例共享。一个类的类字段可以不用创建对象来引用，而是直接使用类名引用，使用**ClassName.X**语法。最好使用类名引用，而不是用对象，因为这样使类变量角色更加清晰。
+#### 类方法
+**类方法**也叫**静态方法**，也就是方法声明中有**static**修饰符的方法。它也可以使用类名直接调用，并且应当这样做。静态方法的常见用途是访问静态字段。
+
+注意，不是所有的实例和类的变量与方法都能组合使用**
+- **实例方法可以直接访问实例变量和实例方法**。
+- **实例方法可以直接访问类变量和类方法**。
+- **类方法可以直接访问类变量和类方法**。
+- **类方法不可以直接访问实例变量或实例方法**——它们必须使用对象引用。同时，类方法也不能使用**this*  *关键字，因为类方法与实例无关，它没有this可以引用的实例。
+
+#### 常量
+**static**修饰符与**final**结合使用用于定义常量，**final**表示这个字段的值不能再被改变。以这种方式定义的常量不能再重新分配，否则会产生一个编译时期错误。按照惯例，常量名字母全部大写。如果由多个单词组成，使用下划线（_）分隔。
+> 如果将原始类型或string定义为常量，并且它的值在编译时期已知。编译器会将代码中的常量名替换为它的值。这被称为编译时期常量（compile-time constant）。如果源代码中修改常量值，需要重新编译所有使用了该常量的类。
+
+### 字段初始化
+#### 静态字段初始化
+通常将字段声明和初始化放在一起，但有时字段初始化需要一些逻辑处理（例如，错误处理或for循环来填充复杂数组），则需要分开。实例变量可以在构造方法中初始化，以添加一些逻辑。对于类变量，由于它是和类相关的，Java编程语言使用**静态初始化代码块**（static initialization blocks）提供此功能。其形式如下：
+```java
+static {
+    // 进行初始化处理
+}
+```
+一个类可以有多个静态初始化代码块，并且可以在类体内任意位置，运行时期系统按照它们在源代码中的顺序进行调用。
+此外也可以使用一个私有静态方法来初始化静态变量字段。
+```java
+class Whatever {
+    public static varType myVar = initializeClassVariable();
+        
+    private static varType initializeClassVariable() {
+
+        // initialization code goes here
+    }
+}
+```
+私有静态方法的优点是，如果需要重新初始化类变量，它们可以稍后重用。
+
+#### 实例成员初始化
+实例变量除了可以在构造方法中初始化外，还有两个选择：**初始化代码块**和**final方法**。
+
+初始化代码块就像静态初始化代码块一样，除了没有static关键字：
+```java
+{
+    // whatever code is needed for initialization goes here
+}
+```
+<font style="color:#ec70ae;">Java编译器会将初始化代码块复制到每个构造方法中。</font>因此，这种方法可以用于在多个构造方法之间共享一个代码块。
+
+final方法不可以在子类中重写，所以它也可以用于初始化实例变量：
+```java
+class Whatever {
+    private varType myVar = initializeInstanceVariable();
+        
+    protected final varType initializeInstanceVariable() {
+
+        // initialization code goes here
+    }
+}
+```
+如果子类想要重用初始化方法时，这特别适用。
+
+
 
 ## 对象
 ***
@@ -360,6 +485,36 @@ public void methodName(int... varargsName){...}
 Object varName = new Object(args1,args2);
 ```
 每个对象创建语句都包含三部分
-1. 声明：Object varName属于变量声明部分
-2. 实例化：new关键字是一个Java操作符，它创建对象
+1. 声明：Object varName属于变量声明部分，不像原始类型变量声明，引用类型声明不会为其分配内存空间。
+2. 实例化：new关键字是一个Java操作符，它为变量分配内存并返回分配的内存的引用，它还同时调用对象构造方法
 3. 初始化：new操作符后跟着一个 构造方法调用，它初始化这个新对象。
+
+## 嵌套类
+***
+嵌套类分为两种：静态和非静态。使用static声明的嵌套类称为静态嵌套类。非静态嵌套类称为内部类。
+嵌套类是包含它的类的成员。非静态嵌套类（内部类）可以访问其他的类成员，即使是被private修饰的。静态嵌套类则无法访问其他类成员（实例成员）。作为外部类（OuterClass）的成员，嵌套类可以使用private, public, protected, 或package private来声明。
+使用嵌套了有以下三种理由：
+- **它是将只会在一个地方使用的类逻辑分组的方式。**如果一个类只对另一个类有用，，那么把它嵌入该类并将它们保持在一起是合乎逻辑的。嵌套的例如”助手类“使它们的包结构更加精简。
+- **它增加了封装性。**考虑两个顶级类，A和B，B需要访问A需要声明尾private的成员。通过将类B藏在类A中，A的成员可以声明为private，而B还可以访问它们。此外，B本身也可以从外界隐藏起来。
+- **它可以导致更可读和可维护的代码：**在顶级类中嵌套小类将代码更接近使用的位置。
+
+### 静态嵌套类
+与类方法和类变量一样，静态嵌套类是与其外部类相关的。就像静态类方法，静态嵌套类不能直接引用包含它的类的实例变量或方法。只能通过对象引用来使用。静态嵌套类可以用包含它的类的类名来访问：
+```java
+OuterClass.StaticNestedClass
+```
+例如，要想创建静态嵌套类的对象，使用以下语法：
+```java
+OuterClass.StaticNestedClass nestedObject = new OuterClass.StaticNestedClass();
+```
+
+### 内部类
+与实例方法和实例变量一样，内部类是与包含它的类的实例相关的，并且可以直接访问对象的方法和字段。<font style="color:#ec70ae;">同时，由于内部类是与实例相关，所以它不能定义任何静态成员</font>。
+内部类的实例只能存在于外部类的实例中，要想实例化一个内部类，必须首先实例化外部类。然后在外部对象中创建内部对象，如下语法：
+```java
+OuterClass.InnerClass innerObject = outerObject.new InnerClass();
+```
+还有两种特殊的内部类：**局部类**和**匿名类**。
+
+#### 局部类
+局部类是定义在代码块（如for循环，if字句或方法）中的类，通常定义在方法体中。局部类可以访问包含它的类中的成员。<font style="color:#ec70ae;">此外，局部类还可以访问局部变量，但是局部类只能访问声明为final的变量。</font>
