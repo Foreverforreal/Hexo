@@ -98,18 +98,18 @@ Java编程语言支持八种原始数据类型，分别是：
 
 ### 字面值
 字面值是一个固定值的源代码表示，可以分配一个字面值给相应的原始类型。
-一个整数型字面值如果以**L**或**l**结尾，则表示long类型，否则表示int类型，建议使用L，以免误认。byte, short, int, 和long的字面值都可以使用int类型字面值创建。类型long的值超过int的范围可以从long字面值创建。整型字面值可以以三种数字系统表示：
+一个整数型字面值如果以**L**或**l**结尾，则表示**long**类型，否则表示**int**类型，建议使用**L**，以免误认。**byte**,**short**,**int**,和**long**的字面值都可以使用int类型字面值创建。类型long的值超过int的范围可以从long字面值创建。整型字面值可以以三种数字系统表示：
 - 十进制：最常用进制
 - 十六进制：字面值前加**0x**
 - 二进制：字面值前加**0b**，在JavaSE 7之后支持二进制字面值
 
-一个浮点数字面值如果以**F**或**f**结尾，则表示float类型，否则是double类型，double类型字面值也可以用**D**或**d**结尾。浮点数字面值还可以使用**E**或**e**科学表达式。
+一个浮点数字面值如果以**F**或**f**结尾，则表示**float**类型，否则是**double**类型，**double**类型字面值也可以用**D**或**d**结尾。浮点数字面值还可以使用**E**或**e**科学表达式。
 
-char或String类型的字面值可能包含Unicode(UTF-16)字符，也可以使用Unicode转义，如'\u0108'。
+**char**或**String**类型的字面值可能包含Unicode(UTF-16)字符，也可以使用Unicode转义，如'\u0108'。
 
 最后还有一个特殊的字面值 ，叫class字面值，任何一种类型后加“.class”，如String.class，这指表示类型的对象（Class类型）。
 
-> Java SE 7之后数值字面值可以插入下划线（_）以增强可读性。
+> Java SE 7之后数值字面值可以插入下划线（_）以增强可读性。如long a = 777_777_1;
 
 ### 数组
 数值是一个原始类型或对象的容器，数据长度在创建时指定，并且之后是固定的。数组内的项目被称为元素，通过索引获取，索引从0开始。
@@ -221,7 +221,7 @@ char或String类型的字面值可能包含Unicode(UTF-16)字符，也可以使�
 ### 语句
 语句大致相当于自然语言中的句子。一个语句形成一个完整的执行单元。以下类型的表达式可以通过用分号（;）终止表达式来形成语句。
 - 赋值表达式
-- ++或--的使用
+- ++或\-\-的使用
 - 方法调用
 - 对象创建表达式
 
@@ -277,50 +277,52 @@ if语句形式
 ```
 switch语句形式
 ```java
-switch语句1
+//  switch语句1
 switch (value) {
-            case value1:  
-				statement1;
+            case value1: 
+		statement1;
                 break;
             case value2:  
-				statement2;
+		statement2;
                 break;
             case value3:  
-				statement3;
+		statement3;
                 break;
 				...
-            default: statementN;
+            default: 
+			statementN;
                 break;
 				
-switch语句2
+//  switch语句2
 switch (value) {
-            case value1:  
+            case value1:
             case value2:  
-				statement2;
+			statement2;
                 break;
-            case value3:  
-				statement3;
+            case value3:
+		statement3;
                 break;
 				...
-            default: statementN;
+            default: 
+			statementN;
                 break;				
 ```
 switch语句支持**byte**,**short**,**char**,**int**原始类型，**Enum**类型，**String**（Java SE 7之后），以及**Character**,**Byte**,**Short**,**Integer**包装类型。switch块中break语句终止包含它的switch语句，如果没有break语句，匹配case标签之后的所有语句都将按顺序执行，而不管后续case标签的表达，直到遇到break语句。
 
 ### 循环语句
-while语句
+//  while语句
 ```java
 while (expression) {
      statement(s)
 }
 ```
-do-while语句
+//  do-while语句
 ```java
 do {
      statement(s)
 } while (expression);
 ```
-for语句
+//  for语句
 ```java
 for (initialization; termination; increment) {
     statement(s);
@@ -343,5 +345,21 @@ for ( ; ; ) {
 ***
 ### 方法
 方法签名是指方法的名称和参数类型，Java通过方法签名区分两个不同的方法。Java编程语言支持方法重载，也这是方法之间可以有相同的名称，但是参数数量或类型不同。方法重载应该谨慎使用，因为它们可以使代码的可读性降低。
+Parameters和Arguments都是指参数，但是Parameters是方法声明中的变量列表，是形式参数，而Arguments是调用方法时传入的变量，是实际参数。
+当需要向一个方法传入不确定数量的参数时，可以使用可变参数*varargs *，它实际是数组参数的一种简写形式。可变参数形式如下
+```java
+public void methodName(int... varargsName){...}
+```
 ### 构造方法
 编译器会为没有构造方法的类提供一个默认的无参构造，这个默认无参构造会调用父类的无参构造，这时要注意，如果父类没有无参构造，会产生编译器错误。
+
+## 对象
+***
+对象创建语句：
+```java
+Object varName = new Object(args1,args2);
+```
+每个对象创建语句都包含三部分
+1. 声明：Object varName属于变量声明部分
+2. 实例化：new关键字是一个Java操作符，它创建对象
+3. 初始化：new操作符后跟着一个 构造方法调用，它初始化这个新对象。
