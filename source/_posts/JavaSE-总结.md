@@ -410,7 +410,7 @@ OutClassName.this.X
 |public|O|O|O|O|
 |protected|O|O|O|X|
 |默认|O|O|X|X|
-|private|O|O|X|X|
+|private|O|X|X|X|
 
 如上可见，同类中总是可以访问它的成员，同包中只有private修饰的类成员无法在类外访问，该包之外声明的类的子类可以访问public或protected权限的成员，只有public修饰的成员可以被所有类访问。
 
@@ -547,6 +547,9 @@ OuterClass.InnerClass innerObject = outerObject.new InnerClass();
 - 局部类
 
 <font style="color:#ec70ae;">但是，你不可以在匿名类中声明构造方法</font>。
+#### lambda表达式
+与局部类与匿名类一样，lambda表达式可以捕获变量，并且对封闭域内的局部变量有相同的访问权限，只能访问final或事实fianl的局部变量。然而，不像局部类和匿名类，lambda表达式不会有任何变量遮蔽问题，Lambda表达式是词法上确定范围。这意味着它们不会从超类型继承任何名称或引入新的域级别。在lambda表达式中的声明就像在包含它的域中声明一样。
+
 
 ### 嵌套类适用场景
 
@@ -557,3 +560,79 @@ OuterClass.InnerClass innerObject = outerObject.new InnerClass();
 	- 如果需要一个函数接口的简单实例，并且不适用前面的条件（例如，你不需要构造函数，命名类型，字段或其他方法）
 - **嵌套类**：如果类似于局部类的要求，并希望其类型更广泛地可用，并且不需要访问局部变量或方法参数，使用它。
 	- 如果需要访问包含它的实例的非公开字段和方法，使用非静态嵌套类，否则使用静态嵌套类。
+	
+## 枚举类型
+***
+枚举类型（ enum type）是一种特殊的数据类型，可使变量成为一组预定义的常量。因为是常量，所以枚举类型字段名称都是大写字母。使用enum关键字定义枚举类型。
+> 所有枚举隐式继承了java.lang.Enum。因为一个类之类继承一个父类，Java不支持多继承，所以枚举无法继承其他类。
+
+枚举中常量需要先于字段和方法继承。常量要以分号结尾。枚举的构造方法必须是**package-private**或**private**权限。它会自动创建在枚举正文开头定义的常量。不能自己调用枚举的构造方法。
+
+***
+# 接口和继承
+***
+## 接口
+***
+在Java编程语言中，接口是类似于类的引用类型，只能包含常量，方法签名，default方法，static方法和嵌套类型。只用default方法和static方法拥有方法体。接口不能被实例化，它们只能被类实现，或被其他接口继承。
+
+### 定义接口
+接口定义语法如下：
+```java
+public interface Name extend ParentInterface1,ParentInterface2...{
+		void method1();
+		default mehtod2(){
+			//code...
+		}
+		static void method3(){
+			//code...
+		}
+}
+```
+和类不同，接口可以继承多个父接口。使用逗号（,）分割多个父接口。接口体可以包含**abstract方法**,**default方法**以及**static方法**。abstract方法后跟一个分号，但没有大括号（抽象方法不包含实现）。接口中所有的abstract，default，static方法隐式使用public修饰，所以public可以忽略。
+
+此外接口可以包含常量声明。接口中所有的常量值隐式使用public，static，和final修饰，所以这些也可以忽略。
+
+### 实现接口
+一个类可以实现多个接口，使用implements关键字实现接口。多个接口使用逗号（,）分割，如果这个类同时还继承其他类，按惯例，implements字句放在extend字句后。
+
+### Dafault方法
+如果有一个接口名为DoiT：
+```java
+public interface DoIt {
+
+   void doSomething(int i, double x);
+   int doSomethingElse(String s);
+}
+```
+现在想向这个接口中添加第三个方法，直接添加的话会破坏类结构，因为原来实现该接口的类都必须实现新的方法。为了避免这个问题有两种解决方法。
+第一种是创建新的接口继承DoIt：
+```java
+public interface DoItPlus extends DoIt {
+
+   boolean didItWork(int i, double x, String s);
+   
+}
+```
+这样你的代码可以选择使用旧接口或者新的升级接口。
+第二种是在原来接口中将新添方法定义为default方法：
+```java
+public interface DoIt {
+
+   void doSomething(int i, double x);
+   int doSomethingElse(String s);
+   default boolean didItWork(int i, double x, String s) {
+       // Method body 
+   }
+   
+}
+```
+注意，必须为default方法提供实现。此外还可以定义一个新的static方法到已有接口中。原来这样实现该接口的类不必修改或重新编译以适应新添的方法。
+
+当另一个接口继承一个拥有default方法的接口，你可以做以下事：
+- 没有提到default方法，这允许扩展的接口继承default方法。
+- 重新声明default方法，使它变为abstract。
+- 重新定义default方法，这回重写它。
+
+### Static方法
+除了default方法之外，还可以在接口中定义静态方法。（静态方法是与定义它的类相关联的方法，而不是与任何对象相关联。类的每个实例都共享其静态方法。）这样更容易在库中组织辅助方法;可以在同一个接口中指定静态方法到接口上，而不是分开的类上。
+
