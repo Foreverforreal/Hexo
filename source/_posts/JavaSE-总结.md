@@ -329,9 +329,9 @@ for ( ; ; ) {
 ***
 ### 方法
 #### 参数
-方法签名是指方法的名称和参数类型，Java通过方法签名区分两个不同的方法。Java编程语言支持方法重载，也这是方法之间可以有相同的名称，但是参数数量或类型不同。方法重载应该谨慎使用，因为它们可以使代码的可读性降低。
-Parameters和Arguments都是指参数，但是Parameters是方法声明中的变量列表，是形式参数，而Arguments是调用方法时传入的变量，是实际参数。
-当需要向一个方法传入不确定数量的参数时，可以使用可变参数*varargs*，它实际是数组参数的一种简写形式。可变参数形式如下
+**方法签名**是指方法的名称和参数类型，Java通过方法签名区分两个不同的方法。Java编程语言支持**方法重载**，也这是方法之间可以有相同的名称，但是参数数量或类型不同。方法重载应该谨慎使用，因为它们可以使代码的可读性降低。
+**Parameters**和**Arguments**都是指参数，但是**Parameters**是方法声明中的变量列表，是形式参数，而**Arguments**是调用方法时传入的变量，是实际参数。
+当需要向一个方法传入不确定数量的参数时，可以使用可变参数***varargs***，它实际是数组参数的一种简写形式。可变参数形式如下
 ```java
 public void methodName(int... varargsName){...}
 ```
@@ -405,7 +405,7 @@ OutClassName.this.X
 
 下表显示了每个修饰符允许的成员访问
 
-|修饰符|同类中|同包中|子类|所有|
+|修饰符|同类中|同包中|不同包子类|所有|
 |--|---|--|--|--|
 |public|O|O|O|O|
 |protected|O|O|O|X|
@@ -461,7 +461,10 @@ class Whatever {
     // whatever code is needed for initialization goes here
 }
 ```
-<font style="color:#ec70ae;">Java编译器会将初始化代码块复制到每个构造方法中。</font>因此，这种方法可以用于在多个构造方法之间共享一个代码块。
+
+<font style="color:#ec70ae;">Java编译器会将初始化代码块复制到每个构造方法中。</font>  
+
+因此，这种方法可以用于在多个构造方法之间共享一个代码块。
 
 final方法不可以在子类中重写，所以它也可以用于初始化实例变量：
 ```java
@@ -477,9 +480,9 @@ class Whatever {
 如果子类想要重用初始化方法时，这特别适用。
 
 
-
 ## 对象
 ***
+
 对象创建语句：
 ```java
 Object varName = new Object(args1,args2);
@@ -546,7 +549,8 @@ OuterClass.InnerClass innerObject = outerObject.new InnerClass();
 - 实例初始化器
 - 局部类
 
-<font style="color:#ec70ae;">但是，你不可以在匿名类中声明构造方法</font>。
+**但是，你不可以在匿名类中声明构造方法**。   
+
 #### lambda表达式
 与局部类与匿名类一样，lambda表达式可以捕获变量，并且对封闭域内的局部变量有相同的访问权限，只能访问final或事实fianl的局部变量。然而，不像局部类和匿名类，lambda表达式不会有任何变量遮蔽问题，Lambda表达式是词法上确定范围。这意味着它们不会从超类型继承任何名称或引入新的域级别。在lambda表达式中的声明就像在包含它的域中声明一样。
 
@@ -636,3 +640,202 @@ public interface DoIt {
 ### Static方法
 除了default方法之外，还可以在接口中定义静态方法。（静态方法是与定义它的类相关联的方法，而不是与任何对象相关联。类的每个实例都共享其静态方法。）这样更容易在库中组织辅助方法;可以在同一个接口中指定静态方法到接口上，而不是分开的类上。
 
+## 继承
+***
+子类会从父类继承所有的**public**和**protected**成员（字段，方法，嵌套类），无论子类的包在哪。如果子类和父类同包，它还可以继承**package-private**成员。构造方法不是成员，所以不会继承，但是可以从子类调用父类的构造方法。以下是子类可以在继承关系中执行的操作：
+- 可以直接使用继承字段
+- 可以在子类声明和父类字段相同名称的字段，这样隐藏了父类该字段
+- 可以声明一个父类中没有的字段
+- 可以直接使用继承的方法
+- 可以在子类写一个新的实例方法，与父类中的有相同方法签名，这样隐藏了父类该方法
+- 可以在子类写一个新的static方法，与父类中的有相同方法签名，这样隐藏了父类该方法
+- 可以声明一个父类中没有的新方法
+- 可以写一个子类构造方法，隐式调用或通过使用super关键字。来调用父类中的构造方法。
+
+子类不能继承父类的private成员，但是可以通过父类public或protecteds方法间接访问。由于嵌套类可以访问包含它的类的所有成员，包括private，所以也可以通过public或protected的 嵌套类间接访问父类private成员。
+
+### 接口多继承
+<font style="color:#ec70ae;">类与接口的一个显著区别是，类有字段而接口不可以有字段，因为对象使用字段保存状态，Java编程语言不允许多继承的一个原因就是避免状态的多继承 问题。因为接口没有字段，所以不会有状态的多继承问题。</font>
+
+**实现的多继承**（Multiple inheritance of implementation）是从多个类中继承方法定义的能力，但也因此会产生一些问题。比如，一个接口多个父类中包含冲突和歧义的名称。此外，default方法也引入了一种实现的多重继承形式。一个类可以可以实现多个接口，接口中可能包含相同名称的default方法。Java编译器提供了一些规则来确定特定类使用的default方法。
+
+Java编程语言支持**类型的多继承**（multiple inheritance of type），它是类实现多个接口的能力。一个对象可能有多个类型：它自身类的类型，它实现的多个接口的类型。
+
+### 方法重写与隐藏
+#### 实例方法
+与父类方法拥有有相同签名（名称，以及其参数的数量和类型）的子类实例方法重写了父类方法。
+
+**重写方法**（overriding method ）和它重写的方法有相同的名称，参数的数量和类型，返回类型。一个重写方法还可以返回一个被重写方法返回类型的子类型。这个子类型称为**协变返回类型**（covariant return type）。
+
+如果想要重写一个方法，可以使用**@Override**注解指示编译器要重写父类的方法。
+
+#### 静态方法
+如果子类定义一个静态方法和父类中的静态方法有相同的签名，那么子类中的方法隐藏（hide）了父类中的对应方法。
+
+隐藏静态方法和重写实例方法之间的区别有重要意义：
+- **被调用的重写实例方法版本是在子类中的那一个。**
+- **被调用的隐藏实例方法版本取决于它是用父类中调用还是子类中调用。**
+
+考虑下面一个例子包含了两个类：
+```java
+public class Animal {
+    public static void testClassMethod() {
+        System.out.println("The static method in Animal");
+    }
+    public void testInstanceMethod() {
+        System.out.println("The instance method in Animal");
+    }
+}
+
+public class Cat extends Animal {
+    public static void testClassMethod() {
+        System.out.println("The static method in Cat");
+    }
+    public void testInstanceMethod() {
+        System.out.println("The instance method in Cat");
+    }
+
+    public static void main(String[] args) {
+        Cat myCat = new Cat();
+        Animal myAnimal = myCat;
+        myAnimal.testClassMethod();
+        myAnimal.testInstanceMethod();
+    }
+}
+```
+Cat类覆盖了Animal中的实例方法，并隐藏了在Animal中静态方法。控制台输出：
+```
+The static method in Animal
+The instance method in Cat
+```
+
+#### 接口方法
+接口中的default方法和abstract方法像实例方法一样被继承。但是，当类或接口的父类型提供具有相同签名的多个default方法时，Java编译器遵循继承规则来解决名称冲突。这些规则是由以下两个原则驱动的：
+- **实例方法优于接口default方法。**
+考虑以下类和接口
+```java
+public class Horse {
+    public String identifyMyself() {
+        return "I am a horse.";
+    }
+}
+public interface Flyer {
+    default public String identifyMyself() {
+        return "I am able to fly.";
+    }
+}
+public interface Mythical {
+    default public String identifyMyself() {
+        return "I am a mythical creature.";
+    }
+}
+public class Pegasus extends Horse implements Flyer, Mythical {
+    public static void main(String... args) {
+        Pegasus myApp = new Pegasus();
+        System.out.println(myApp.identifyMyself());
+    }
+}
+```
+控制台输出“I am a horse”。
+- **已经被其他候选者重写的方法被忽略。**当超类型共享共同父级时，可能会出现这种情况。
+考虑以下接口和类：
+```java
+public interface Animal {
+    default public String identifyMyself() {
+        return "I am an animal.";
+    }
+}
+public interface EggLayer extends Animal {
+    default public String identifyMyself() {
+        return "I am able to lay eggs.";
+    }
+}
+
+public interface FireBreather extends Animal { }
+
+public class Dragon implements EggLayer, FireBreather {
+    public static void main (String... args) {
+        Dragon myApp = new Dragon();
+        System.out.println(myApp.identifyMyself());
+    }
+}
+```
+控制台输出“I am able to lay eggs”
+
+如果两个或多个独立定义的default方法冲突，或default方法与abstract方法冲突，则Java编译器将生成编译器错误。你必须显式重写超类型方法。
+考虑以下两个接口OperateCar与FlyCar ，它们有两个相同的方法(startEngine):
+```java
+public interface OperateCar {
+    // ...
+    default public int startEngine(EncryptedKey key) {
+        // Implementation
+    }
+}
+public interface FlyCar {
+    // ...
+    default public int startEngine(EncryptedKey key) {
+        // Implementation
+    }
+}
+```
+一个类同时实现OperateCar和FlyCar必须重写方法startEngine。<font style="color:#ec70ae;">可以使用super关键字调用父类型中任何一个这个default实现。</font>
+```java
+public class FlyingCar implements OperateCar, FlyCar {
+    // ...
+    public int startEngine(EncryptedKey key) {
+        FlyCar.super.startEngine(key);
+        OperateCar.super.startEngine(key);
+    }
+}
+```
+super关键字之前的名称（这个例子中是FlyCar或OperateCar）必须引用直接的父接口，该父接口定义或继承了调用的default方法。这种形式的方法调用不限于区分多个包含具有相同签名的default方法的实现的接口。你可以使用super关键字在类和接口中调用default方法。
+
+<font style="color:#ec70ae;">从类继承的实例方法可以重写抽象接口方法。</font>考虑以下接口和类：
+```java
+public interface Mammal {
+    String identifyMyself();
+}
+public class Horse {
+    public String identifyMyself() {
+        return "I am a horse.";
+    }
+}
+public class Mustang extends Horse implements Mammal {
+    public static void main(String... args) {
+        Mustang myApp = new Mustang();
+        System.out.println(myApp.identifyMyself());
+    }
+}
+```
+控制台输出“I am a horse”。Mustang从Horse继承了identifyMyself方法，该方法重写了在接口Mammal中相同名字的抽象方法。
+
+> **接口中的静态方法从不会被继承**。
+
+#### 修饰符
+**重写方法的访问权限可以比被重写的方法更大，但不能更小。**例如一个在父类中protected修饰的实例方法，可以在子类中设置为public，但不能是private。
+**此外如果将父类中的实例方法在子类中改为静态方法，会产生编译时期错误，反之亦然。**
+
+#### 总结
+下表总结了当使用与超类中的方法相同的签名定义方法时会发生什么。
+
+|  |父类<br/>实例方法|父类<br/>静态方法|
+|---|---|---|
+|子类<br/>实例方法|重写|编译时期错误|
+|子类<br/>静态方法|编译时期错误|隐藏|
+
+> 在一个子类中，可以重载从超类继承的方法。这种重载的方法既不隐藏也不重写超类实例方法 - 它们是子类新的方法。
+
+### 多态（Polymorphism）
+
+在多态的情况下，声明为父类类型的引用变量只能调用父类中的方法，但如果此变量实际引用的是子类对象，而子类对象中重写了父类的方法，这时父类对象调用的是子类中的方法，这种机制就成为**虚方法调用**（virtual method invocation ）。
+
+在Java中，所有非静态方法都是默认的“虚函数（virtual functions.）”。只有标有关键字final（不能被重写）的方法以及不能被继承的private方法都是非虚的。虚方法在编译时期和运行时期被区别对待。JVM专门利用一个虚方法表来用于虚方法分配。
+
+### 隐藏字段
+在一个类中，如果有和父类中相同名称的字段，该字段会隐藏父类字段，**即使字段类型并不相同**。子类可以通过super关键字来引用父类被隐藏字段。一般来说，不建议隐藏字段，因为它使代码难以阅读。
+
+### super关键字
+super关键字可以在子类中调用父类被隐藏的字段和方法。此外，super还可以调用父类的构造方法，使用super调用父类构造方法时，必须放在子类构造方法方法体第一行。
+> 如果构造方法没有显式调用父类构造方法，Java编译器会自动将插入对父类的无参数构造的调用。如果父类没有无参构造，那么会产生一个编译时期错误。Object有这样一个构造函数，所以如果Object是唯一的父类，没有问题。
+
+子类构造方法显式或隐式地调用其父类的构造方法时，会有一整链的构造方法调用，一直返回到Object的构造方法。这被称为构造链。
