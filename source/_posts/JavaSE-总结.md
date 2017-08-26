@@ -835,7 +835,48 @@ public class Mustang extends Horse implements Mammal {
 在一个类中，如果有和父类中相同名称的字段，该字段会隐藏父类字段，**即使字段类型并不相同**。子类可以通过super关键字来引用父类被隐藏字段。一般来说，不建议隐藏字段，因为它使代码难以阅读。
 
 ### super关键字
-super关键字可以在子类中调用父类被隐藏的字段和方法。此外，super还可以调用父类的构造方法，使用super调用父类构造方法时，必须放在子类构造方法方法体第一行。
+**super**关键字可以在子类中调用父类被隐藏的字段和方法。此外，**super**还可以调用父类的构造方法，使用**super**调用父类构造方法时，必须放在子类构造方法方法体第一行。
 > 如果构造方法没有显式调用父类构造方法，Java编译器会自动将插入对父类的无参数构造的调用。如果父类没有无参构造，那么会产生一个编译时期错误。Object有这样一个构造函数，所以如果Object是唯一的父类，没有问题。
 
 子类构造方法显式或隐式地调用其父类的构造方法时，会有一整链的构造方法调用，一直返回到Object的构造方法。这被称为构造链。
+
+### 写一个final类和方法
+你可以声明一个类的部分或全部方法为**final**。你在方法声明中使用final关键字来表示这个方法不能被子类重写。Object类有一些方法就是final的。
+从构造方法调用的方法一般都被声明为final。如果一个构造方法调用一个非final方法，子类可能会以不期望的方法重定义这个方法。如下：
+```java
+class Father{
+	public Father(){
+		initMethod();
+	}
+	public void initMethod(){
+		System.out.println("init Father method");
+	}
+}	
+
+class Son{
+	public Son(){
+		initMethod();	
+	}
+	public void initMethod(){
+		System.out.println("init Son method");
+	}
+	
+	public static void main(String[] args){
+		Son son = new Son();
+	}
+}
+```
+控制台输出
+```
+init Son method
+init Son method
+```
+注意，你也可以声明整个类为final，被声明为final的类不能被子类化。当创建一个不可变类时这是非常有用的，像String类。
+
+### 抽象方法和类
+抽象类可能包含也可能不包含抽象方法。当抽象类被子类化，子类需要提供所有抽象方法的实现，否则则类必须被声明为abstract。
+> 接口中未声明为default或static的方法隐式声明abstract，所以abstract修饰符不与接口方法一起使用（可以使用，但是没有必要）。
+
+
+#### 抽象类与接口比较
+抽象类和接口都不能实例化，并且都可以混合包含使用或不使用实现声明的方法。然而，对于抽象类，可以声明不是static和final的字段，并且可以定义public，protected，和private的具体方法。对于接口，所有的字段自动为public, static, 和final，并且所有你声明或定义（如default方法）的方法都是public。
