@@ -15,6 +15,8 @@ date: 2017-08-26 18:15:00
 
 **Object**类在**java.lang**包中，它位于类层次结构树的顶部。每个类都是直接或间接派生自**Object**。你使用或编写的每个子类都继承了**Object**的实例方法。你不需要使用任何这些方法，但如果你使用的话，你可能需要使用特定于你的类的代码来重写它们。从**Object**继承的方法有以下几个：
 
+<!-- more -->
+
 - protected Object clone() throws CloneNotSupportedException
 创建并返回这个对象的副本
 - public boolean equals(Object obj)

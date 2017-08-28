@@ -21,6 +21,7 @@ Java程序不是在底层硬件上直接运行，运行Java程序的被称为Jav
 - The Java Virtual Machine
 - The Java Application Programming Interface (API)
 
+<!-- more -->
 Java平台是完全的软件平台，运行在各种底层硬件平台上，Java程序也通过Java平台与底层硬件平台实现隔离，也因此Java平台运行要比本地代码慢些，但随着JVM的优化和性能提升，它已经接近本地代码的性能。
 ![jvm](/images/java base/getStarted-jvm.gif)
 
