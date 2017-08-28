@@ -635,7 +635,7 @@ public interface DoIt {
 当另一个接口继承一个拥有default方法的接口，你可以做以下事：
 - 没有提到default方法，这允许扩展的接口继承default方法。
 - 重新声明default方法，使它变为abstract。
-- 重新定义default方法，这回重写它。
+- 重新定义default方法，这会重写它。
 
 ### Static方法
 除了default方法之外，还可以在接口中定义静态方法。（静态方法是与定义它的类相关联的方法，而不是与任何对象相关联。类的每个实例都共享其静态方法。）这样更容易在库中组织辅助方法;可以在同一个接口中指定静态方法到接口上，而不是分开的类上。
@@ -647,7 +647,7 @@ public interface DoIt {
 - 可以在子类声明和父类字段相同名称的字段，这样隐藏了父类该字段
 - 可以声明一个父类中没有的字段
 - 可以直接使用继承的方法
-- 可以在子类写一个新的实例方法，与父类中的有相同方法签名，这样隐藏了父类该方法
+- 可以在子类写一个新的实例方法，与父类中的有相同方法签名，这样重写了父类该方法
 - 可以在子类写一个新的static方法，与父类中的有相同方法签名，这样隐藏了父类该方法
 - 可以声明一个父类中没有的新方法
 - 可以写一个子类构造方法，隐式调用或通过使用super关键字。来调用父类中的构造方法。
@@ -880,3 +880,61 @@ init Son method
 
 #### 抽象类与接口比较
 抽象类和接口都不能实例化，并且都可以混合包含使用或不使用实现声明的方法。然而，对于抽象类，可以声明不是static和final的字段，并且可以定义public，protected，和private的具体方法。对于接口，所有的字段自动为public, static, 和final，并且所有你声明或定义（如default方法）的方法都是public。
+
+抽象类也可以实现接口，此时可以不必实现接口的方法。
+
+***
+# 包
+***
+package语句必须放在源文件的第一行。每个源文件只能有一个package语句，并且它适用于文件中所有的类型。
+
+> 如果将多个类型放入一个源文件，只能有一个为public，并且它必须与源文件使用相同的名字。
+
+## 命名惯例
+***
+包名采用小写形式，以避免与类或接口冲突。公司使用他们反向的互联网域名来开始他们的包名——例如由example.com创建的名为mypackage的软件包的com.example.mypackage。
+
+Java语言中的本身的包就以**java.**或**javax.**开头
+
+在某些情况下，互联网域名可能不是有效的包名称。如包含一个连字符或特殊字符。如果包名称以数字或其他字符开头，作为Java名称的开头是非法的，或者如果包名包含保留的Java关键字，例如“int”。在这种情况下，建议的惯例是添加下划线。
+
+## 使用包成员
+***
+构成包的类型称为包成员。要在其包之外使用public包成员，必须执行以下操作之一：
+- 以完全限定名称引用成员
+- 导入包成员
+- 导入成员的整个包
+
+### 导入包成员
+使用import关键字导入包成员，import位于package语句后，类型定义前。如果使用一个包很多成员的话，可以使用（*）通配符导入整个包。import语句中的星号只能用于指定包中的所有类，它不能用于匹配包中的类的一个子集。
+
+> import还可以导入一个封闭类中的public嵌套类。如graphics.Rectangle包含一个嵌套类Rectangle.DoubleWide和Rectangle.Square, 你可以使用以下两个语句导入Rectangle及其嵌套类。
+```java
+import graphics.Rectangle;
+import graphics.Rectangle.*;
+```
+请注意，第二个import语句不会导入Rectangle。
+如果导入的两个包中包含相同名称的类型，这种情况，必须使用完全限定名称来正确指出要使用的类型。
+
+为方便起见，Java编译器会为每个源文件自动导入两个完整的包：
+1. **java.lang**
+2. **当前包**
+
+### 包的明显层次结构
+**首先，包似乎是分级的，但实际不是。**例如Java API包含java.awt包，java.awt.color包，java.awt.font包以及许多以java.awt开头的其他包。但是，java.awt.color包，java.awt.font包和其他java.awt.xxxx包不包含在java.awt包中。前缀java.awt（Java抽象窗口工具包）用于许多相关的包，是用来使包关系变的明显，但不显示包含关系。
+
+导入java.awt.*导入java.awt包中的所有类型，但它不导入java.awt.color，java.awt.font或其他任何java.awt.xxxx包。
+
+### 静态导入
+有些情况需要频繁访问一个或两个类的静态final字段（常量）和静态方法，这时可以使用**静态导入**（static import ）语句。例如，可以使用静态导入语句导入java.lang.Math的静态成员，这样不需要在类名前缀Math。 Math的静态成员可以单独导入：
+```java
+import static java.lang.Math.PI;
+```
+或以组导入
+```java
+import static java.lang.Math.*;
+```
+一旦它们被导入，静态成员就可以不使用限定名使用。如
+```java
+double r = cos(PI * theta);
+```
