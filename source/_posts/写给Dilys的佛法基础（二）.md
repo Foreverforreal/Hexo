@@ -2,8 +2,7 @@ title: 写给Dilys的佛法基础（二）
 id: 1493800996178
 author: 不识
 tags: []
-categories:
-  - 写给Dilys的佛法基础
+categories: []
 date: 2017-05-03 16:43:00
 ---
 # 佛
