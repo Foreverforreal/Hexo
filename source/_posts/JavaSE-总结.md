@@ -92,7 +92,7 @@ Java编程语言支持八种原始数据类型，分别是：
 
 **char**或**String**类型的字面值可能包含Unicode(UTF-16)字符，也可以使用Unicode转义，如'\u0108'。
 
-最后还有一个特殊的字面值 ，叫class字面值，任何一种类型后加“.class”，如String.class，这指表示类型的对象（Class类型）。
+最后还有一个特殊的字面值 ，叫**class**字面值，任何一种类型后加“**.class**”，如String.class，这指表示类型的对象（Class类型）。
 
 > Java SE 7之后数值字面值可以插入下划线（_）以增强可读性。如long a = 777_777_1;
 
@@ -149,8 +149,10 @@ Java编程语言支持八种原始数据类型，分别是：
 
 |运算符|说明|
 |----|----|
-|&&|在两个boolean表达式之间执行AND|
-|&#124;&#124;|在两个boolean表达式之间执行OR|
+|&|逻辑与|
+|&#124;|逻辑或|
+|&&|短路与|
+|&#124;&#124;|短路或|
 |?:|三元运算符，if-then-else语句缩写|
 
 三元运算符格式为 ** result = someCondition ? value1 : value2;**，它可以解读为，如果someCondition为ture，那么给result赋值value1，否则赋值value2。
@@ -194,7 +196,7 @@ Java编程语言支持八种原始数据类型，分别是：
 |逻辑 AND	|&&
 |逻辑 OR	|&#124;&#124;
 |三元	|? :
-|赋值|	= += -= *= /= %= &= ^= |= <<= >>= >>>=
+|赋值|	= += -= *= /= %= &= ^= &#124;= <<= >>= >>>=
 
 
 
@@ -275,24 +277,24 @@ switch (value) {
                 break;
 				...
             default: 
-			statementN;
+		statementN;
                 break;
 				
 //  switch语句2
 switch (value) {
             case value1:
             case value2:  
-			statement2;
+		statement2;
                 break;
             case value3:
 		statement3;
                 break;
 				...
             default: 
-			statementN;
+		statementN;
                 break;				
 ```
-switch语句支持**byte**,**short**,**char**,**int**原始类型，**Enum**类型，**String**（Java SE 7之后），以及**Character**,**Byte**,**Short**,**Integer**包装类型。switch块中break语句终止包含它的switch语句，如果没有break语句，匹配case标签之后的所有语句都将按顺序执行，而不管后续case标签的表达，直到遇到break语句。
+switch语句支持**byte**,**short**,**char**,**int**原始类型，**Enum**类型（Java SE 5之后），**String**（Java SE 7之后），以及**Character**,**Byte**,**Short**,**Integer**包装类型。switch块中break语句终止包含它的switch语句，如果没有break语句，匹配case标签之后的所有语句都将按顺序执行，而不管后续case标签的表达，直到遇到break语句。
 
 ### 循环语句
 //  while语句
@@ -495,7 +497,7 @@ Object varName = new Object(args1,args2);
 
 ## 嵌套类
 ***
-嵌套类分为两种：静态和非静态。使用static声明的嵌套类称为静态嵌套类。非静态嵌套类称为内部类。
+嵌套类分为两种：**静态**和**非静态**。使用static声明的嵌套类称为静态嵌套类。非静态嵌套类称为内部类。
 嵌套类是包含它的类的成员。非静态嵌套类（内部类）可以访问其他的类成员，即使是被private修饰的。静态嵌套类则无法访问其他类成员（实例成员）。作为外部类（OuterClass）的成员，嵌套类可以使用private, public, protected, 或package private来声明。
 使用嵌套了有以下三种理由：
 - **它是将只会在一个地方使用的类逻辑分组的方式。**如果一个类只对另一个类有用，，那么把它嵌入该类并将它们保持在一起是合乎逻辑的。嵌套的例如”助手类“使它们的包结构更加精简。
@@ -666,7 +668,7 @@ Java编程语言支持**类型的多继承**（multiple inheritance of type）�
 #### 实例方法
 与父类方法拥有有相同签名（名称，以及其参数的数量和类型）的子类实例方法重写了父类方法。
 
-**重写方法**（overriding method ）和它重写的方法有相同的名称，参数的数量和类型，返回类型。一个重写方法还可以返回一个被重写方法返回类型的子类型。这个子类型称为**协变返回类型**（covariant return type）。
+**重写方法**（overriding method ）和它重写的方法有相同的**名称**，**参数数量和类型**，以及**返回类型**。一个重写方法还可以返回一个被重写方法返回类型的子类型。这个子类型称为**协变返回类型**（covariant return type）。
 
 如果想要重写一个方法，可以使用**@Override**注解指示编译器要重写父类的方法。
 
