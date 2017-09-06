@@ -588,7 +588,7 @@ System.out.println(fs);
 ## Number与String之间的转换
 ***
 ### String转换为Number
-通常，一个程序以在字符串对象中的数字数据介绍——比如，用户输入的值。
+通常，数字数据在程序中以一个字符串对象结束一个程序——比如，用户输入的值。
 
 Number子类包装了原始的数字类型（Byte，Integer，Double，Float，Long和Short）每一个都提供了一个名为valueOf的类方法，它将字符串转换一个那个包装类类型。这有一个例子，ValueOfDemo，它从命令行获取两个字符串，将它们转换为数字，并且在值上执行算数操作：
 ```java
@@ -627,7 +627,7 @@ a * b = 392.4
 a / b = 0.0516055
 a % b = 4.5
 ```
-> **注意：**每一个Number子类包装了原始数字类型并且提供了一个parseXXX()方法（比如，parseFloat()），它可以用来将字符串转换为yg原始类型数字。因为返回的是一个原始类型而不是对象，parseFloat()方法要比valueOf()方法更直接。比如在ValueOfDemo程序中，我们会使用：
+> **注意：**每一个Number子类包装了原始数字类型并且提供了一个parseXXX()方法（比如，parseFloat()），它可以用来将字符串转换为原始类型数字。因为返回的是一个原始类型而不是对象，parseFloat()方法要比valueOf()方法更直接。比如在ValueOfDemo程序中，我们会使用：
 ```java
 float a = Float.parseFloat(args[0]);
 float b = Float.parseFloat(args[1]);

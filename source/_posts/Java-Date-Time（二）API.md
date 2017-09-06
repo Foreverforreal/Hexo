@@ -18,7 +18,7 @@ Date-Time API的核心是java.time包。定义在java.time中的类的它们的�
 代表时间有两种基本方式。一种是以人为本代表时间的方式，称为人类时间，如年，月，日，时，分，秒。另一种方式是机器时间，以一个纳秒的分辨率，从一个起源的时间线不断地测量时间，被称为时代。Date-Time包提供了丰富的类来代表日期和时间。在Date-Time API中一些类旨在表示机器时间，而另一些则更适合代表人类时间。
 <!-- more-->
 首先确定您需要哪些方面的日期和时间，然后选择满足这些需求的类。当你选择基于时间的类后，你首先决定是否需要代表人类时间还是机器时间。然后，您将确定您需要代表时间的哪些方面。你是需要一个时区？日期和时间？只是日期？如果你需要一个日期，你是需要月，天，年，还是子集？
-> 术语：在Date-Time API中捕获并使用日期或时间的值的类，比如Instant，LocalDateTime和ZonedDateTime，在本教程中被称为基于时间的类（或类型）。支持类型，如TemporalAdjuster接口或DayOfWeek枚举，不包括在此定义中。
+> 术语：在Date-Time API中捕获并使用日期或时间的值的类，比如Instant，LocalDateTime和ZonedDateTime，在本教程中被称为基于时间的类（或类型）。一些提供支持的类型，如TemporalAdjuster接口或DayOfWeek枚举，不包括在此定义内。
 
 比如，你可能使用一个LocalDate对象来表示生日日期，因为大多数人注意它们的生日，无论他们是在他们的出生城市还是跨过全球，在国际日期变更线的另一边。如果您正在追踪占星术时间，那么您可能希望使用LocalDateTime对象来表示出生日期和时间，或者ZonedDateTime，它还包括时区。如果你创建一个时间戳，那么你最可能想要使用一个Instant，它允许您将时间轴上的一个瞬时点与另一个瞬时点进行比较。
 
@@ -54,12 +54,12 @@ table:first-of-type th:nth-of-type(2),table:first-of-type th:nth-of-type(3),tabl
 \*\*这类别不存储这些信息，但是具有在这些单元中提供时间的方法。
 \*\*\*当将Period添加到ZonedDateTime时，会观察到夏令时或其他本地时差。
 ***
-# DayWeek和Month枚举
+# DayOfWeek和Month枚举
 ***
-> 本节讨论定义一周中的日期的枚举（DayWeek）和定义了月的枚举（Month）。
+> 本节讨论定义一周中的日期的枚举（DayOfWeek）和定义了月的枚举（Month）。
 
 Date-Time API提供了指定一周中的日期和一年中的月份的枚举。
-## DayWeek
+## DayOfWeek
 ***
 DayOfWeek枚举包含七个常数，用于描述星期几：从MONDAY到SUNDAY。DayOfWeek常数的整数值范围从1（Monday）到7（Sunday）。使用定义的常量（DayOfWeek.FRIDAY）使您的代码更易读。
 
