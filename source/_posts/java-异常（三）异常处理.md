@@ -10,7 +10,7 @@ categories:
 date: 2017-05-28 12:17:15
 ---
 # 捕获异常
-捕获异常有三个组件——try,catch和finally代码块。在Java SE 7后新引进了try-with-resources语句。ry-with-resources语句特别适用于使用可关闭资源（如流）的情况。
+捕获异常有三个组件——try,catch和finally代码块。在Java SE 7后新引进了try-with-resources语句。try-with-resources语句特别适用于使用可关闭资源（如流）的情况。
 
 ## try代码块
 
@@ -44,7 +44,7 @@ catch (ExceptionType | ExceptionType ex) {
 }
 
 ```
->如果一个catch块处理多个异常类型，那么catch参数是隐式的final。在这个例子中，catch参数ex是final，因此你不能在catch块内给它赋值。
+>**如果一个catch块处理多个异常类型，那么catch参数是隐式的final。在这个例子中，catch参数ex是final，因此你不能在catch块内给它赋值。**
 
 ## finally代码块
 

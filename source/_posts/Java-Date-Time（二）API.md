@@ -427,11 +427,11 @@ DateTimeFormatter类提供了许多预定义的formatter，也可以定义自己
 
 如果在转换过程中出现问题，则parse和format方法会抛出异常。因此，您的解析代码应该捕获DateTimeParseException错误，您的格式化代码应该捕获DateTimeException错误。
 
-静态方法加上DateTimeFormatter中的常量，是最通用的创建格式化器的方式。包括：
+使用静态方法以及DateTimeFormatter中的常量，是最通用的创建格式化器的方式。包括：
 
-- 常用ISO格式常量，如ISO_LOCAL_DATE
-- 字母模式，如ofPattern(“dd/MM/uuuu”)
-- 本地化样式，如ofLocalizedDate(FormatStyle.MEDIUM)
+- **常用ISO格式常量**，如ISO_LOCAL_DATE
+- **字母模式**，如ofPattern(“dd/MM/uuuu”)
+- **本地化样式**，如ofLocalizedDate(FormatStyle.MEDIUM)
 
 DateTimeFormatter类是不可变的和线程安全的;它可以（并且应该）适当地分配给静态常量。
 
@@ -491,7 +491,7 @@ ARRIVING: Jul 21 2013  10:20 PM (Asia/Tokyo)
 
 java.time.temporal包提供了一组接口，类和枚举，支持日期和时间代码，特别是日期和时间计算。
 
-这些接口旨在用于最低层次。通常应用程序代码应根据具体类型声明变量和参数，如LocalDate或ZonedDateTime，而不是Temporal接口。这与声明一个String类型，而不是CharSequence类型的变量完全一样。
+这些接口旨在用于最低层次。通常应用程序代码应根据具体类型声明变量和参数，如LocalDate或ZonedDateTime，而不是Temporal接口。这与声明一个String类型，而不是CharSequence类型的变量一个道理。
 
 ## 包接口
 ***

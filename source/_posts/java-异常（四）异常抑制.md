@@ -1,13 +1,13 @@
 title: java 异常（四）异常抑制
 id: 1496032917285
 author: 不识
-date: 2017-05-29 12:41:59
 tags:
   - java
   - exception
 categories:
   - java 基础
   - java 异常
+date: 2017-05-29 12:41:59
 ---
 在我们使用一些I/O类的时候，我们必须保证在I/O操作结束后，关闭流来释放资源，看下面代码
 
@@ -69,7 +69,7 @@ class Resource implements AutoCloseable {
 >Resource is doing something  
 >Exception in thread "main" java.io.IOException
 
-可以发现try-with-resource语句与try...finally相反，它的close方法抛出异常被抑制，抛出的是代码块内异常，这是try-with-resource的异常处理机制，它只会抛出在代码块内的异常，try()语句中的异常将被抑制，但是被一致的异常并没有被丢弃，在Java 7后java.lang.Throwable类中新加入两个方法，是我们可以添加或获取抑制异常
+可以发现try-with-resource语句与try...finally相反，它的close方法抛出异常被抑制，抛出的是代码块内异常，这是try-with-resource的异常处理机制，它只会抛出在代码块内的异常，try()语句中的异常将被抑制，但是被抑制的异常并没有被丢弃，在Java 7后java.lang.Throwable类中新加入两个方法，是我们可以添加或获取抑制异常
 - public final void **addSuppressed**(Throwable exception)
 - public final Throwable[] **getSuppressed**()
 
