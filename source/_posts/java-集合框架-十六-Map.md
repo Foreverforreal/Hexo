@@ -45,13 +45,13 @@ if(m1.keySet().equals(m2.keySet())) {}
 　　Map集合并无法直接实现遍历,而是通过它的集合视角遍历元素,所以SortedMap在返回的集合视角中,集合视角的迭代器也将会按SortedMap的顺序进行排序,同理的SortedMap中toArray方法返回的数组也是如此,toString方法会返回一个包含所有元素,并排序好的字符串.
   
 # 实现
-　　Map的实现可以分成**通用实现**,**专用实现**,并发实现
+　　Map的实现可以分成**通用实现**,**专用实现**,**并发实现**
 
-## 　通用实现
+## 通用实现
 　　通用实现有三个,**HashMap**,**TreeMap**和**LinkedHashMap**.如果我们想要对元素进行一些排序操作,那么应当使用TreeMap,如果我们想要最好的性能而不在乎是否排序,应当使用HashMap,如果需要和HashMap接近的性能,并且可以以插入顺序遍历,那么应当使用LinkedHashMap.这和Set的通用实现很类似.
 
 　　此外LinkedHashMap不仅提供了插入排序(insert order),同时还提供访问排序(access order),这样LinkedHashMap非常适用做本地缓存类(LRU)
-## 　专用实现
+## 专用实现
 　　专用实现也有三个,分别是**Enummap**,**WeakHashMap**和**IdentityHashMap**。
 
 - EnumMap是一个高性能的以枚举为键的Map集合,它内部是以数组实现.EnumMap将Map集合的丰富功能和安全性与数组的快速访问结合起来,如果想要实现一个用枚举映射值得结构,应当使用EnumMap.
