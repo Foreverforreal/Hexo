@@ -137,7 +137,7 @@ public class WildcardError {
 
 WildcardError示例在使用Oracle JDK 7 javac实现编译时产生以下错误：
 
-```bash
+```
 WildcardError.java:6: error: method set in interface List<E> cannot be applied to given types;
     i.set(0, i.get(0));
      ^
@@ -199,7 +199,7 @@ swapFirst(li, ld);
 虽然List &lt;Integer>和List &lt;Double>都符合List<？extends Number>，从Integer的list中获取元素，并尝试将其放入Double值list中显然是不正确的。    
 使用Oracle的JDK javac编译器编译代码会产生以下错误：
 
-```bash
+```
 WildcardErrorBad.java:7: error: method set in interface List<E> cannot be applied to given types;
       l1.set(0, l2.get(0)); // expected a CAP#1 extends Number,
         ^

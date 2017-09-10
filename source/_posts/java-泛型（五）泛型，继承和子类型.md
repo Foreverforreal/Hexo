@@ -40,12 +40,12 @@ public void boxTest(Box<Number> n) { /* ... */ }
 >注意：给定两个具体类型A和B（例如Number和Integer），MyClass &lt;A>与MyClass &lt;B>无关，无论A和B是否相关。 MyClass &lt;A>和MyClass &lt;B>的父对象是Object。
 
 # 泛型类和子类型
-以Collections类作为示例，ArrayList &lt;E>实现List &lt;E>，并且List &lt;E>扩展Collection &lt;E>。所以ArrayList &lt;String>是List &lt;String>的子类型，它是Collection &lt;String>的子类型。只要不改变类型参数，子类型之间的关系将保留在类型之间。
+以Collection类作为示例，ArrayList &lt;E>实现List &lt;E>，并且List &lt;E>扩展Collection &lt;E>。所以ArrayList &lt;String>是List &lt;String>的子类型，它是Collection &lt;String>的子类型。只要不改变类型参数，子类型之间的关系将保留在类型之间。
 ![generics-sampleHierarchy](/images/java base/generics-sampleHierarchy.gif)
 
 现在想象我们要定义我们自己的List接口PayloadList，它将泛型类型P的可选值与每个元素相关联。其声明可能如下所示：
 ```java
-interface PayloadList<E,P> extends List&lt;E> {
+interface PayloadList<E,P> extends List<E> {
   void setPayload(int index, P val);
   ...
 }
