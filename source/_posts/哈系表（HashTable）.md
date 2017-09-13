@@ -153,23 +153,7 @@ while (HT[i] != EMPTY || HT[i] != DELETED)  //如果该地址不为空或不为�
   
 found insertion point, insert key at HT[i]
 ```
-主要逻辑Java实现递归代码
-```java
-    public void insert(int key) {
-        insertByIndex(hashing(key), key); // 传入基本地址，也就是该数据哈希值
-    }
-
-    public void insertByIndex(int index, int key) {
-        if (hashTable[index] == Status.Empty || hashTable[index] == Status.Delete) { // 如果为空就直接插入
-            hashTable[index] = key;
-        } else {
-            int nextIndex = (index + 1) % hashTable.length;  // 不为空设置下一个地址
-            if(nextIndex != hashing(key))	//只查找一圈，防止哈希表全满时，递归无法收敛
-            insertByIndex(nextIndex, key); //递归插入下一个地址
-        }
-    }
-```
-主要逻辑Java实现循环代码
+Java实现代码
 ```java
     public void insert(int key){
         int step = 0;
@@ -184,8 +168,6 @@ found insertion point, insert key at HT[i]
         hashTable[i] = key;
     }
 ```
-> 注意这里没有判断哈系表已满
-
 ### Search(v)
 
 线性探查搜索操作类似于插入操作，步骤如下：
@@ -321,7 +303,7 @@ h2(v)被称为次级哈希函数，如果h2（v）= 1，则Double Hashing与Line
 4. 足够快，O（1）
 
 ***
-## 分离链接（Separate Chaining）
+# 分离链接（Separate Chaining）
 ***
 分离链接技术（Separate Chaining）是另一种冲突解决策略。它把哈希到同一个槽中的所有元素都放到一个链表中。分离链接技术将采用额外的数据结构来处理冲突，其将哈希表中每个位置（slot）都映射到了一个链表。当冲突发生时，冲突的元素将被添加到桶（bucket）列表中，而每个桶都包含了一个链表以存储相同哈希的元素。
 ![分离链接](\images\datastructure\seperatechain.gif)
@@ -329,7 +311,7 @@ h2(v)被称为次级哈希函数，如果h2（v）= 1，则Double Hashing与Line
 如果我们使用分离链接技术，那么负载因子α= N / M描述列表的平均长度M，并且它确定Search（v）的性能，因为我们可能必须平均探索α元素。作为Remove（v） - 也需要Search（v），其性能将与Search（v）类似。insert(v)的时间复杂度显然是O（1）。如果我们可以将α绑定为小常数，则使用分离链接的所有Search（v），Insert（v）和Remove（v）操作将为O（1）。
 
 ***
-## 哈希表扩增
+# 哈希表扩增
 ***
 当负载因子α越高时，哈希表的性能下降。对于（标准）二次探查冲突解决技术，当哈希表α> 0.5时，插入可能会失败。如果发生这种情况，我们可以重新哈希转换。我们使用新的哈希函数构建另一个哈希表，大小约是原来的两倍。我们重新计算原始哈希表中的所有键的新哈希值，并将卫星数据插入到新的更大的哈希表中，最后我们删除较旧的较小的哈希表。
 
