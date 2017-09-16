@@ -176,7 +176,7 @@ t.join();
 ***
 Java内存模型在JVM内部被使用，将内存分为**线程栈**（stack）和**堆**（heap）。下面示图从逻辑角度说明了Java内存模型：
 ![Java内存模型1](/images/java base/java-memory-model-1.png)
-每个Java虚拟机上运行的线程都有它自己的线程栈。<font style="color:#ec70ae;">线程栈包含了线程达到当前执行点调用方法的信心。此外还包含每个正执行方法(调用栈中的所有方法)的局部变量</color>。一个线程只可以访问自己的线程栈，由线程栈创建的局部变量对其他线程都不可见，即使两个线程执行相同的代码。
+每个Java虚拟机上运行的线程都有它自己的线程栈。<font style="color:#ec70ae;">线程栈包含了线程达到当前执行点调用方法的信心。此外还包含每个正执行方法(调用栈中的所有方法)的局部变量</font>。一个线程只可以访问自己的线程栈，由线程栈创建的局部变量对其他线程都不可见，即使两个线程执行相同的代码。
 
 所有原始类型 ( boolean, byte, short, char, int, long, float, double)的局部变量都完全存储在**线程栈**上，因此对其他线程不可见。**堆**包含所有你的Java应用程序创建的对象，无论是哪个线程创建的。不管一个对象是被创建并分配给一个局部变量，或者作为其他对象的成员变量创建，这个对象依旧存储在堆上。
 
@@ -185,7 +185,7 @@ Java内存模型在JVM内部被使用，将内存分为**线程栈**（stack）�
 1. 一个局部变量可能是原始类型，这是它完全存储在线程栈上。只有局部变量存储在线程栈上。
 2. 一个局部变量也可能是一个对象的引用，这种情况引用（局部变量）存储在线程栈上，而对象本身存储在堆中
 3. 一个对象的成员变量与对象本身一起存储在堆上。无论成员变量是原始类型还是引用类型。
-4. <font style="color:#ec70ae;">静态类变量也与类定义一起存储在堆上。</color>
+4. <font style="color:#ec70ae;">静态类变量也与类定义一起存储在堆上。</font>
 5. 堆上的对象可以被所有拥有它的引用的线程访问。当一个线程访问一个对象时，它也可以访问对象的成员变量，但每个线程都有它自己的局部变量（对象引用）。
 
 ## 硬件内存架构
@@ -203,6 +203,14 @@ Java内存模型在JVM内部被使用，将内存分为**线程栈**（stack）�
 通常，当一个CPU需要访问主内存，它会读取主内存一部分到它的CPU缓存，甚至可以将缓存的一部分读入其内部寄存器，然后在上面执行某些操作。当CPU需要将结果写入到主内存，它会将值从它的内部寄存器刷入到缓存，并在某些时候将值刷入到主内存。
 
 存储在缓存中的值通常在CPU需要在缓存存储其他东西时，被刷回到主内存中。CPU可以以此只读写部分其中的数据，而不用在更新时读写所有的缓存。通常缓存以更小的被称为“缓存行”的内存块被更新。可以将一个或多个缓存行读入缓存中，并且一个或多个缓存行可以再次刷新回主内存。
+
+## 原子性访问
+***
+编程中，原子性动作是可以一次有效完成的动作。它不会在中途停止：也就是要么一次完成，要么根本没有发生。有些表达式看似简单，但并不是原子性动作，比如自加操作a++,它实际是分成几个步骤完成的。这里有一些动作是原子性的：
+- 引用类型变量和大多数原始类型变量（除了long和double）的读写是原子性的
+- 所有声明为volatile的变量（包括long和double）都是原子性的
+
+原子性操作不用担心多线程干扰，但依然还有可能发生内存一致性错误，此时应该使用volatile关键字减少这些错误。java.util.concurrent包中的一些类提供了不依赖同步的原子性方法。
 
 ## Java内存模型与硬件内存架构
 ***
@@ -313,7 +321,7 @@ object = newObject;
 
 ## volatile不足
 ***
-如前面例子，当一个线程读取或写入一个共享变量，另一个线程只能读取该共享变量，此时通过volatile关键字可以保证程序如预期运行。volatile关键字可以保证32位和64位的变量。
+如前面例子，当一个线程读取或写入一个共享变量，另一个线程只能读取该共享变量，此时通过volatile关键字可以保证程序如预期运行。volatile关键字可以用于32位和64位的变量。
 
 然而，实际可能多个线程同时读写一个共享的volatile变量，如果新的写入值并不依赖它之前的值，那么在主内存中依旧是正确的值，但是如果依赖之前的值，此时volatile再不能确保正确的可见性，因为两个线程可能同时读取一个共享变量，并且对其进行写入，这时就产生了一个**竞态条件**。此时两个线程写回主内存的值可能会互相覆盖，导致非预期的值。这种情况下需要使用synchronized 关键字来确保变量读写的原子性。
 
@@ -329,25 +337,34 @@ synchronized关键字可用于标记四种不同类型的代码块：
 - **静态方法内代码块 **
 
 
+## 内部锁
+***
+同步是围绕着称为内部锁（ intrinsic lock）或监视器锁（monitor lock）的内部实体构建的。内部锁在同步中有作用：强制执行对对象状态的独占访问，并建立对可见性至关重要的happen-before关系。
+
+每个对象都有一个与之相关的内部锁。按照约定，一个线程要想对对象字段进行排他和一致性的访问，在访问之前必须获得该对象的内部锁，然后在完成对象时释放内部锁。线程在获得锁和释放锁的之间被称为拥有内部锁定。只要一个线程拥有对象的内部锁，其他线程都无法获得该锁。当其他尝试获取锁时，会被阻塞。
+
+当一个线程释放内部锁，它与后续获取该锁动作建立了一个happen-before关系。
 
 ## 同步方法
 ***
-**同步实例方法**
+同步方法分为同步实例方法和同步静态方法，只需要简单地在方法声明上加上**synchronized**关键字。
+- 同步实例方法
 ```java
  public synchronized void add(int value){
       this.count += value;
   }
 ```
-Java中的同步实例方法在拥有该方法的实例（对象）上同步。
-
-**同步静态方法**
+- 同步静态方法
 ```java
   public static synchronized void add(int value){
       count += value;
   }
 ```
-同步静态方法在该属于的类的类对象上同步。
-由于每个类在Java VM中只存在一个类对象，所以在同一个类中的静态同步方法中只能执行一个线程。
+当一个线程调用同步方法的时候，它自动获得该方法对象的内部锁，并在返回的时候释放它。即使是由未捕获的异常引发的返回，依旧会释放该锁。对于实例同步方法，它的内部锁为调用该方法的实例，对于静态同步方法，它的内部锁为方法所在类的Class实例。
+
+同步方法有两个作用：
+1. 同一个对象的所有同步方法无法被多个线程同时调用。当一个线程调用一个对象上的同步方法，其他调用该对象同步方法的线程都处于阻塞状态，知道正在执行的线程返回。
+2. 当一个同步方法退出的时候，它自动与该对象同步方法随后的调用建立happen-before关系。这保证了对对象状态的更改对其他线程可见。
 
 注意synchronized关键字无法用在构造方法上，否则的话会导致语法错误。同步构造方法没有意义，因为只有创建对象的线程在构造时才能访问它。
 
@@ -362,7 +379,7 @@ instances.add(this);
 
 ## 同步语句
 ***
-**实例方法内同步语句**
+有时不需要将整个方法同步，只需要同步方法内的一部分，这时可以使用同步语句，同步语句分实例方法内的同步语句和静态方法内的同步语句，与同步方法不同是，同步语句必须指定一个对象来提供内部锁。如下：
 ```java
 public void add(int value){
     synchronized(this){
@@ -370,55 +387,29 @@ public void add(int value){
     }
   }
 ```
-同步代码块构造在括号中接收一个对象，它被称为**监视器对象**（monitor object），表示代码块同步在该监视器对象上。上面例子中使用this作为监视器对象，是指调用add方法的实例。
+同步语句提供内部锁的对象被称为**监视器对象**（monitor object），上面示例中使用this作为监视器对象，它是调用add方法的实例。对于静态方法中的同步语句，由于静态方法是与类相关的，所以需要使用一个类的Class实例作为监视器对象。
 
-只有一个线程可以在同一监视对象上同步的Java代码块中执行。
-以下两个示例在被调用的实例上同步。因此，它们是等价同步：
+同步语句通过指定监视器对象，提升了更细粒度的同步控制。例如，有一个MsLunch 类有两个字段c1和c2，它们从不在一起使用，所有对该字段的更新都必须是同步的，但没有理由在更新c1的时候阻止c2的更新，因此相比使用同步方法，可以通过使用同步语句指定不同的内部锁来实现。
 ```java
-  public class MyClass {
-  
-    public synchronized void log1(String msg1, String msg2){
-       log.writeln(msg1);
-       log.writeln(msg2);
+public class MsLunch {
+    private long c1 = 0;
+    private long c2 = 0;
+    private Object lock1 = new Object();
+    private Object lock2 = new Object();
+
+    public void inc1() {
+        synchronized(lock1) {
+            c1++;
+        }
     }
 
-  
-    public void log2(String msg1, String msg2){
-       synchronized(this){
-          log.writeln(msg1);
-          log.writeln(msg2);
-       }
+    public void inc2() {
+        synchronized(lock2) {
+            c2++;
+        }
     }
-  }
+}
 ```
-同一时刻，只有一个线程可以访问两个方法之一，如果一个线程正在调用log1，那么其他线程两个方法都无法进入，必须等待log1中的线程退出。
-
-
-**静态方法内同步语句**
-```java
-  public class MyClass {
-
-    public static synchronized void log1(String msg1, String msg2){
-       log.writeln(msg1);
-       log.writeln(msg2);
-    }
-  
-    public static void log2(String msg1, String msg2){
-       synchronized(MyClass.class){
-          log.writeln(msg1);
-          log.writeln(msg2);  
-       }
-    }
-  }
- ```
-静态方法内同步代码块类似于实例方法内的同步代码块，不同的静态方法中的同步使用一个类的Class实例作为监视器对象。
-
-
-## Happen-Before保证
-***
-当一个synchronized方法退出时，对于相同的对象，它会自动与随后调用的synchronized方法建立happen-before关系。这保证了对对象状态的修改对所有线程都可见。
-
-sychronized还保证在同步块内访问的所有变量将从主内存中读入，并且当线程退出同步块时，所有更新的变量将被刷回主内存。
 
 
 ## Java并发工具
@@ -426,39 +417,37 @@ sychronized还保证在同步块内访问的所有变量将从主内存中读入
 synchronized机制是Java第一个同步访问多线程共享对象的机制。synchronized机制不是很先进。这就是为什么Java 5得到了一整套并发工具类，以帮助开发人员实现比synchronized的更精细的并发控制。
 
 
-
 ***
-# 同步
+# ThreadLocal
 ***
-线程主要通过共享对字段的访问和对象引用字段进行通信。这种形式的通信是非常有效的，但可能造成两种错误：**线程干扰**（thread interference）和**内存一致性错误**（memory consistency errors）。此时需要**同步**（sychronization）来防止这些错误。
+Java中的ThreadLocal类允许创建只能由同一个线程读取和写入的变量。因此，即使两个线程正在执行相同的代码，并且代码对ThreadLocal变量进行引用，那么两个线程也看不到彼此的ThreadLocal变量。
 
-然而，当两个或更多线程尝试同时访问相同的资源的时候，同步也引入了**线程竞争**（thread contention）问题,并且导致Java运行时执行一个或多个线程 更加缓慢，甚至暂停执行。饥饿与活锁（Starvation and Livelock）就是线程竞争的一种形式。
-
-
-
-
-
-## 线程干扰
-***
-考虑一个Counter这个简单类：
 ```java
-class Counter {
-    private int c = 0;
+private ThreadLocal<String> myThreadLocal = new ThreadLocal<String>();
 
-    public void increment() {
-        c++;
-    }
-
-    public void decrement() {
-        c--;
-    }
-
-    public int value() {
-        return c;
-    }
-
-}
+myThreadLocal.set("Hello ThreadLocal");
+String threadLocalValue = myThreadLocal.get();
 ```
+如上初始化ThreadLocal变量，并且使用set()方法设置值，get()方法获取值。由于设置在ThreadLocal对象上的值仅对设置该值的线程是可见的，所以线程不能使用set()设置一个对所有线程都可见的初始值。但是可以通过子类话ThreadLocal，并重写它的**initialValue()**方法来设置一个初始化值：
+```java
+private ThreadLocal myThreadLocal = new ThreadLocal<String>() {
+    @Override protected String initialValue() {
+        return "This is the initial value";
+    }
+};  
+```
+现在所有线程在调用set()之前调用get()时会看到相同的初始值。
+
+***
+# 线程信令
+***
+线程信令的目的是使线程能够互相之间发送信号。此外，线程信令使线程能够等待来自其他线程的信号。例如，线程B可能等待来自线程A的信号，指示数据准备好被处理。
 
 
+***
+# 活性
+***
+一个并发应用程序及时执行的能力被称活性（liveness）。下面讨论常见的活性问题。
 
+## 死锁
+***
