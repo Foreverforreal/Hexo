@@ -442,6 +442,150 @@ private ThreadLocal myThreadLocal = new ThreadLocal<String>() {
 # 线程信令
 ***
 线程信令的目的是使线程能够互相之间发送信号。此外，线程信令使线程能够等待来自其他线程的信号。例如，线程B可能等待来自线程A的信号，指示数据准备好被处理。
+## 使用共享对象
+***
+实现线程相互发送信号的一种简单方式是通过将信号值设置在某些共享对象变量中。线程A可以从同步块内部将boolean成员变量hasDataToProcess设置为true，线程B也可以在同步块内部读取hasDataToProcess成员变量。这是一个可以容纳这种信号的对象的简单示例，并提供设置和检查它的方法：
+```java
+public class MySignal{
+
+  protected boolean hasDataToProcess = false;
+
+  public synchronized boolean hasDataToProcess(){
+    return this.hasDataToProcess;
+  }
+
+  public synchronized void setHasDataToProcess(boolean hasData){
+    this.hasDataToProcess = hasData;  
+  }
+
+}
+```
+处理数据的线程B正在等待数据可用于处理。换而言之，它正在等待来自线程A的信号，这会导致hasDataToProcess()返回true。线程B正在运行循环，同时等待此信号：
+```java
+protected MySignal sharedSignal = ...
+
+...
+
+while(!sharedSignal.hasDataToProcess()){
+  //do nothing... busy waiting
+}
+```
+注意在hasDataToProcess()返回true之前，while循环如何保持执行。这被称为**忙等待**(busy waiting)。
+
+## wait(), notify()和notifyAll()
+***
+在运行等待线程时，忙等待对CPU的利用不是非常高效的，除非平均的等待时间非常少。如果使等待的线程可以休眠或者变为待用，可能会更明智些。
+
+Java有一个内置的等待机制，使得线程在等待信号时变为不活动。java.lang.Object类定义了**wait()**，**notify()**和**notifyAll()**这三个方法。
+
+一个线程可以在任何对象上调用wait()方法时线程不活动，直到另一个线程在该对象上调用notify()。为了调用wait()和notify()，调用线程必须首先获得监视器对象上的锁。换句话说，调用线程必须从同步块内部调用wait()或notify()。这是MySignal的修改版本MyWaitNotify，它使用wait()和notify()。
+```java
+
+public class MonitorObject{
+}
+
+public class MyWaitNotify{
+
+  MonitorObject myMonitorObject = new MonitorObject();
+
+  public void doWait(){
+    synchronized(myMonitorObject){
+      try{
+        myMonitorObject.wait();
+      } catch(InterruptedException e){...}
+    }
+  }
+
+  public void doNotify(){
+    synchronized(myMonitorObject){
+      myMonitorObject.notify();
+    }
+  }
+}
+```
+等待线程可以调用doWait(),而唤醒线程可以调用doNotify()。当一个线程在对象上调用notify(),在该线程上等待的一个线程就会被唤醒继续执行。还有一个notifyAll()方法会唤醒所有在给定对象上等待的线程。
+
+如上所见，调用wait()和notify()的调用都在同步块中，这是强制的。如果没有持有这些方法对象上的锁的话，一个线程无法调用wait(),notify()和notifyAll()方法。如果调用，会抛出IllegalMonitorStateException 异常。
+
+一旦线程调用了wait()方法，它会释放它持有的该监视器对象上的锁。此时其他线程可以获得该锁。
+<font style="color:#ec70ae;">一旦线程被唤醒，它不能立即退出wait()方法，要一直到调用notify()的线程离开它的同步块。</font>换而言之，唤醒的线程必须在它可以退出wait()方法前，重新获得监视器对象上锁,因为wait的调用嵌套在同步块内。如果多个线程被使用notifyAll()唤醒，一次只有一个唤醒的线程可以退出wait()方法，因为每个线程必须在退出wait()之前依次获取监视对象上的锁。
+
+## 信号丢失
+***
+notify（）和notifyAll（）方法不会将保存方法调用，以防止调用时没有线程处于wait状态。然后通知信号就会丢失。因此，如果一个线程在其他线程调用wait()前调用了notify()，信号将被等待线程错过。这可能是或可能不是一个问题，但在某些情况下，这可能导致等待线程永远等待，永远不会醒来，因为唤醒的信号被错过了。
+
+为了避免丢失信号，信号应该存储在信号类中。在MyWaitNotify示例中，通知信号应存储在MyWaitNotify实例中的成员变量中。以下是MyWaitNotify的修改版本：
+```java
+public class MyWaitNotify2{
+
+  MonitorObject myMonitorObject = new MonitorObject();
+  boolean wasSignalled = false;
+
+  public void doWait(){
+    synchronized(myMonitorObject){
+      if(!wasSignalled){
+        try{
+          myMonitorObject.wait();
+         } catch(InterruptedException e){...}
+      }
+      //clear signal and continue running.
+      wasSignalled = false;
+    }
+  }
+
+  public void doNotify(){
+    synchronized(myMonitorObject){
+      wasSignalled = true;
+      myMonitorObject.notify();
+    }
+  }
+}
+```
+
+## 虚假唤醒
+***
+由于不可思议的原因，即使notify（）和notifyAll（）尚未被调用，线程也可以唤醒。这被称为虚假唤醒。唤醒没有任何理由。
+
+如果在MyWaitNofity2类的doWait（）方法中发生虚假唤醒，则等待线程可能会没有收到信号就继续处理！这可能会导致您的应用程序的严重问题。
+
+为了防止虚假唤醒，信号成员变量在一个while循环内被检查，而不是在if语句内部。这样的while循环也称为**自旋锁**。线程直到自旋锁（while循环）中的条件变为false才会真正唤醒。这是MyWaitNotify2的修改版本：
+```java
+public class MyWaitNotify3{
+
+  MonitorObject myMonitorObject = new MonitorObject();
+  boolean wasSignalled = false;
+
+  public void doWait(){
+    synchronized(myMonitorObject){
+      while(!wasSignalled){
+        try{
+          myMonitorObject.wait();
+         } catch(InterruptedException e){...}
+      }
+      //清楚信号，继续运行。
+      wasSignalled = false;
+    }
+  }
+
+  public void doNotify(){
+    synchronized(myMonitorObject){
+      wasSignalled = true;
+      myMonitorObject.notify();
+    }
+  }
+}
+```
+注意wait（）调用如何嵌套在while循环而不是if语句中。如果等待线程在没有收到信号的情况下唤醒，则isSignalled成员仍将是false，while循环将再次执行，导致唤醒的线程返回等待。
+
+## 多个线程等待同一个信号
+***
+当有多个线程等待，并且被notifyAll()全部唤醒的，但只有一个线程应该运行被执行，此时这个while循环也是一个很好的解决方案。一次只能有一个线程能够获取监视器对象上的锁，这意味着只有一个线程可以退出wait()调用并且清除wasSignalled标记。一旦该线程在doWait()方法中退出同步块，其他线程就可以退出wait()调用，并检查while循环内的wasSignalled成员变量。然而，这个标志被第一个线程清除，所以其余的唤醒的线程返回等待，直到下一个信号到达。
+
+##  不要在String或全局对象上调用wait()方法
+***
+由于JVM/编译器别不将常量字符串转换为同一个对象，因此如果使用字符串作为监视器对象，如MyWaitNotify定义“String myMonitorObject = "";”，这将导致一个问题，即使创建多个MyWaitNotify实例，但监视器对象还是同一个，在多个线程等待唤醒的调用中将出现混乱。
+
+所以：不要对wait（）/ notify（）机制使用全局对象，字符串常量等。使用使用它的构造是唯一的对象。例如，每个MyWaitNotify3（早期部分的示例）实例都有自己的MonitorObject实例，而不是为wait（）/ notify（）调用使用空字符串。
 
 
 ***
@@ -451,3 +595,26 @@ private ThreadLocal myThreadLocal = new ThreadLocal<String>() {
 
 ## 死锁
 ***
+死锁是两个或多个线程永远被阻塞，互相等待彼此释放锁的的情况。死锁会有至少两个锁，
+并且线程在一个同步块中尝试进入另一个同步块。例如线程1锁定A，尝试获取B锁，而线程2锁定B，尝试获取A锁，这时死锁发生了。情况如下所示：
+```
+Thread 1  locks A, waits for B
+Thread 2  locks B, waits for A
+```
+死锁也可以包含两个以上的线程。这使得更难检测。以下是四个线程死锁的示例：
+```
+Thread 1  locks A, waits for B
+Thread 2  locks B, waits for C
+Thread 3  locks C, waits for D
+Thread 4  locks D, waits for A
+```
+一个死锁可能会发生的更复杂的情况是数据库事务。数据库事务可能包含许多SQL更新请求。当在一个事务中更新记录时，对于他事务更新该记录将被锁定，直到第一个事务完成。因此，相同事务中的每个更新请求可能会锁定数据库中的一些记录。
+
+如果多个事务正在同时运行，需要更新相同的记录，那么就有可能会导致死锁。例如：
+```
+Transaction 1, request 1, locks record 1 for update
+Transaction 2, request 1, locks record 2 for update
+Transaction 1, request 2, tries to lock record 2 for update.
+Transaction 2, request 2, tries to lock record 1 for update.
+```
+因为锁在采用自不同的请求，因此并不是提前知道给定事务所需的所有锁，很难检测或防止数据库事务中的死锁。
