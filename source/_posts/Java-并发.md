@@ -587,7 +587,271 @@ public class MyWaitNotify3{
 
 所以：不要对wait（）/ notify（）机制使用全局对象，字符串常量等。使用使用它的构造是唯一的对象。例如，每个MyWaitNotify3（早期部分的示例）实例都有自己的MonitorObject实例，而不是为wait（）/ notify（）调用使用空字符串。
 
+***
+# 不可变对象
+***
+如果一个对象在创建之后状态不能改变，那么它被认为是一个不可变对象。不可变对象在并发应用程序中特别有用。由于它们不能改变状态，它们不会被线程干扰所破坏或者在不一致状态下观察到。
 
+程序员通常不愿使用不可变对象，因为他们担心创建一个新对象的花销，而不是更新一个对象。对象创建的影响往往被高估，它可以通过与不可变对象的一些有点带来的效率来抵消。这些包括由于垃圾回收而导致的开销降低，以及为消除为了保护可变对象免受损坏所需的代码。
+
+以下规则定义了创建不可变对象的简单策略。不是所有“不可变”的类都遵循这些规则。这并不一定意味着这些类的创作者都是草率的 - 他们可能有充分的理由相信他们的类在构造后永远不会改变。然而，这种策略需要复杂的分析，不适合初学者。
+1. 不提供“setter”方法 — 修改字段或引字段引用对象的方法。
+2. 使所有的字段final和private
+3. 不允许子类重写方法。最简单的方法是将类声明为final。更复杂的方法是使构造函数为私有并在工厂方法中构造实例。
+4. 如果实例字段包含可变对象的引用，则不允许更改这些对象：
+	- 不提供修改这些可变对象的方法
+	- 不共享可变对象的引用。
+	不要存储引用到外部，可变对象传递给构造方法；如果需要，创建一个副本，并存储副本引用。同样，如果需要的时候创建内部可变对象副本，以避免在方法中返回原始可变对象。
+	
+
+***
+# 高级并发对象
+***
+前面是是一些低级并发API，这些API足够用于非常基本的任务，但更高级的构建模块需要更高级的任务。对于充分利用当今多处理器和多核系统的大规模并发应用程序尤其如此。在Java 5.0中引入了一些高级并发功能，大多数这些功能都在新的java.util.concurrent包中实现。 Java Collections Framework（JCF）中还有新的并发数据结构。
+
+## Lock
+***
+同步代码依赖于一种简单的重入锁。这种锁便于使用，但也有很多限制。java.util.concurrent.locks包支持更多复杂的同步锁功能。其中最基本的是Lock接口。
+
+Lock对象非常向同步代码块使用的隐式锁。与隐式锁一样，一次只能有一个线程拥有一个Lock对象。锁定对象还通过其关联的Condition对象支持wait/notify机制。
+
+## Executors
+***
+前面例子中，在由Runable对象定义的要使用线程完成的任务，与有Thread对象定义的线程本身有着紧密联系。这适用于小型应用程序，但在大规模应用程序中，将线程管理和创建与其他应用程序分开是有意义的。封装这些函数的对象被称为执行器（executor），以下是执行器的一些细节：
+- Executor接口：定义了三个执行器对象类型
+- 线程池：最常用的执行器实现方式。
+- fork/join：一个用于利用多个处理器的框架（JDK 7中的新功能）
+
+### Executor接口
+java.util.concurrent包定义了三个执行器接口：
+- **Executor**，一个支持启动新任务的简单界面。
+- **ExecutorService**，Executor的一个子接口，它增加了帮助管理独立任务和执行者本身生命周期的功能。
+- **ScheduledExecutorService**，ExecutorService的一个子接口，支持将来和/或定期执行任务。
+
+通常，引用执行器对象的变量被声明为这三种接口类型之一，而不是执行器类类型。
+
+#### Executor接口
+Executor接口只提供了一个方法，execute，被设计为普通线程创建形式的替代品。。如果r是一个Runnable对象，e是一个Executor对象，可以将
+```java
+(new Thread(r)).start();
+```
+换为
+```java
+e.execute(r);
+```
+但是，execute的定义较不具体。第一种语句创建一个线程并立即启动。根据Executor的实现，execute可能执行相同的操作，但更有可能使用现有的一个工作线程来运行r，或者将r置于队列中等待一个工作线程变为可用。（将在线程池部分中描述工作线程。）
+
+java.util.concurrent中的执行器实现旨在充分利用更高级的ExecutorService和ScheduledExecutorService接口，尽管它们也可以与基本Executor接口一起使用。
+
+#### ExecutorService接口
+ExecutorService接口使用类似但更通用的submit方法来补充execute方法。像execute一样，submit接受Runnable对象，但也接受Callable对象，这允许任务返回一个值。 submit方法返回一个Future对象，用于检索Callable返回值并管理Callable和Runnable任务的状态。
+
+ExecutorService还提供了用于提交大型Callable对象集合的方法。最后，ExecutorService提供了许多管理执行器关闭的方法。为了支持立即关闭，任务应正确处理interrupt。
+
+#### ScheduledExecutorService 接口
+ScheduledExecutorService接口使用schedule补充其父接口ExecutorService中的方法，schedule方法在指定的延迟之后执行Runnable或Callable任务。另外，这个接口定义了scheduleAtFixedRate和scheduleWithFixedDelay，它们以定义的的间隔重复执行指定的任务。
+
+### 线程池
+java.util.concurrent中的大多数执行器实现都使用由**工作线程**（worker thread）组成的**线程池**（thread pool）。这种线程与其执行的Runnable和Callable任务分离开，并且经常用于执行多个任务。
+
+使用工作线程可以最大限度地减少线程创建时的开销。Thread对象使用大量的内存，并且在大规模应用程序中，分配和释放许多线程对象会产生显着的内存管理开销。
+
+一种常见的**线程池**类型是**固定线程池**。这种类型的线程池总是有指定数量的线程在运行;如果一个线程在它还在使用的时候不知何故被终止，则会自动被一个新的线程替换。任务通过它的内部队列被提交到线程池，每当存在比线程更多的活动任务时，多出的任务会被保存到该内部队列。
+
+固定线程池的一个重要优点是使用它的应用程序正常地降级。要理解这一点，请考虑一个Web服务器应用程序，其中每个HTTP请求由单独的线程处理。如果应用程序只是为每个新的HTTP请求创建一个新的线程，并且系统收到比它可以立即处理的更多的请求，当所有这些线程的开销超过系统的容量时，应用程序将突然停止响应所有请求。通过对可以创建的线程数量的限制，应用程序将不会尽快为HTTP请求提供服务，但它将在系统可以承受的时候尽快提供服务。
+
+一个创建使用固定线程池的执行器的简单方法是在java.util.concurrent.Executors中调用**newFixedThreadPool**工厂方法，此类还提供以下工厂方法：
+- **newCachedThreadPool**方法创建一个具有可扩展线程池的执行器。这个执行器适用于启动许多短暂任务的应用程序。
+- **newSingleThreadExecutor**方法创建一次执行一个任务的执行器。
+- 几个是上述执行器的ScheduledExecutorService版本的工厂方法。
+
+如果上述工厂方法提供的任何执行程序都不满足需求，则构造**java.util.concurrent.ThreadPoolExecutor**或**java.util.concurrent.ScheduledThreadPoolExecutor**的实例将提供其他选项。
+
+### Fork/Join
+fork/join框架是ExecutorService接口的一个实现，可以帮助利用多个处理器。它被设计用于可递归地分解成更小的部分的工作。目标是使用所有可用的处理能力来提高应用程序的性能。
+
+与任何ExecutorService实现一样，fork/join框架将任务分配到线程池中的工作线程。fork/join框架是独特的，因为它使用work-stealing算法。无事可做的工作线程可能会从仍然忙碌的其他线程中窃取任务。
+
+fork/join框架的中心是**ForkJoinPool**类，它是**AbstractExecutorService**类的扩展。 **ForkJoinPool**实现了核心的**work-stealing**算法，并且可以执行**ForkJoinTask**进程。
+
+#### 基本使用
+使用fork/join框架的第一步是编写执行工作段的代码，您的代码应类似于以下伪代码：
+```
+if (my portion of the work is small enough)
+  do the work directly
+else
+  split my work into two pieces
+  invoke the two pieces and wait for the results
+ ```
+将此代码包装在**ForkJoinTask**子类中，通常使用其更专门的类型之，即**RecursiveTask**（可返回结果）或**RecursiveAction**。
+
+在**ForkJoinTask**子类准备好后，创建表示所有要完成的工作的对象，并将其传递给**ForkJoinPool**实例的**invoke（）**方法。
+
+#### 使用示例
+为了帮助了解fork/join框架的工作原理，请考虑以下示例。假设你想模糊图像。原始的源图像由整数数组表示，其中每个整数包含单个像素的颜色值。模糊的目标图像也用与源的大小相同的整数数组表示。
+
+执行模糊是通过一次处理源数组一个像素来完成的。每个像素与其周围的像素（红色，绿色和蓝色被平均）进行平均，并将结果放到目标数组中。由于图像是一个大的数组，这个过程可能需要很长时间。您可以通过使用fork/join框架实现算法来利用多处理器系统上的并发处理。这是一个可能的实现：
+```java
+public class ForkBlur extends RecursiveAction {
+    private int[] mSource;
+    private int mStart;
+    private int mLength;
+    private int[] mDestination;
+  
+    // 处理窗口大小，应该是一个奇数.
+    private int mBlurWidth = 15;
+  
+    public ForkBlur(int[] src, int start, int length, int[] dst) {
+        mSource = src;
+        mStart = start;
+        mLength = length;
+        mDestination = dst;
+    }
+
+    protected void computeDirectly() {
+        int sidePixels = (mBlurWidth - 1) / 2;
+        for (int index = mStart; index < mStart + mLength; index++) {
+            // 计算平均值。
+            float rt = 0, gt = 0, bt = 0;
+            for (int mi = -sidePixels; mi <= sidePixels; mi++) {
+                int mindex = Math.min(Math.max(mi + index, 0),mSource.length - 1);
+                int pixel = mSource[mindex];
+                rt += (float)((pixel & 0x00ff0000) >> 16) / mBlurWidth;
+                gt += (float)((pixel & 0x0000ff00) >>  8) / mBlurWidth;
+                bt += (float)((pixel & 0x000000ff) >>  0)  / mBlurWidth;
+            }
+          
+            // 重新组装目标像素。
+            int dpixel = (0xff000000     ) | (((int)rt) << 16) |  (((int)gt) <<  8) | (((int)bt) <<  0);
+            mDestination[index] = dpixel;
+        }
+    }	
+  ...
+```
+现在实现抽象的compute()方法，它要么直接执行模糊，要么将其分为两个更小的任务。一个简单的数组长度阈值有助于确定工作是要执行还是要拆分。
+```java
+protected static int sThreshold = 100000;
+
+protected void compute() {
+    if (mLength < sThreshold) {
+        computeDirectly();
+        return;
+    }
+    
+    int split = mLength / 2;
+    
+    invokeAll(new ForkBlur(mSource, mStart, split, mDestination),
+              new ForkBlur(mSource, mStart + split, mLength - split,
+                           mDestination));
+}
+```
+如果上一个方法在RecursiveAction类的子类中，则设置在ForkJoinPool中配置要运行的任务是直接的，并且涉及以下步骤：
+1. 创建一个代表所有要完成的工作的任务。
+```java
+// 源图像像素在src中
+// 目标图像像素dst中
+ForkBlur fb = new ForkBlur(src, 0, src.length, dst);
+```
+2. 创建要运行任务的ForkJoinPoll
+```java
+ForkJoinPool pool = new ForkJoinPool();
+```
+3. 运行任务
+```java
+pool.invoke(fb);
+```
+
+对于完整的源代码，包括创建目标映像文件的一些额外的代码，请参阅ForkBlur示例。
+
+#### 标准实现
+除了使用fork/join框架来实现在多处理器系统上同时执行的任务的自定义算法（例如上一节中的ForkBlur.java示例），Java SE中有一些常用的功能，它们已经使用fork/join框架。一个这样的实现在Java SE 8中引入，它被**java.util.Arrays**类所使用，用于它的**parallelSort()**方法。这些方法类似于**sort（）**，但是通过fork/join框架来利用并发性。在多处理器系统上运行时，大型数组的并行排序比顺序排序更快。然而，这些方法如何利用fork/join框架是不在本节范围之内的。有关此信息，请参阅Java API文档。 
+
+**fork/join**框架的另一个实现由**java.util.streams**包中的方法所使用，它是为Java SE 8发行版计划的Project Lambda的一部分。有关更多信息，请参阅[“Lambda表达式”]。
+
+## 并发集合
+***
+java.util.concurrent包包含许多Java Collections Framework的添加。这些最容易被提供的集合接口分类：
+- [BlockingQueue](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/BlockingQueue.html)定义一个先进先出的数据结构，当你尝试向已满queue添加元素或从空queue中检索时，该数据结构将阻塞或超时。 
+- [ConcurrentMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html)是java.util.Map的一个子接口，它定义了一些有用的原子性操作。这些操作仅在键存在时才删除或替换键值对，或者仅在键不存在时才添加键值对。使这些操作原子化有助于避免同步问题。ConcurrentMap的标准通用实现是[ConcurrentHashMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html)，它是[HashMap](https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html)的并发模拟。
+- [ConcurrentNavigableMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentNavigableMap.html)是ConcurrentMap的一个子接口，它支持近似匹配。ConcurrentNavigableMap的标准通用实现是[ConcurrentSkipListMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentSkipListMap.html)，它是[TreeMap](https://docs.oracle.com/javase/8/docs/api/java/util/TreeMap.html)的并发模拟。
+
+所有这些集合通过在向一个集合添加元素操作与后续的访问或移除对象的操作之间建立happens-before关系，来避免了内存一致性错误。
+
+## 原子性变量
+***
+java.util.concurrent.atomic包定义了对单个变量支持原子操作的类。所有类都有get和set方法，其工作就像在volatile变量上的读写一样。也就是，在同一个变量上set与任何后续的get有一个happens-before关系。原子性compareAndSet方法也具有这些内存一致性特征，简单的原子性算术方法也适用于整数原子性变量。
+
+要看如何使用这个包，先看线程不安全的Counter类：
+```java
+class Counter {
+    private int c = 0;
+
+    public void increment() {
+        c++;
+    }
+
+    public void decrement() {
+        c--;
+    }
+
+    public int value() {
+        return c;
+    }
+
+}
+```
+使Counter避免线程干扰的一种方法是使其方法同步，如SynchronizedCounter：
+```java
+class SynchronizedCounter {
+    private int c = 0;
+
+    public synchronized void increment() {
+        c++;
+    }
+
+    public synchronized void decrement() {
+        c--;
+    }
+
+    public synchronized int value() {
+        return c;
+    }
+
+}
+```
+对于这个简单的类，同步是可以接受的解决方案。但是对于一个更复杂的类，我们可能希望避免不必要的同步的活性影响。用AtomicInteger替换int字段可以防止线程干扰，而不要求同步，如AtomicCounter：
+```java
+import java.util.concurrent.atomic.AtomicInteger;
+
+class AtomicCounter {
+    private AtomicInteger c = new AtomicInteger(0);
+
+    public void increment() {
+        c.incrementAndGet();
+    }
+
+    public void decrement() {
+        c.decrementAndGet();
+    }
+
+    public int value() {
+        return c.get();
+    }
+
+}
+```
+
+
+## ThreadLocalRandom
+***
+在JDK 7中，java.util.concurrent包含一个便捷类，**ThreadLocalRandom**，用于希望在多线程或ForkJoinTask使用随机数的应用程序。 
+
+对于并发访问，使用**ThreadLocalRandom**而不是**Math.random()**导致更少的争用，并最终产生更好的性能。 
+
+所有需要做的是调用**ThreadLocalRandom.current()**，然后调用其一个方法来检索一个随机数。这里有一个例子： 
+```java
+int r = ThreadLocalRandom.current() .nextInt(4, 77);
+```
 ***
 # 活性
 ***
@@ -595,12 +859,45 @@ public class MyWaitNotify3{
 
 ## 死锁
 ***
-死锁是两个或多个线程永远被阻塞，互相等待彼此释放锁的的情况。死锁会有至少两个锁，
-并且线程在一个同步块中尝试进入另一个同步块。例如线程1锁定A，尝试获取B锁，而线程2锁定B，尝试获取A锁，这时死锁发生了。情况如下所示：
+死锁是两个或多个线程永远被阻塞，互相等待彼此释放锁的的情况。死锁会有至少两个内部锁，并且线程在一个同步块中尝试进入另一个同步块。例如线程1持有A锁，尝试获取B锁，而线程2持有B锁，尝试获取A锁，这时死锁发生了。情况如下所示：
 ```
 Thread 1  locks A, waits for B
 Thread 2  locks B, waits for A
 ```
+举例，Alphonse和Gaston是朋友，也是礼貌的信徒。它们你有一个严格的礼貌规则是，当你向朋友鞠躬时，你必须保持鞠躬，直到你的朋友有机会回躬。不幸的是，这个规则不能排除两个朋友可能会同时相互鞠躬的可能。这个例子应用程序, Deadlock，模拟这种可能性：
+```java
+public class Deadlock {
+    static class Friend {
+        private final String name;
+        public Friend(String name) {
+            this.name = name;
+        }
+        public String getName() {
+            return this.name;
+        }
+        public synchronized void bow(Friend bower) {
+            System.out.format("%s: %s" + "  has bowed to me!%n", this.name, bower.getName());
+            bower.bowBack(this);
+        }
+        public synchronized void bowBack(Friend bower) {
+            System.out.format("%s: %s" + " has bowed back to me!%n",this.name, bower.getName());
+        }
+    }
+
+    public static void main(String[] args) {
+        final Friend alphonse = new Friend("Alphonse");
+        final Friend gaston = new Friend("Gaston");
+		
+        new Thread(new Runnable() {
+            public void run() { alphonse.bow(gaston); }
+        }).start();
+        new Thread(new Runnable() {
+            public void run() { gaston.bow(alphonse); }
+        }).start();
+    }
+}
+```
+
 死锁也可以包含两个以上的线程。这使得更难检测。以下是四个线程死锁的示例：
 ```
 Thread 1  locks A, waits for B
@@ -618,3 +915,19 @@ Transaction 1, request 2, tries to lock record 2 for update.
 Transaction 2, request 2, tries to lock record 1 for update.
 ```
 因为锁在采用自不同的请求，因此并不是提前知道给定事务所需的所有锁，很难检测或防止数据库事务中的死锁。
+
+## 饥饿与公平锁
+***
+饥饿描述了线程无法获得对共享资源的正常访问并且无法继续执行的情况。以下三个常见原因可能导致Java中线程的饥饿：
+- 具有高优先级的线程相比较低优先级的线程，占据了所有的CPU时间。
+- 线程被无限期阻塞等待进入同步块，因为其他线程一直在它之前先进入。
+- 线程无限期在等待被唤醒，因为其他线程一直在它之前被唤醒。
+
+饥饿问题的解决方案被称为公平锁，它使所有线程公平的获得执行权限。
+### 使用Lock代替同步块
+同步代码依赖于一种简单的可重入锁。这种锁很容易使用，但有很多限制。java.util.concurrent.locks包支持更复杂的锁。其中最基本的是Lock接口。
+
+Lock对象的工作非常像同步代码使用的隐式锁。
+
+
+
