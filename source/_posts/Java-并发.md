@@ -588,6 +588,35 @@ public class MyWaitNotify3{
 所以：不要对wait（）/ notify（）机制使用全局对象，字符串常量等。使用使用它的构造是唯一的对象。例如，每个MyWaitNotify3（早期部分的示例）实例都有自己的MonitorObject实例，而不是为wait（）/ notify（）调用使用空字符串。
 
 ***
+# 线程生命周期
+***
+![线程生命周期](/images/java base/thread-life.png)
+创建并运行线程：
+
+① **新建状态**(New Thread)：在Java语言中使用new操作符创建一个线程后，该线程仅仅是一个空对象，它具备类线程的一些特征，但此时系统没有为其分配资源，这时的线程处于创建状态。
+线程处于创建状态时，可通过Thread类的方法来设置各种属性，如线程的优先级(setPriority)、线程名(setName)和线程的类型(setDaemon)等。
+
+②**就绪状态**(Runnable)：使用start()方法启动一个线程后，系统为该线程分配了除CPU外的所需资源，使该线程处于就绪状态。此外，如果某个线程执行了yield()方法，那么该线程会被暂时剥夺CPU资源，重新进入就绪状态。
+
+③**运行状态**(Running)：Java运行系统通过调度选中一个处于就绪状态的线程，使其占有CPU并转为运行状态。此时，系统真正执行线程的run()方法。
+- 可以通过Thread类的isAlive方法来判断线程是否处于就绪/运行状态：当线程处于就绪/运行状态时，isAlive返回true，当isAlive返回false时，可能线程处于阻塞状态，也可能处于停止状态。
+
+④ **阻塞和唤醒线程**
+**阻塞状态**(Blocked)：一个正在运行的线程因某些原因不能继续运行时，就进入阻塞 状态。这些原因包括：
+1. 当执行了某个线程对象的sleep()等阻塞类型的方法时，该线程对象会被置入一个阻塞集内，等待超时而自动苏醒。
+2. 当多个线程试图进入某个同步区域时，没能进入该同步区域的线程会被置入锁定集，直到获得该同步区域的锁，进入就绪状态。
+3. 当线程执行了某个对象的wait()方法时，线程会被置入该对象的等待集中，知道执行了该对象的notify()方法wait()/notify()方法的执行要求线程首先获得该对象的锁。
+
+⑤**死亡状态**(Dead)：线程在run()方法执行结束后进入死亡状态。此外，如果线程执行了interrupt()或stop()方法，那么它也会以异常退出的方式进入死亡状态。
+
+终止线程的三种方法
+①使用退出标志，使线程正常退出，也就是当run方法完成后线程终止，推荐使用。
+②使用stop方法强制终止线程(这个方法不推荐使用，因为stop和suppend、resume一样，也可能发生不可预料的结果)。
+③ 使用interrupt方法中断线程。
+
+
+
+***
 # 不可变对象
 ***
 如果一个对象在创建之后状态不能改变，那么它被认为是一个不可变对象。不可变对象在并发应用程序中特别有用。由于它们不能改变状态，它们不会被线程干扰所破坏或者在不一致状态下观察到。
@@ -771,9 +800,9 @@ pool.invoke(fb);
 ## 并发集合
 ***
 java.util.concurrent包包含许多Java Collections Framework的添加。这些最容易被提供的集合接口分类：
-- [BlockingQueue](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/BlockingQueue.html)定义一个先进先出的数据结构，当你尝试向已满queue添加元素或从空queue中检索时，该数据结构将阻塞或超时。 
-- [ConcurrentMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html)是java.util.Map的一个子接口，它定义了一些有用的原子性操作。这些操作仅在键存在时才删除或替换键值对，或者仅在键不存在时才添加键值对。使这些操作原子化有助于避免同步问题。ConcurrentMap的标准通用实现是[ConcurrentHashMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html)，它是[HashMap](https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html)的并发模拟。
-- [ConcurrentNavigableMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentNavigableMap.html)是ConcurrentMap的一个子接口，它支持近似匹配。ConcurrentNavigableMap的标准通用实现是[ConcurrentSkipListMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentSkipListMap.html)，它是[TreeMap](https://docs.oracle.com/javase/8/docs/api/java/util/TreeMap.html)的并发模拟。
+- [**BlockingQueue**](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/BlockingQueue.html)定义一个先进先出的数据结构，当你尝试向已满queue添加元素或从空queue中检索时，该数据结构将阻塞或超时。 
+- [**ConcurrentMap**](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html)是java.util.Map的一个子接口，它定义了一些有用的原子性操作。这些操作仅在键存在时才删除或替换键值对，或者仅在键不存在时才添加键值对。使这些操作原子化有助于避免同步问题。ConcurrentMap的标准通用实现是[ConcurrentHashMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html)，它是[HashMap](https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html)的并发模拟。
+- [**ConcurrentNavigableMap**](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentNavigableMap.html)是ConcurrentMap的一个子接口，它支持近似匹配。ConcurrentNavigableMap的标准通用实现是[ConcurrentSkipListMap](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentSkipListMap.html)，它是[TreeMap](https://docs.oracle.com/javase/8/docs/api/java/util/TreeMap.html)的并发模拟。
 
 所有这些集合通过在向一个集合添加元素操作与后续的访问或移除对象的操作之间建立happens-before关系，来避免了内存一致性错误。
 
