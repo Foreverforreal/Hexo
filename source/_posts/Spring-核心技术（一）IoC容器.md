@@ -685,9 +685,9 @@ public class ExampleBean {
 
 </beans>
 ```
-上面的XML更简洁;然而，拼写错误会在运行时而不是设计时被发现，除非你在创建bean定义时使用支持自动属性完成的IDE（如IntelliJ IDEA或Spring Tool Suite（STS））。
+上面的XML更简洁;然而，拼写错误将在运行时而不是设计时被发现，除非你在创建bean定义时使用支持自动属性完成的IDE（如IntelliJ IDEA或Spring Tool Suite（STS））。
 
-你也可以如下配置一个java.util.Properties实例：
+你也可以如下配置一个**java.util.Properties**实例：
 ```xml
 <bean id="mappings"
     class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -701,10 +701,10 @@ public class ExampleBean {
     </property>
 </bean>
 ```
-Spring容器通过使用JavaBeans PropertyEditor机制将&lt;value/>元素内的文本转换为java.util.Properties实例。这是一个很好的捷径，而且是Spring团队赞成在value属性样式中使用嵌套的&lt;value/>元素的几个地方之一。
+Spring容器通过使用JavaBeans **PropertyEditor**机制将**&lt;value/>**元素内的文本转换为**java.util.Properties**实例。这是一个很好的捷径，而且是Spring团队赞成在value属性样式中使用嵌套的**&lt;value/>**元素的几个地方之一。
 
 #### idref元素
-idref元素只是将容器中另一个bean的id（字符串值 - 不是引用）传递给&lt;constructor-arg/>或&lt;property/>元素的错误方法。
+**idref**元素只是将容器中另一个bean的id（字符串值 - 不是引用）传递给**&lt;constructor-arg/>**或**&lt;property/>**元素的防错方式。
 ```xml
 <bean id="theTargetBean" class="..."/>
 
@@ -722,19 +722,19 @@ idref元素只是将容器中另一个bean的id（字符串值 - 不是引用）
     <property name="targetName" value="theTargetBean"/>
 </bean>
 ```
-第一种形式优于第二种形式，因为使用idref标签允许容器在部署时验证所引用的，命名的bean实际存在。在第二个变体中，不会对传递给client bean的targetName属性的值执行验证。只有当client bean被实际实例化的时候，错别字才会被发现（最可能是致命的结果）。如果client bean是一个 [原型]() bean,这种错字和它产生的异常只能在容器部署后很久才能被发现。
-> 在4.0 beans xsd中，idref元素上的local属性不再受支持，因为它不再提供超过常规bean引用的值。在升级到4.0 schema时，只需将你现有的idref local引用更改为idref bean。
+第一种形式优于第二种形式，因为使用**idref**标签允许容器在部署时验证所引用的，命名的bean实际存在。在第二个变体中，不会对传递给client bean的targetName属性的值执行验证。只有当client bean被实际实例化的时候，错误拼写才会被发现（最可能是致命的结果）。如果client bean是一个 [原型](#Bean域) bean,这种错字和它产生的异常只能在容器部署后很久才能被发现。
+> 在4.0 beans xsd中，**idref**元素上的**local**属性不再受支持，因为它不再提供超过常规bean引用的值。在升级到4.0 schema时，只需将你现有的**idref local**引用更改为**idref bean**。
 
-&lt;idref/>元素带来值一个常用的地方是在ProxyFactoryBean bean定义中AOP拦截器的配置中（至少早在Spring 2.0版本）。指定拦截器名称时使用&lt;idref/>元素可防止拼写错误。
+**&lt;idref/>**元素带来值一个常用的地方是在**ProxyFactoryBean** bean定义中AOP拦截器的配置中（至少早在Spring 2.0版本）。指定拦截器名称时使用**&lt;idref/>**元素可防止拼写错误。
 
 ### 引用其他bean（协作者）
-ref元素是&lt;constructor-arg/>或&lt;property/>定义元素中的最后一个元素。在这里，你可以将bean的指定属性的值设置为对由容器管理的另一个bean（协作者）的引用。这个被引用的bean是进行属性设置bean的依赖，并且他在属性设置前被引用bean一经请求就进行初始化（如果协作者是单例bean，它可能已经被容器初始化。）。所有引用最终都是对另一个对象的引用。范围和验证取决于你是否通过 bean, local,或parent属性指定其他对象的id/name。
+**ref**元素是**&lt;constructor-arg/>**或**&lt;property/>**定义元素中的最后一个元素。在这里，你可以将bean的指定属性的值设置为对由容器管理的另一个bean（协作者）的引用。这个被引用的bean是进行属性设置bean的依赖项，并且它在进行属性设置前被引用bean一经请求就进行初始化（如果协作者是单例bean，它可能已经被容器初始化）。所有引用最终都是对另一个对象的引用。作用域和验证取决于你是否通过 **bean**, **local**,或**parent**属性指定其他对象的id/name。
 
-通过&lt;ref/>标签的bean属性指定目标bean是最常用的形式，并允许创建对在同一容器或父容器中任何bean的引用，而不管它是否在同一个XML文件中。bean属性的值可能与目标bean的id属性相同，或者与目标bean的name属性的一个值相同。
+通过**&lt;ref/>**标签的bean属性指定目标bean是最常用的形式，并允许创建对在同一容器或父容器中任何bean的引用，而不管它是否在同一个XML文件中。bean属性的值可能与目标bean的**id**属性相同，或者与目标bean的**name**属性中的一个值相同。
 ```xml
 <ref bean="someBean"/>
 ```
-通过parent属性指定目标bean是创建对在当前容器的父容器中bean的引用。parent属性的值可能与目标bean的id属性或目标bean的name属性中的值之一相同，并且目标bean必须在当前容器的父容器中。你使用这种引用形式变体，主要在当你有层次结构的容器，并且你想要使用代理包装一个在父容器中已有的bean，这样会与父bean具有相同的名称。
+通过**parent**属性指定目标bean是创建对在当前容器的父容器中bean的引用。**parent**属性的值可能与目标bean的id属性或目标bean的name属性中的值之一相同，并且目标bean必须在当前容器的父容器中。你使用这种引用形式变体，主要是在当你有层次结构的容器，并且你想要使用代理包装一个在父容器中已有的bean，这样会与父bean具有相同的名称。
 ```xml
 <!-- 在父上下文中 -->
 <bean id="accountService" class="com.foo.SimpleAccountService">
@@ -742,19 +742,18 @@ ref元素是&lt;constructor-arg/>或&lt;property/>定义元素中的最后一个
 </bean>
 ```
 ```xml
-<!-- 在子（后裔）上下文中 -->
-<bean id="accountService" <!-- bean名称与父bean相同 -->
-    class="org.springframework.aop.framework.ProxyFactoryBean">
+<!-- 在子（后代）上下文中 -->
+<bean id="accountService" class="org.springframework.aop.framework.ProxyFactoryBean"><!-- bean名称与父bean相同 -->
     <property name="target">
         <ref parent="accountService"/> <!-- 注意我们如何引用父bean -->
     </property>
     <!-- 在这里按需要插入其他配置和依赖 -->
 </bean>
 ```
-> 在4.0 beans xsd中，idref元素上的local属性不再受支持，因为它不再提供超过常规bean引用的值。在升级到4.0 schema时，只需将你现有的idref local引用更改为idref bean。
+> 在4.0 beans xsd中，**idref**元素上的**local**属性不再受支持，因为它不再提供超过常规bean引用的值。在升级到4.0 schema时，只需将你现有的**idref local**引用更改为**idref bean**。
 
 ### 内部bean
-一个在&lt;property/>或&lt;constructor-arg/>元素内部的&lt;bean/>元素定义了一个所谓的内部bean。
+一个在**&lt;property/>**或**&lt;constructor-arg/>**元素内部的**&lt;bean/>**元素定义了一个所谓的内部bean。
 ```xml
 <bean id="outer" class="...">
     <!-- 相比使用一个目标bean的引用，可以只是内联定义这个目标bean -->
@@ -766,7 +765,7 @@ ref元素是&lt;constructor-arg/>或&lt;property/>定义元素中的最后一个
     </property>
 </bean>
 ```
-一个内部bean定义不需要定义的id或name;如果指定的话，容器也不使用这样的值作为标识符。容器也会忽略创建的scope标志：内部bean总是匿名的，并且它们总是外部bean而创建。不可能将注入内部bean到除闭包bean外的其他协作bean中，也不可能独立访问它们。
+一个内部bean定义不需要定义的id或name;如果指定的话，容器也不使用这样的值作为标识符。容器也会忽略创建的**scope**标志：内部bean总是匿名的，并且它们总是外部bean而创建。不可能将注入内部bean到除闭包bean外的其他协作bean中，也不可能独立访问它们。
 
 作为一个个别案例，有可能从一个自定义域中接收销毁回调，例如，对一个包含在单例bean中的request-scoped内部bean：内部Bean实例的创建将绑定到其包含的bean上但是销毁回调允许它参与到request scope的生命周期。这不是常见场景；内部bean通常只是分享在它们的包含bean的域内。
 ### 集合
@@ -804,7 +803,7 @@ ref元素是&lt;constructor-arg/>或&lt;property/>定义元素中的最后一个
     </property>
 </bean>
 ```
-*Map的key和value的值，或set的值，也可以是以下任意一元素*
+*Map的 key 和 value 的值，或 set 的值，也可以是以下任意一元素*
 ```
 bean | ref | idref | list | set | map | props | value | null
 ```
