@@ -21,7 +21,7 @@ strong {
 }
 </style>
 
-[原文链接](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#validation)
+[原文链接](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#validation)
 ***
 # 简介
 ***

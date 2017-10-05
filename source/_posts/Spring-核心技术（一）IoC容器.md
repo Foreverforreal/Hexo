@@ -22,46 +22,46 @@ strong {
 }
 </style>
 
-[原文链接](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#beans)
+[原文链接](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#beans)
 ***
 # Spring IoC容器和bean介绍
 ***
-本章涵盖了控制反转-*Inversion of Control*  （IoC）原理的Spring框架实现。IoC也被称为依赖注入-*dependency injection* （DI）。它是一个通过对象定义它们依赖的过程，也就是它们使用的其他对象，这些依赖只能通过构造函数参数、工厂方法的参数，或者已经被构建或由工厂方法返回的对象实例上设置的属性这些形式。。然后，容器在创建bean时注入这些依赖项。这个过程从根本上反转了bean本身通过直接构造类，或者使用一个如Service Locator模式的机制对依赖实例化或定位的控制，因此命名控制反转（IoC）。
+本章涵盖了控制反转-*Inversion of Control*  （IoC）原理的Spring框架实现。IoC也被称为依赖注入-*dependency injection* （DI）。它是一个通过对象定义它们的依赖项（也就是它们使用的其他对象）的过程，这些依赖只能通过构造方法参数、工厂方法的参数，或者已经被构建或由工厂方法返回的对象实例上设置的属性这些形式。然后，容器在创建bean时注入这些依赖项。这个过程从根本上反转了bean本身通过直接构造类，或者使用一个如Service Locator模式的机制对依赖实例化或定位的控制，因此命名控制反转（IoC）。
 <!-- more -->
-**org.springframework.beans** 和 **org.springframework.context** 包是Spring框架IoC容器的基础。BeanFactory接口提供了一个能够管理任何类型对象的高级配置机制。ApplicationContext是BeanFactory的一个子接口。它添加与Spring AOP功能的简单集成；消息资源处理（在国际化中使用），事件发布；以及应用层特定的上下文，例如用于Web应用程序的WebApplicationContext。
+**org.springframework.beans**和**org.springframework.context**包是Spring框架IoC容器的基础。**BeanFactory**接口提供了一个能够管理任何类型对象的高级配置机制。**ApplicationContext**是**BeanFactory**的一个子接口。它添加与Spring AOP功能的简单集成；消息资源处理（在国际化中使用），事件发布；以及应用层特定的上下文，例如用于Web应用程序的**WebApplicationContext**。
 
-简而言之，BeanFactory提供配置框架和基本功能，ApplicationContext添加了更多的企业特定功能。ApplicationContext是BeanFactory的完整超集,本章仅用于Spring的IoC容器的描述。有关使用BeanFactory而不是ApplicationContext的更多信息，请参阅第7.16节“BeanFactory"。
+简而言之，**BeanFactory**提供配置框架和基本功能，**ApplicationContext**添加了更多的企业特定功能。**ApplicationContext**是**BeanFactory**的完整超集,本章仅用于Spring的IoC容器的描述。有关使用BeanFactory而不是ApplicationContext的更多信息，请参阅第7.16节“BeanFactory"。
 
-在Spring中，构成应用程序主干并由Spring IoC容器管理的对象称为bean。bean是由Spring IoC容器实例化，组装和以其他方式管理的对象。不然，bean简单只是应用程序中的许多对象之一。Bean和它们之间的依赖关系反映在容器使用的配置元数据中。
+在Spring中，构成应用程序主干并由Spring IoC容器管理的对象称为bean。bean是由Spring IoC容器实例化，组装和以其他方式管理的对象。否则，bean简单只是应用程序中的许多对象之一。Bean以及bean之间的依赖关系反映在容器使用的配置元数据中。
 
 ***
 # 容器概述
 ***
-org.springframework.context.ApplicationContext接口表示Spring IoC容器，并且负责实例化，配置和组装上述的bean。容器通过读取配置元数据获取有关实例化，配置和组合的对象的说明。配置元数据用XML，Java注解或Java代码表示。它允许你表示组成应用程序的对象以及这些对象之间丰富的相互依赖关系。
+**org.springframework.context.ApplicationContext**接口表示Spring IoC容器，并且负责实例化，配置和组装上述的bean。容器通过读取配置元数据获取有关实例化，配置和组装的对象的说明。配置元数据用XML，Java注解或Java代码表示。它允许你表示组成应用程序的对象以及这些对象之间丰富的相互依赖关系。
 
-ApplicationContext接口的几个实现与Spring一起提供。在独立应用程序中，通常创建一个ClassPathXmlApplicationContext或FileSystemXmlApplicationContext的实例。虽然XML已经称为定义配置元数据的传统格式，但你还可以指示容器使用Java注解或代码作为元数据格式，只需要通过提供少量的XML配置来声明开启对这些额外元数据格式的支持。
+Spring还提供了**ApplicationContext**接口的几个实现。在独立应用程序中，通常创建一个**ClassPathXmlApplicationContext**或**FileSystemXmlApplicationContext**的实例。虽然XML已经成为定义配置元数据的惯用格式，但你还可以指示容器使用Java注解或代码作为元数据格式，只需要通过提供少量的XML配置来声明开启对这些额外元数据格式的支持。
 
-在大多数应用程序场景中，显式的用户代码不需要实例化一个或多个Spring IoC容器的实例。比如，在一个web应用程序情景中，在应用程序的web.xml文件中的一个简单的八行（或更多）的样板web描述XML通常就足够了（查看“Web应用程序的便捷ApplicationContext实例化"）。如果你使用Spring Tool Suite Eclipse-powered开发环境，则可以通过鼠标点击或击键轻松创建该样板设置。
+在大多数应用程序场景中，实例化一个或多个Spring IoC容器的实例不需要显式的用户代码。比如，在一个web应用程序情景中，在应用程序的web.xml文件中的一个简单的八行（或更多）的样板web描述XML通常就足够了（查看“Web应用程序的便捷ApplicationContext实例化"）。如果你使用Spring Tool Suite Eclipse-powered开发环境，则可以通过鼠标点击或击键轻松创建该样板设置。
 
-下图是Spring如何工作的高级视图。你的应用程序类与配置元数据相结合，以便在创建和初始化ApplicationContext之后，你有一个完全配置和可执行的系统或应用程序。
+下图是Spring如何工作的高级视图。你的应用程序类与配置元数据相结合，以便在创建和初始化**ApplicationContext**之后，有一个完全配置和可执行的系统或应用程序。
 ![Spring IoC容器](/images/spring/container-magic.png.pagespeed.ce.-0JjaOG5As.png)
 ## 配置元数据
 ***
-如前面的图标所展示，Spring IoC容器消耗一种形式的配置元数据；这个配置元数据表示你作为一个应用程序开发者如何告诉Spring容器去实例化，配置并且组装你程序中的对象。
+如前面的图标所展示，Spring IoC容器消耗一种形式的配置元数据；这个配置元数据表示作为应用程序开发者如何告诉Spring容器去实例化，配置并且组装你程序中的对象。
 
 配置元数据传统上由一个简单且直观的XML格式提供，这是本章用来传达Spring IoC容器的关键概念和特性大多数使用的方式。
 
->基于XML的元数据不是唯一允许的配置元数据形式。Spring IoC容器本身与实际写入此配置元数据的格式完全分离。这些天，很多开发人员为他们的Spring应用程序选择基于Java的配置。
+>基于XML的元数据不是唯一允许的配置元数据形式。Spring IoC容器本身与实际写入此配置元数据的格式完全分离。近来，很多开发人员为他们的Spring应用程序选择基于Java的配置。
 
 有关使用Spring容器的其他形式的元数据的信息，请参阅：
 - [基于注解的配置](#基于注解的容器配置)：Spring 2.5引入了基于注解的配置元数据的支持。
 - [基于Java的配置](#基于Java的容器配置)：从Spring 3.0开始，Spring JavaConfig项目提供的许多功能成为核心Spring框架的一部分。因此，你可以使用Java而不是XML文件来定义应用程序类外部的bean。要使用这些新功能，请参阅@Configuration，@Bean，@Import和@DependsOn注解。
 
-Spring配置由容器必须管理的至少一个和通常多个bean定义组成。基于XML的配置元数据显式在顶级&lt;beans/>元素内bean是以&lt;bean/>元素的形式配置。Java配置通常在@Configuration类中使用@Bean注解方法。
+Spring配置由必须是容器管理的一个但通常是多个bean定义组成。基于XML的配置元数据在顶级元素**&lt;beans/>**内展示这些配置为**&lt;bean/>**元素的bean。基于Java配置通常在**@Configuration**类中使用**@Bean**注解。
 
 这些bean定义对应于构成应用程序的实际对象。通常，你定义服务层对象，数据访问对象（DAO），表示对象（如Struts Action实例），基础架构对象（如Hibernate SessionFactories，JMS Queues等）。通常，在容器中不配置细粒度的域对象，因为通常由DAO和业务逻辑来负责创建和加载这些域对象。但是，你可以使用Spring与AspectJ的集成来配置在IoC容器的控制之外创建的对象。请参阅[使用AspectJ对Spring进行依赖注入域对象]()。
 
-以下示例显式了基于XML的配置元数据的基本结构：
+以下示例显示了基于XML的配置元数据的基本结构：
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -81,18 +81,18 @@ Spring配置由容器必须管理的至少一个和通常多个bean定义组成�
 
 </beans>
 ```
-id属性是用于标识单个bean定义的字符串。class属性定义bean的类型，并使用完全限定的类名。id属性的值指的是合作的对象。用于引用协作对象的XML在此示例中未显式;有关详细信息，请参阅[依赖]()。
+**id**属性是用于标识单个bean定义的字符串。**class**属性定义bean的类型，并使用完全限定的类名。id属性的值指的是相互协作的对象。引用协作对象的XML在此示例中没有展示;有关详细信息，请参阅[依赖](#依赖)。
 
 ## 实例化容器
 ***
-实例化一个Spring IoC容器是直观的。提供给ApplicationContext构造函数的位置路径或路径实际上是资源字符串，这允许容器从各种外部资源（如本地文件系统），从Java CLASSPATH等中加载配置元数据。
+实例化一个Spring IoC容器是直观的。提供给**ApplicationContext**构造方法的本地路径或路径上是实际资源字符串，这允许容器从各种外部资源（如本地文件系统），或从从Java **CLASSPATH**等中加载配置元数据。
 ```java
 ApplicationContext context =
     new ClassPathXmlApplicationContext(new String[] {"services.xml", "daos.xml"});
 ```
 > 在了解Spring的IoC容器之后，你可能想要了解更多有关Spring Resource抽象的信息，如“[资源]()"中所述，它提供了一种从URI语法中定义的位置读取InputStream的便捷机制。特别地，Resource路径用于构建应用程序上下文，如第8.7节“[应用程序上下文和资源路径]()"中所述。
 
-下面示例展示了服务层对象（services.xml）配置文件：
+下面示例展示了服务层对象（**services.xml**）配置文件：
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -112,7 +112,7 @@ ApplicationContext context =
 
 </beans>
 ```
-下面示例展示了数据访问对象dao.xml文件：
+下面示例展示了数据访问对象**dao.xml**文件：
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -133,12 +133,12 @@ ApplicationContext context =
 
 </beans>
 ```
-在前面的示例中，服务层由类PetStoreServiceImpl和两个数据访问对象类型为JpaAccountDao和JpaItemDao（基于JPA对象/关系映射标准）组成。property name元素是指JavaBean属性的名称，而ref元素是指另一个bean定义的名称。id和ref元素之间的这种链接表示协作对象之间的依赖关系。有关配置对象的依赖关系的详细信息，请参阅[依赖]()。
+在前面的示例中，服务层由类PetStoreServiceImpl和两个数据访问对象类型为JpaAccountDao和JpaItemDao（基于JPA对象/关系映射标准）组成。**property name**元素是指JavaBean属性（property）的名称，而**ref**元素是指另一个bean定义的名称。**id**和**ref**元素之间的这种链接表示协作对象之间的依赖关系。有关配置对象的依赖关系的详细信息，请参阅[依赖]()。
 
 ### 编写基于XML的配置元数据
-让bean定义跨越多个XML文件是有用的。每个单独的XML配置文件通常表示你的体系结构中的逻辑层或模块。
+让bean定义分布在多个XML文件中是有意义的。每个单独的XML配置文件通常表示你的体系结构中的逻辑层或模块。
 
-你可以使用ApplicationContext构造函数从所有这些XML片段中加载bean定义。如上一节所示那样，构造函数接受多个**Resource**位置。或者，使用一个或多个出现的<import />元素从另一个文件加载bean定义。例如：
+你可以使用**ApplicationContext**构造方法从所有这些XML片段中加载bean定义。如上一节所示那样，构造方法接收多个**Resource**位置。或者，使用一个或多个**&lt;import />**元素从其他文件加载bean定义。例如：
 ```xml
 <beans>
     <import resource="services.xml"/>
@@ -149,12 +149,12 @@ ApplicationContext context =
     <bean id="bean2" class="..."/>
 </beans>
 ```
-在上述示例中，外部定义的bean从三个文件中加载：services.xml，messageSource.xml和themeSource.xml。所有的位置路径是相对于做导入操作的定义文件，所以services.xml必须在与导入的文件相同的目录或类路径位置，而messageSource.xml和themeSource.xml必须位于导入文件位置下的resources位置中。<font color= "#1469b3">如你看到的，一个前置的斜杠被忽略，但是鉴于这些路径是相对的，所以最好不要使用斜杠</font>。被导入文件的内容包括顶级&lt;beans />元素,它必须是根据Spring Schema有效的XML bean定义文件。
+在上述示例中，外部定义的bean从三个文件中加载：**services.xml**，**messageSource.xml**和**themeSource.xml**。所有的位置路径是相对于执行导入操作的定义文件路径，所以**services.xml**必须与执行导入文件在相同的目录或类路径位置下，而**messageSource.xml**和**themeSource.xml**必须位于执行导入文件位置下的resources位置中。<font color= "#1469b3">如你所见，前置的斜杠被忽略，但是鉴于这些路径都是相对的，所以最好不要使用斜杠</font>。被导入文件的内容包括顶级**&lt;beans/>**元素,它必须是依据Spring Schema的有效XML bean定义文件。
 
-> 这有可能但是不推荐，使用一个相对"../"路径引用上级目录的文件。这样做会创建对当前应用程序之外的文件的依赖。特别是，这个引用不推荐用于“classpath："URL（例如“classpath：../ services.xml"），运行时解析过程选择“最近"类路径根，然后查看其父目录。Classpath配置的更改可能会导致选择一个不同的，不正确的目录。     
-你可以一直使用完全限定的资源位置而不是性对路径：比如， "file:C:/config/services.xml" 或 "classpath:/config/services.xml"。然而，请注意，你将应用程序的配置与特定的绝对位置相耦合在一起。通常最好与这些绝对路径保持一个间接关联，比如，通过 "${…}" 占位符在运行时期解析JVM系统属性
+> 这是可行，但是不推荐使用一个相对"../"路径引用上级目录的文件。这样做会创建对当前应用程序之外的文件的依赖。特别是，这个引用不推荐用于“classpath："URL（例如“classpath：../ services.xml"），运行时解析过程选择“最近"根类路径，然后再查看其父目录。Classpath配置的更改可能会导致选择一个不同的，不正确的目录。     
+你可以一直使用完全限定的资源位置而不是相对路径：比如， "file:C:/config/services.xml" 或 "classpath:/config/services.xml"。然而，请注意，你将应用程序的配置与特定的绝对位置相耦合在一起。通常最好与这些绝对路径保持一个间接关联，比如，通过 "${…}" 占位符在运行时期解析JVM系统属性
 
-import指令是由beans命名空间本身提供的一个功能。Spring提供的一些XML命名空间中可以使用除纯bean定义之外的更多配置功能，例如。 “context"和“util"命名空间。
+import指令是由**beans**命名空间本身提供的一个功能。Spring提供的一些XML命名空间中可以使用除纯bean定义之外的更多配置功能，例如。 **“context"**和**“util"**命名空间。
 
 ### Groovy Bean定义DSL
 作为外部配置元数据的另一个例子，bean定义也可以在Spring的Groovy Bean Definition DSL中表示，如Grails框架所知。通常，这种配置将存在一个“.groovy"文件中，结构如下：
@@ -198,28 +198,28 @@ List<String> userList = service.getUsernameList();
 ```java
 ApplicationContext context = new GenericGroovyApplicationContext("services.groovy", "daos.groovy");
 ```
-最灵活的变体是GenericApplicationContext与reader委托组合，例如与XML文件的XmlBeanDefinitionReader：
+最灵活的变体是**GenericApplicationContext**与**reader**委托组合，例如与XML文件的**XmlBeanDefinitionReader**：
 ```java
 GenericApplicationContext context = new GenericApplicationContext();
 new XmlBeanDefinitionReader(context).loadBeanDefinitions("services.xml", "daos.xml");
 context.refresh();
 ```
-或者为Groovy文件使用GroovyBeanDefinitionReader 
+或者为Groovy文件使用**GroovyBeanDefinitionReader**
 ```java
 GenericApplicationContext context = new GenericApplicationContext();
 new GroovyBeanDefinitionReader(context).loadBeanDefinitions("services.groovy", "daos.groovy");
 context.refresh();
 ```
-这样的reader代理可以在相同的ApplicationContext中进行混合和匹配，从不同的配置源读取bean定义，如果需要的话。
+这样的reader委托可以在相同的**ApplicationContext**中进行混合和匹配，从不同的配置源读取bean定义，如果需要的话。
 
-然后你可以使用getBean来获取你的bean实例。AApplicationContext接口还有其他一些获取bean的方法，但理想情况下你的应用程序代码应该从不会使用到它们。实际上，你的应用程序代码根本不应该调用getBean()方法，因此根本不需要依赖Spring API。例如，Spring与Web框架的集成为各种Web框架组件（如controller和JSF-managed bean）提供依赖注入，允许你在指定bean上通过元数据声明一个依赖（例如自动装配注解）
+然后你可以使用**getBean**来获取你的bean实例。**ApplicationContext**接口还有其他一些获取bean的方法，但理想情况下你的应用程序代码应该从不会使用到它们。实际上，你的应用程序代码根本不应该调用**getBean()**方法，因此根本不需要依赖Spring API。例如，Spring与Web框架的集成为各种Web框架组件（如controller和JSF-managed bean）提供依赖注入，允许你在指定bean上通过元数据声明一个依赖（例如自动装配注解）
 
 ***
 # Bean概述
 ***
-Spring IoC容器管理一个或多个bean。这些bean是使用你提供给容器的配置元数据创建的，例如，以XML <bean />定义的形式。
+Spring IoC容器管理一个或多个bean。这些bean是使用你提供给容器的配置元数据创建的，例如，以XML **&lt;bean />**定义的形式。
 
-在容器本身内，这些bean定义以BeanDefinition对象表示，它包含了以下元数据（以及其他信息）：
+在容器本身内，这些bean定义以**BeanDefinition**对象表示，它包含了以下元数据（以及其他信息）：
 
 - 一个包完全限定类名称：通常是要定义的bean的实际实现类。
 - Bean行为配置元素，它说明bean应该在容器（作用域，生命周期回调等）中的行为。
@@ -234,66 +234,68 @@ Spring IoC容器管理一个或多个bean。这些bean是使用你提供给容�
 |name|3.1[“命名bean"](#命名bean)
 |scope|5 [“Bean域"](#Bean域)
 |constructor arguments|4.1[“依赖注入"](#依赖注入)
-|properties|3.1[“依赖注入"](#依赖注入)
+|properties|4.1[“依赖注入"](#依赖注入)
 |autowiring mode|4.5[“自动装配协作者"](#自动装配协作者)
 |lazy-initialization mode|4.4[“懒加载bean"](#懒加载bean)
-|initialization method|the section called “Initialization callbacks"
-|destruction method|the section called “Destruction callbacks"
+|initialization method|6.11[“初始化回调"](#初始化回调)
+|destruction method|6.12 [“销毁回调"](#销毁回调)
 
-除了包含有关如何创建特定bean的信息的bean定义之外，ApplicationContext的实现还允许用户注册在容器外创建的现有对象。这是通过访问ApplicationContext的getBeanFactory()方法获取BeanFatory，这个方法返回BeanFactory的实现DefaultListableBeanFactory。DefaultListableBeanFactory通过registerSingleton(..)和 registerBeanDefinition(..)方法支持这个注册。然而，通常应用程序仅使用通过元数据bean定义定义的bean。
+除了包含有关如何创建特定bean的信息的bean定义之外，**ApplicationContext**的实现还允许用户注册在容器外创建的现有对象。这是通过访问ApplicationContext的**getBeanFactory()**方法获取BeanFatory，这个方法返回BeanFactory的实现**DefaultListableBeanFactory**。**DefaultListableBeanFactory**通过**registerSingleton(..)**和 **registerBeanDefinition(..)**方法支持这种注册。然而，通常应用程序仅使用通过元数据bean定义定义的bean。
 
-> Bean元数据和手动提供的单例实例需要尽早注册，以便容器在自动装配和其他内省步骤期间正确地对其进行推理。然而在某种程度上也支持覆盖已有的元数据和单例实例，在运行时期新的bean注册（同时实时访问工厂）是不被正式支持的，并且可能导致bean容器中的并发访问异常和/或不一致的状态。
+> Bean元数据和手动提供的单例实例需要尽早注册，以便容器在自动装配和其他内省步骤期间正确地推断它们。然而在某种程度上也支持覆盖已有的元数据和单例实例，在运行时期新的bean注册（同时实时访问工厂）是不被正式支持的，并且可能导致bean容器中的并发访问异常和/或不一致的状态。
 
 ## 命名bean
 ***
 每个bean都有一个或多个标识符。这些标识符在托管该bean的容器中必须是唯一的。一个bean通常只有一个标识符，但是如果它需要不止一个的话，额外的可以被认为是别名。
 
-在基于XML配置元数据，你使用id和/或name属性来指定bean的标识符。id属性允许你指定一个id。通常这些名称是字母数字（'myBean'，'fooService'等），但也可能包含特殊的字符。如果你想要向bean引入其他别名，你可以在name属性中指定它们，并用逗号（，），分号（;）或空白来分隔。作为一个历史记录，在Spring 3.1之前的版本中，id属性被定义为一个xsd:ID类型，它限制了可能的字符。从3.1开始，它被定义为一个xsd:string类型。注意容器依然强制bean id的唯一性，尽管不再是XML解析。
+在基于XML配置元数据，你使用**id**和/或**name**属性来指定bean的标识符。**id**属性允许你指定一个id。通常这些名称是字母数字（'myBean'，'fooService'等），但也可能包含特殊的字符。如果你想要向bean引入其他别名，你可以在**name**属性中指定它们，并用逗号（**,**），分号（**;**）或**空白**来分隔。作为一个历史说明，在Spring 3.1之前的版本中，**id**属性被定义为一个**xsd:ID**类型，它限制了可能的字符。从3.1开始，它被定义为一个**xsd:string**类型。注意容器依然强制bean id的唯一性，尽管不再通过XML解析。
 
-你不需要为bean提供名称或ID。如果没有明确提供名称或ID，容器将为该bean生成唯一的名称。但是，如果要通过名称引用该bean，通过使用ref元素或 Service Locator样式查找，你必须提供一个名称。不提供名称的意图与使用 [内部bean](#内部bean)和自动装配依赖有关。
+你不需要为bean提供name或id。如果没有明确提供name或id，容器将为该bean生成唯一的名称。但是，如果要通过名称引用该bean，通过使用**ref**元素或 Service Locator样式查找，你必须提供一个名称。如果不提供名称，则可能与使用 [内部bean](#内部bean)和[自动装配协作者](#自动装配协作者)有关。
 
 <div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">**bean命名惯例**   
 命名bean时的惯例是使用标准Java用于实例字段命名的惯例。也就是，bean名称以一个小写字母开始，后面是是驼峰式命名。这样命名的示例是（不带引号）"accountManager"，"accountService"，"userDao"等等。      
 一致的bean命名使你的配置更容易阅读和理解，并且如果你使用Spring AOP ，在通过名称将advice应用到到一组bean时，这会非常有帮助。
 </div> 
 
-> 在类路径中通过组件扫描，Spring会按照上述规则为未命名组件生成bean名称：实质上是采用简单类名称，并将它的第一个字母转换为小写。然而，在（异常）特殊情况下，如果有多个字符，并且第一个和第二个字符都是大写字母，则原始大写将被保留。这些与java.beans.Introspector.decapitalize（也是这里Spring使用的）定义的规则相同。
+> 在类路径中通过组件扫描，Spring会按照上述规则为未命名组件生成bean名称：实质上是采用简单类名称，并将它的第一个字母转换为小写。然而，在（异常）特殊情况下，如果有多个字符，并且第一个和第二个字符都是大写字母，则原始大写将被保留。这些与**java.beans.Introspector.decapitalize**（也是这里Spring使用的）定义的规则相同。
 
 
 ### 在bean定义外为bean起别名      
-在bean定义本身中，你可以通过使用由id属性指定的最多一个名称和在name属性中任意数量的其他名称，组合来为bean提供多个名称。这些名称可以是同一个bean的等价别名，并且在一些情况下有用，例如允许应用程序中的每个组件通过使用指定给该组件本身的bean名称来引用一个公共依赖。
+在bean定义本身中，你可以通过使用由**id**属性指定的最多一个名称和在**name**属性中任意数量的其他名称，组合来为bean提供多个名称。这些名称可以是同一个bean的等价别名，并且在一些情况下有用，例如允许一个应用程序中的每个组件通过使用指定给该组件本身的bean名称来引用一个公共依赖。
 
-但是在bean实际定义的地方指定它的所有别名并不是总是足够的。有时需要为一个在其他地方定义的bean引入一个别名。这在一个大型系统中通常是这样，这样的系统它的配置被分隔在每个子系统中，每一个子系统都有它自己的一系列对象定义。在基于XML的配置元数据中，你可以使用&lt;alias>元素来完成此操作。
+但是在实际定义bean的地方指定它的所有别名并不总是足够的。有时需要为一个在其他地方定义的bean引入一个别名。这在大型系统中通常会遇到，因为这样的系统的配置被分隔在每个子系统中，每一个子系统都有它自己的一系列对象定义。在基于XML的配置元数据中，你可以使用**&lt;alias>**元素来完成此操作。
 ```xml
 <alias name="fromName" alias="toName"/>
 ```
-在这个情景中，在相同容器中一个名称为fromName的bean，也可能在使用这个别名定义后，可以以toName引用。
+在这种情况下，在相同容器中一个名称为fromName的bean，也可能在使用这种别名定义后，以toName引用。
 
-例如，子系统A的配置元数据可能通过名称subsystemA-dataSource引用一个DateSource。子系统B的配置元数据可能通过名称subsystemB-dataSource引用一个DateSource。当使用这两个子系统构成主程序，主程序通过名称myApp-dataSource引用这个DataSource。要使所有三个名称都引用相同的对象，你向MyApp配置元数据中添加以下别名定义：
+例如，子系统A的配置元数据可能通过名称**subsystemA-dataSource**引用一个DateSource。子系统B的配置元数据可能通过名称**subsystemB-dataSource**引用一个DateSource。当使用这两个子系统构成主程序，主程序通过名称**myApp-dataSource**引用这个**DataSource**。要使所有三个名称都引用相同的对象，你向MyApp配置元数据中添加以下别名定义：
 ```xml
 <alias name="subsystemA-dataSource" alias="subsystemB-dataSource"/>
 <alias name="subsystemA-dataSource" alias="myApp-dataSource" />
 ```
 现在，每个组件和主应用程序可以通过唯一的名称来引用dataSource，并保证不会与任何其他定义（有效创建命名空间）冲突，但它们引用同一个bean。
 
+> 如果使用Java配置，可以使用**@Bean**注解来提供别名，详见第12.3节[“使用@Bean注解”](#使用@Bean注解)。
+
 ## 实例化bean
 ***
 bean定义本质上是创建一个或多个对象的配方。当询问时，容器会查看命名bean的配方，并使用由该bean定义封装的配置元数据创建（或获取）实际对象。
 
-如果使用基于XML的配置元数据，则可以在&lt;bean/>元素的class属性中指定要实例化的对象的类型（或类）。class属性（attribute），在内部是BeanDefinition实例上的Class属性（property），通常是必须的。你可以通过以下两种方式之一使用Class属性：
+如果使用基于XML的配置元数据，则可以在**&lt;bean/>**元素的**class**属性中指定要实例化的对象的类型（或类）。**class**属性（attribute），在内部是**BeanDefinition**实例上的**Class**属性（property），通常是强制必须的。你可以通过以下两种方式之一使用**Class**属性：
 - 通常，在容器本身通过反射调用它的构造器直接创建bean的情况下，指定被构建的bean类，这与Java代码使用new操作符有些等同。
-- 要指定一个实际的类，它包含了会被调用来创建对象的静态工厂方法，在这种不常见的情况下，容器会在一个类上调用静态工厂方法来创建一个bean。从调用静态工厂方法返回的对象类型可能完全是同一个类或另一个类。
+- 指定一个实际的类，它包含了会被调用来创建对象的静态工厂方法，在这种不常见的情况下，容器会在一个类上调用静态工厂方法来创建一个bean。从调用静态工厂方法返回的对象类型可能完全是同一个类或另一个类。
 
-<div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">**内部类名称** 如果你校内概要为一个静态嵌套类配置一个bean定义，你必须使用嵌套类的二进制名称。    
+<div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">**内部类名称** 如果要为静态嵌套类配置bean定义，则必须使用嵌套类的二进制名称。    
 比如，如果你在com.example包有一个类叫Foo，并且这个Foo类有一个静态嵌套类叫Bar，那么在bean定义上'class'的值会是...    
 **com.example.Foo$Bar**
-注意，在名称中使用$字符将外部类名称与嵌套类名称分隔开。
+注意，在名称中使用**$**字符将外部类名称与嵌套类名称分隔开。
 </div>
 
-### 使用构造函数实例化
-当通过构造函数方法创建一个bean时，所有普通类都可以使用并与Spring兼容。也就是说，正在开发的类不需要实现任何特定的接口或以特定方式编码。只需指定bean类即可。然而，根据为这个指定bean所使用的IoC类型，你可能需要一个默认（空）的构造函数。
+### 使用构造方法实例化
+当通过构造方法方法创建一个bean时，所有普通类都可以使用并与Spring兼容。也就是说，正在开发的类不需要实现任何特定的接口或以特定方式编码。只需指定bean类即可。然而，根据为这个指定bean所使用的IoC类型，你可能需要一个默认（空）的构造方法。
 
-Spring IoC容器几乎可以管理你想要管理的任何类;它不限于只管理真正的JavaBeans。大多数Spring用户喜欢实际的JavaBeans，它只有一个默认（无参）构造函数和在容器中属性之后仿照的适当的setter和getter。你还可以在容器中拥有更多异国情调的非Bean风格的类。例如，如果你需要使用绝对不遵守JavaBean规范的旧版连接池，那么Spring也可以管理它。
+Spring IoC容器几乎可以管理你想要管理的任何类;它不限于只管理真正的JavaBeans。大多数Spring用户喜欢实际的JavaBeans，它只有一个默认（无参）构造方法和容器中的属性（properties）之后建立适当的setter和getter。。你还可以在容器中有更多别样情调的非Bean风格的类。例如，如果你需要使用完全不遵守JavaBean规范的旧版连接池，那么Spring也可以管理它。
 
 使用基于XML配置元数据，你可以如下指定你的bean类：
 ```xml
@@ -301,12 +303,12 @@ Spring IoC容器几乎可以管理你想要管理的任何类;它不限于只管
 
 <bean name="anotherExample" class="examples.ExampleBeanTwo"/>
 ```
-关于为构造函数提供参数（如果需要的话）和在对象构建后设置对象实例属性的机制更多的信息，参阅[“注入依赖"](#注入依赖)
+关于为构造方法提供参数（如果需要的话）和在对象构建后设置对象实例属性的机制更多的信息，参阅[“注入依赖"](#注入依赖)
 
 ### 使用静态工厂方法实例化
-当你使用一个静态工厂方法创建一个bean定义，你使用class属性来指定包含这个静态工厂方法的类，并且使用一个名为factory-method的属性指定这个工厂方法本身。你应该可以调用此方法（随后可以使用可选参数），并返回一个活动对象，随后将其视为通过构造函数创建的对象。这种bean定义的一个用途是在旧代码中调用静态工厂。
+当你使用一个静态工厂方法创建一个bean定义，你使用**class**属性来指定包含这个静态工厂方法的类，并且使用一个名为**factory-method**的属性指定这个工厂方法本身。你应该可以调用此方法（随后可以使用可选参数），并返回一个活动对象，随后将其视为通过构造方法创建的对象。这种bean定义的一个用途是在旧代码中调用静态工厂。
 
-下面的bean定义指定这个bean会被通过调用一个工厂方法来创建。这个定义没有指定返回对象的类型（类），只指定了包含此工厂方法的类。在这个例子中，createInstance()方法必须是静态方法。
+下面的bean定义指定这个bean会被通过调用一个工厂方法来创建。这个定义没有指定返回对象的类型（类），只指定了包含此工厂方法的类。在这个例子中，**createInstance()**方法必须是静态方法。
 ```xml
 <bean id="clientService"
     class="examples.ClientService"
@@ -322,10 +324,10 @@ public class ClientService {
     }
 }
 ```
-有关为工厂方法提供（可选）参数和从工厂返回对象后，设置对象实例属性机制的更多信息，参阅[“依赖和配置细节"]()
+有关为工厂方法提供（可选）参数和从工厂返回对象后，设置对象实例属性机制的更多信息，参阅[“依赖和配置细节"](#依赖和配置细节)
 
 ### 使用实例工厂方法实例化
-类似于通过静态工厂方法实例化，也可以使用一个实例工厂方法，调用容器中现有的bean的非静态方法来创建一个新的bean。要使用这种机制，让class属性为空，并且在 **factory-bean** 属性中指定当前（或父/祖）容器中包含了要用来调用用于创建对象的实例方法的bean名称。使用 **factory-method** 属性设置工厂方法本身名称。
+类似于通过静态工厂方法实例化，也可以使用一个实例工厂方法，调用容器中现有的bean的非静态方法来创建一个新的bean。要使用这种机制，使**class**属性为空，并且在 **factory-bean** 属性中指定当前（或父/祖）容器中包含了要用来调用用于创建对象的实例方法的bean名称。使用 **factory-method** 属性设置工厂方法本身名称。
 ```xml
 <!-- 工厂bean，其中包含一个名为createInstance()的方法， -->
 <bean id="serviceLocator" class="examples.DefaultServiceLocator">
@@ -380,9 +382,9 @@ public class DefaultServiceLocator {
 
 }
 ```
-这种方法表明，工厂bean本身可以通过依赖注入（DI）进行管理和配置。详细信息请参见[“依赖和配置细节"]()。
+这种方法表明，factory bean本身可以通过依赖注入（DI）进行管理和配置。详细信息请参见[“依赖和配置细节"]()。
 
-> 在Spring文档中，工厂bean（factory bean）是指在Spring容器中配置，通过实例或静态工厂方法创建对象的bean。相比之下，FactoryBean（注意大写）是指一个Spring特定的FactoryBean。
+> 在Spring文档中，factory bean是指在Spring容器中配置的bean，通过它的实例或静态工厂方法来创建对象。相比之下，**FactoryBean**（注意大写）是指一个Spring特定的**FactoryBean**。
 
 ***
 # 依赖
@@ -391,21 +393,21 @@ public class DefaultServiceLocator {
 
 ## 依赖注入
 ***
-依赖注入（DI）是一个通过对象定义它们依赖的过程，也就是它们使用的其他对象，这些依赖只能通过构造函数参数、工厂方法的参数，或者已经被构建或由工厂方法返回的对象实例上设置的属性这些形式。然后，容器在创建bean时注入这些依赖项。这个过程从根本上反转了bean本身通过直接构造类，或者使用一个如Service Locator模式的机制对依赖实例化或定位的控制，因此命名控制反转（IoC）。
+依赖注入（DI）是一个通过对象定义它们依赖的过程，也就是它们使用的其他对象，这些依赖只能通过构造方法参数、工厂方法的参数，或者已经被构建或由工厂方法返回的对象实例上设置的属性这些形式。然后，容器在创建bean时注入这些依赖项。这个过程从根本上反转了bean本身通过直接构造类，或者使用一个如Service Locator模式的机制对依赖实例化或定位的控制，因此命名控制反转（IoC）。
 
-使用DI原理，代码更加清晰，并且当提供对象依赖的时候，解耦更加有效。对象不查找其依赖关系，并且不知道依赖的位置或类。因此，你的类变得更容易测试，特别是当依赖在接口或抽象基类上时，它允许在单元测试中使用存根或模拟实现。
+使用DI原理，代码更加清晰，并且当提给供对象依赖项的时候，解耦更加有效。对象不查找其依赖关系，并且不知道依赖项的位置或类。因此，你的类变得更容易测试，特别是当依赖接口或抽象基类上时，它允许在单元测试中使用存根（实现接口，但方法体为空）或模拟实现。
 
-DI存在两种主要的变体：[基于构造函数的依赖注入](#基于构造函数的依赖注入) 和 [基于Setter的依赖注入](#基于Setter的依赖注入)。
+DI存在两种主要的变体：[基于构造方法的依赖注入](#基于构造方法的依赖注入) 和 [基于Setter的依赖注入](#基于Setter的依赖注入)。
 
-### 基于构造函数的依赖注入
-基于构造函数的DI通过容器调用具有多个参数的构造函数完成，每个参数表示一个依赖。调用具有特定参数的静态工厂方法来构造bean与之几乎相当，并且这个讨论类似地处理构造函数和静态工厂方法的参数。以下示例显式一个只能使用构造函数注入的依赖注入的类。请注意，这个类没有什么特别之处，它是一个POJO，它不依赖于容器特定的接口，基类或注解。
+### 基于构造方法的依赖注入
+基于构造方法的DI通过容器调用有多个参数的构造方法完成，每个参数表示一个依赖项。这与调用一个有特定参数的静态工厂方法来构造bean几乎相当，并且这个讨论将传参给一个构造方法与传参给一个静态工厂方法视为类似的。以下示例显示一个只能使用构造器注入进行依赖注入的类。请注意，这个类没有什么特别之处，它是一个POJO，它不依赖于容器特定的接口，基类或注解。
 ```java
 public class SimpleMovieLister {
 
     // SimpleMovieLister对MovieFinder有依赖关系
     private MovieFinder movieFinder;
 
-    // 一个构造函数，使Spring容器可以注入一个MovieFinder
+    // 一个构造方法，使Spring容器可以注入一个MovieFinder
     public SimpleMovieLister(MovieFinder movieFinder) {
         this.movieFinder = movieFinder;
     }
@@ -415,8 +417,8 @@ public class SimpleMovieLister {
 }
 ```
 
-**构造函数参数解析**   
-使用参数的类型进行构造函数参数解析匹配。如果在bean定义的构造函数参数中不存在潜在的歧义，那么构造函数参数在bean定义中定义的顺序就是在bean被实例化时将这些参数提供给适当的构造函数的顺序。考虑以下类：
+#### 构造方法参数解析
+使用参数的类型进行构造方法参数解析匹配。如果在bean定义的构造方法参数中不存在潜在的歧义，那么构造方法参数在bean定义中定义的顺序就是在bean被实例化时将这些参数提供给适当的构造方法的顺序。考虑以下类：
 ```java
 package x.y;
 
@@ -428,7 +430,7 @@ public class Foo {
 
 }
 ```
-没有潜在的歧义存在，假设Bar和Baz类没有继承关系。因此，以下配置工作正常，你不需要在<constructor-arg />元素中显式指定构造函数参数索引和/或类型。
+没有潜在的歧义存在，假设**Bar**和**Baz**类没有继承关系。因此，以下配置工作正常，你不需要在**<constructor-arg />**元素中显式指定构造方法参数索引和/或类型。
 ```xml
 <beans>
     <bean id="foo" class="x.y.Foo">
@@ -441,7 +443,7 @@ public class Foo {
     <bean id="baz" class="x.y.Baz"/>
 </beans>
 ```
-当引用另一个bean时，类型是已知的，并且可以进行匹配（如前面的例子所示）。当使用一个简单类型，例如&lt;value>true&lt;/value>时，在没有帮助的情况下Spring无法确定值的类型，因此无法通过类型匹配。考虑以下类：
+当引用另一个bean时，其类型是已知的，那么匹配正常（如前面的例子所示）。当使用一个简单类型，例如**&lt;value>true&lt;/value>**时，在没有帮助的情况下Spring无法确定值的类型，因此无法通过类型匹配。考虑以下类：
 ```java
 package examples;
 
@@ -460,30 +462,30 @@ public class ExampleBean {
 
 }
 ```
-在上述情况下，如果使用type属性显式指定构造函数参数的类型，则容器可以用简单类型执行类型匹配。例如：
+在上述情况下，如果使用**type**属性显式指定构造方法参数的类型，那么容器可以用简单类型执行类型匹配。例如：
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean">
     <constructor-arg type="int" value="7500000"/>
     <constructor-arg type="java.lang.String" value="42"/>
 </bean>
 ```
-使用index属性来明确指定构造函数参数的索引。例如：
+使用**index**属性来明确指定构造方法参数的索引。例如：
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean">
     <constructor-arg index="0" value="7500000"/>
     <constructor-arg index="1" value="42"/>
 </bean>
 ```
-除了解决多个简单值的歧义之外，指定索引可以解决构造函数具有两个相同类型参数的歧义。注意，索引从0开始。
+除了解决多个简单值的歧义之外，指定索引可以解决构造方法具有两个相同类型参数的歧义。注意，索引从0开始。
 
-你还可以使用构造函数参数名称为值消除歧义：
+你还可以使用构造方法参数名称为值消除歧义：
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean">
     <constructor-arg name="years" value="7500000"/>
     <constructor-arg name="ultimateAnswer" value="42"/>
 </bean>
 ```
-请记住，为了使这项工作开箱即用，你的代码必须在启用调试标志的情况下进行编译，以便Spring可以从构造函数中查找参数名称。如果你无法使用调试标志（或不想）编译代码，则可以使用@ConstructorProperties JDK注解来明确命名构造函数参数。示例类必须如下所示：
+请记住，为了使这种操作开箱即用，你的代码必须在启用调试标志的情况下进行编译，以便Spring可以从构造方法中查找参数名称。如果你无法使用调试标志（或不想）编译代码，则可以使用**@ConstructorProperties** JDK注解来明确命名构造方法参数。示例类必须如下所示：
 ```java
 package examples;
 
@@ -501,9 +503,9 @@ public class ExampleBean {
 ```
 
 ### 基于Setter的依赖注入
-基于Setter的DI通过在调用无参数构造函数或无参数静态工厂方法来实例化bean之后，通过容器调用bean的setter方法来实现。
+基于Setter的DI通过在调用无参数构造方法或无参数静态工厂方法来实例化bean之后，通过容器调用bean的setter方法来实现。
 
-以下示例显式了一个类，它只能使用纯setter注入进行依赖注入。这个类是常规Java。它是一个POJO，它不依赖容器特定的接口，基类或注解。
+以下示例展示了一个类，它只能使用纯setter注入进行依赖注入。这个类是常规Java。它是一个POJO，它不依赖容器特定的接口，基类或注解。
 ```java
 public class SimpleMovieLister {
 
@@ -519,29 +521,29 @@ public class SimpleMovieLister {
 
 }
 ```
-**ApplicationContext** 对于它管理的bean支持基于构造函数和基于setter的DI。在一些依赖已经通过构造函数方式注入后，它也支持基于setter的DI。你可以以BeanDefinition的形式配置依赖，它与PropertyEditor实例结合使用，以将属性从一种格式转换为另一种格式。然而，大多数Spring用户不直接使用这些类（即以编程方式），而是使用XML bean定义，注解组件（即，使用@Component，@Controller等注解的类）或者在基于Java@Configuration类中的@Bean方法。然后将这些资源内部地转换为BeanDefinition的实例，并用于加载整个Spring IoC容器实例。
+**ApplicationContext** 对于它管理的bean支持基于构造方法和基于setter的DI。在一些依赖已经通过构造方法方式注入后，它也支持基于setter的DI。你可以以**BeanDefinition**的形式配置依赖，它与**PropertyEditor**实例结合使用，以将属性从一种格式转换为另一种格式。然而，大多数Spring用户不直接使用这些类（即以编程方式），而是使用XML bean定义，注解组件（即，使用**@Component**，**@Controller**等注解类）或者在基于Java **@Configuration**类中的**@Bean**方法。然后将这些源内部地转换到**BeanDefinition**的实例中，并用于加载整个Spring IoC容器实例。
 
-<div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">**基于构造还是基于setter DI**      
-由于可以混合使用基于构造函数和基于setter的DI，为强制依赖使用构造函数，并且为可选依赖使用setter方法或配置方法是一个很好的经验法则。请注意，可以在setter方法上使用的的@Required注解可以使属性成为必需的依赖。<br> 
-Spring团队通常主张构造函数注入，因为它可以实现应用程序组件为不可变对象，并确保所需的依赖关系不为null。此外，构造函数注入的组件总是以完全初始化的状态返回给客户端（调用）代码。作为一个附注，大量的构造函数参数是一个不好的代码气息，这意味着该类可能有太多的责任，应该重构以更好地解决问题的正确分离。<br>
+<div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">*基于构造还是基于setter DI*      
+由于可以混合使用基于构造方法和基于setter的DI，这有一个很好的经验法则，就是为强制性依赖项使用构造方法注入，为可选依赖项使用setter方法或配置方法注入。请注意，可以在setter方法上使用@Required注解，使属性成为必需的依赖项。<br> 
+Spring团队通常主张构造方法注入，因为它可以实现应用程序组件为不可变对象，并确保所需的依赖关系不为null。此外，构造方法注入的组件总是以完全初始化的状态返回给客户端（调用）代码。作为一个附注，大量的构造方法参数是一个不好的代码气息，这意味着该类可能有太多的责任，应该重构以更好地解决问题的正确分离。<br>
 Setter注入应主要用于可选依赖，可以在类中分配合理的默认值。否则，必须在代码任何使用依赖的地方执行非空检查。setter注入的一个好处是setter方法使得该类的对象可以在以后重新配置或重新注入。因此对于setter注入，通过 JMX MBeans管理是一个引人注目的用例。<br> 
-使用对特定类最有意义的DI风格。有时候，当你处理没有来源的第三方类时，你来做选择。例如，如果第三方类不暴露任何setter方法，那么构造函数注入可能是DI的唯一可用形式。     
+使用对特定类最有意义的DI风格。有时候，当你处理没有来源的第三方类时，你来做选择。例如，如果第三方类不暴露任何setter方法，那么构造方法注入可能是DI的唯一可用形式。     
 </div>
 
 ### 依赖解析过程
 容器如下执行bean依赖解析：
-- **ApplicationContext**由描述所有bean的配置元数据创建和初始化。配置元数据可以通过XML，Java代码或注解来指定。
-- 对于每一个bean，它的依赖以属性，构造函数参数或静态工厂方法参数（如果你使用它来替代一个正常的构造函数）形式表现。当bean实际创建时，这些依赖被提供给bean。
-- 每个属性或构造函数参数是要设置的值的实际定义，或对容器中另一个bean的引用。
-- 作为值的每个属性或构造函数参数都将从其指定的格式转换为该属性或构造函数参数的实际类型。默认情况下，Spring可以将字符串格式提供的值转换为所有内置类型，如int，long，String，boolean等。
+- **ApplicationContext**使用配置元数据（它描述了所有的bean）来创建和初始化。配置元数据可以通过XML，Java代码或注解指定。
+- 对于每一个bean，它的依赖以属性，构造方法参数或静态工厂方法参数（如果你使用它来替代一个正常的构造方法）形式表现。当bean实际创建时，这些依赖被提供给bean。
+- 每个属性或构造方法参数是要设置的值的实际定义，或对容器中另一个bean的引用。
+- 作为值的每个属性或构造方法参数都将从其指定的格式转换为该属性或构造方法参数的实际类型。默认情况下，Spring可以将字符串格式提供的值转换为所有内置类型，如**int**，**long**，**String**，**boolean**等。
 
-Spring容器会在容器创建时验证每个bean的配置。但是，在bean实际创建之前，不会设置bean的属性。在容器创建时，单域和被设置为预实例化（默认设置）的bean会被创建。域在[“Bean域"](#Bean域)这一章定义。否则的话，bean只在被需要的时候才会创建。bean的创建可能会导致一个bean树被创建，因为bean的依赖和它依赖的依赖（等等）被创建和分配。注意这些依赖间的解析不匹配可能之后才会出现，也就是在首次创建受影响的bean的时候。
+Spring容器会在容器创建时验证每个bean的配置。但是，在bean实际被创建之前，不会设置bean的属性。在容器创建时，被设置为预实例化（默认设置）的单例域bean会被创建。域在[“Bean域"](#Bean域)这一章定义。否则的话，bean只在被需要的时候才会创建。bean的创建可能会导致一个bean树被创建，因为bean的依赖和它依赖的依赖（等等）被创建和分配。请注意，这些依赖关系中的解决方案不匹配可能会显示较晚，也就是在受影响的bean首次创建的时候。
 
 
-<div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">**循环依赖** 如果你主要使用构造函数注入，可能会创建一个无法解决的循环依赖场景。<br> <br> 例如：类A通过构造函数依赖需要一个类B的实例，而类B通过构造函数注入又需要类A的实例。如果你为类A和B配置bean为互相注入，Spring IoC容器在运行时期探测到这个循环引用，就会抛出一个BeanCurrentlyInCreationException。<br> <br> 一个可能的解决方案是编辑这些类的源码，将其通过setter而不是构造函数配置。或者，避免构造函数注入而只使用setter注入。换而言之，你可以使用setter注入配置循环依赖，尽管这是不被推荐的。<br> <br>不像通常的情况（没有循环依赖），bean A和bean B之间的循环依赖关系强制其中一个bean在被完全初始化之前被注入到另一个bean中（一个经典的鸡/鸡蛋场景）。
+<div style="border: 1px solid #ccc;background-color:#f8f8f8;padding:20px;">*循环依赖*： 如果你主要使用构造方法注入，可能会创建一个无法解决的循环依赖场景。<br> <br> 例如：类A通过构造方法依赖需要一个类B的实例，而类B通过构造方法注入又需要类A的实例。如果你为类A和B配置bean为互相注入，Spring IoC容器在运行时期探测到这个循环引用，就会抛出一个BeanCurrentlyInCreationException。<br> <br> 一个可能的解决方案是编辑这些类的源码，将其通过setter而不是构造方法配置。或者，避免构造方法注入而只使用setter注入。换而言之，你可以使用setter注入配置循环依赖，尽管这是不被推荐的。<br> <br>不像通常的情况（没有循环依赖），bean A和bean B之间的循环依赖关系强制其中一个bean在被完全初始化之前被注入到另一个bean中（一个经典的鸡/鸡蛋场景）。
 </div>
 
-你一般可以信任Spring做了正确的事情。它在容器加载时检测到配置问题，例如对不存在的bean的引用和循环依赖。当bean被创建后，Spring尽可能晚的设置属性和解析依赖。这意味着Spring容器被正确加载，但稍后你请求一个对象，如果在创建对象或者创建一个它的依赖上存在问题，容器会抛出一个异常。例如，bean由于缺少或无效的属性而抛出一个异常。这可能延迟了一些配置问题的发现，这也是为什么ApplicationContext的实现默认预实例化单例bean。以一些前期的时间和内存为代价，在bean实际需要前就创建它们，这样你可以在ApplicationContext创建时就发现配置的问题，而不是之后。你依旧可以重写这个默认行为，使单例bean懒加载，而不是预实例化。
+你一般可以信任Spring执行正确操作。它在容器加载时检测到配置问题，例如对不存在的bean的引用和循环依赖。当bean被创建后，Spring尽可能晚的设置属性和解析依赖。这意味着Spring容器被正确加载，但稍后你请求一个对象，如果在创建对象或者创建一个它的依赖上存在问题，容器会抛出一个异常。例如，bean由于缺少或无效的属性而抛出一个异常。这可能延迟了一些配置问题的发现，这也是为什么ApplicationContext的实现默认预实例化单例bean。以一些前期的时间和内存为代价，在bean实际需要前就创建它们，这样你可以在ApplicationContext创建时就发现配置的问题，而不是之后。你依旧可以重写这个默认行为，使单例bean懒加载，而不是预实例化。
 
 如果没有循环依赖存在，当一个或多个协作bean被注入到一个需要该依赖的bean中时，每个协作bean在被注入到需要该依赖的bean之前都会被完全配置。这意味着如果beana A依赖bean B，Spring IoC容器在调用bean A的setter方法之前已经完全配置了bean B。换而言之，bean被实例化（如果不是一个预实例化单例），它的依赖被设置完成，并且相应的生命周期方法（比如 [配置的init方法]() 或 [初始化bean回调方法]()  ）已被调用。
 
@@ -583,15 +585,15 @@ public class ExampleBean {
 
 }
 ```
-在上述示例中，setter被声明与XML文件中指定的属性相匹配。以下示例使用基于构造函数的DI：
+在上述示例中，setter被声明与XML文件中指定的属性相匹配。以下示例使用基于构造方法的DI：
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean">
-    <!-- 使用嵌套的ref元素的构造函数注入 -->
+    <!-- 使用嵌套的ref元素的构造方法注入 -->
     <constructor-arg>
         <ref bean="anotherExampleBean"/>
     </constructor-arg>
 
-    <!-- 使用更加整洁的ref属性的构造函数注入 -->
+    <!-- 使用更加整洁的ref属性的构造方法注入 -->
     <constructor-arg ref="yetAnotherBean"/>
 
     <constructor-arg type="int" value="1"/>
@@ -616,9 +618,9 @@ public class ExampleBean {
 
 }
 ```
-在bean定义中指定的构造函数参数将被用作ExampleBean的构造函数的参数。
+在bean定义中指定的构造方法参数将被用作ExampleBean的构造方法的参数。
 
-现在考虑这个例子的一种变体，不再使用构造函数，而是告诉Spring调用一个静态方法来返回这个对象的一个实例：
+现在考虑这个例子的一种变体，不再使用构造方法，而是告诉Spring调用一个静态方法来返回这个对象的一个实例：
 ```xml
 <bean id="exampleBean" class="examples.ExampleBean" factory-method="createInstance">
     <constructor-arg ref="anotherExampleBean"/>
@@ -649,14 +651,14 @@ public class ExampleBean {
 
 }
 ```
-静态工厂方法的参数通过&lt;constructor-arg/>元素提供，与实际构造函数使用的完全相同。这个工厂方法返回的类的类型不必和包含该静态工厂方法的类的类型一样，尽管在这个实例中是一样的。一个实例（非静态）工厂方法将以基本相同的方式使用（除了使用factory-bean属性而不是class属性），所以这里不再赘述。
+静态工厂方法的参数通过**&lt;constructor-arg/>**元素提供，与实际构造方法使用的完全相同。这个工厂方法返回的类的类型不必和包含该静态工厂方法的类的类型一样，尽管在这个实例中是一样的。一个实例（非静态）工厂方法将以基本相同的方式使用（除了使用**factory-bean**属性而不是**class**属性），所以这里不再赘述。
 
 ## 依赖和配置细节
 ***
-如在前面章节中提到的，你可以将bean属性和构造函数参数定义为对其他被管理的bean（协作者），或行内定义值的引用。为这个目的，Spring基于XML配置元数据在它的&lt;property />和&lt;constructor-arg />元素中支持子元素类型。
+如在前面章节中提到的，你可以将bean属性和构造方法参数定义为对其他被管理的bean（协作者）的引用，或行内定义的值。为这个目的，Spring基于XML配置元数据在它的**&lt;property/>**和**&lt;constructor-arg/>**元素中支持子元素类型。
 
 ### 直接值（原始类型，String等等）
-&lt;property />元素的value属性将一个属性或者构造函数参数指定为人类可读的字符串表示形式。Spring的 [转换服务用]() 于将这些值从String转换为实际的属性或参数类型。
+**&lt;property/>**元素的value属性将一个属性或者构造方法参数指定为人类可读的字符串表示形式。Spring的 [转换服务]() 用于将这些值从String转换为实际的属性或参数类型。
 ```xml
 <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
     <!-- 导致一个setDriverClassName(String)调用 -->
@@ -683,7 +685,7 @@ public class ExampleBean {
 
 </beans>
 ```
-上面的XML更简洁;然而，在运行时而不是设计时发现错字，除非你在创建bean定义时使用支持自动属性完成的IDE（如IntelliJ IDEA或Spring Tool Suite（STS））。
+上面的XML更简洁;然而，拼写错误会在运行时而不是设计时被发现，除非你在创建bean定义时使用支持自动属性完成的IDE（如IntelliJ IDEA或Spring Tool Suite（STS））。
 
 你也可以如下配置一个java.util.Properties实例：
 ```xml
@@ -946,9 +948,9 @@ Spring使用命名空间支持可扩展的配置格式，这是基于XML Schema 
 
 ### 使用c命名空间的XML快捷方式
 
-类似于称为“使用p命名空间的XML快捷方式"，Spring 3.1中新引入的c命名空间允许使用内联属性来配置构造函数参数，而不是使用嵌套的constructor-arg元素。
+类似于称为“使用p命名空间的XML快捷方式"，Spring 3.1中新引入的c命名空间允许使用内联属性来配置构造方法参数，而不是使用嵌套的constructor-arg元素。
 
-我们来回顾一下名为[“基于构造函数的依赖注入"](#基于构造函数的依赖注入)一节中使用c:namespace的例子：
+我们来回顾一下名为[“基于构造方法的依赖注入"](#基于构造方法的依赖注入)一节中使用c:namespace的例子：
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -971,16 +973,16 @@ Spring使用命名空间支持可扩展的配置格式，这是基于XML Schema 
 
 </beans>
 ```
-对于通过参数名来设置构造函数参数，c:命名空间与p:的使用相同的惯例（对bean引用的尾接-ref）。同样，它也需要声明，即使它没有在XSD schema 中定义（但它存在于Spring内核中）。
+对于通过参数名来设置构造方法参数，c:命名空间与p:的使用相同的惯例（对bean引用的尾接-ref）。同样，它也需要声明，即使它没有在XSD schema 中定义（但它存在于Spring内核中）。
 
-对于构造函数参数名称不可用的罕见情况（通常如果字节码在没有调试信息的情况下编译），可以对参数索引使用回退：
+对于构造方法参数名称不可用的罕见情况（通常如果字节码在没有调试信息的情况下编译），可以对参数索引使用回退：
 ```xml
 <!-- c命名空间索引声明 -->
 <bean id="foo" class="x.y.Foo" c:_0-ref="bar" c:_1-ref="baz"/>
 ```
 > 由于XML语法，索引符号需要前置\_的存在，因为XML属性名称不能以数字开头（即使某些IDE允许）。
 
-在实践中，构造函数解析机制在匹配参数方面非常有效，除非真的需要，我们建议你在你的配置宗始终使用名称符号。
+在实践中，构造方法解析机制在匹配参数方面非常有效，除非真的需要，我们建议你在你的配置宗始终使用名称符号。
 
 ### 复合属性名称
 当你设置bean属性时，可以使用复合或嵌套属性名称，只要除了最后属性名称之外的路径的所有组件都不为null。 考虑下面的bean定义。
@@ -1031,7 +1033,7 @@ foo bean有一个fred属性，fred属性又有一个bob属性，bob属性又有�
 ## 自动装配协作者
 ***
 Spring容器可以自动关联协作bean。你可以通过检查ApplicationContext的内容来允许Spring为你的bean自动解析协作者（其他bean）。自动装配有以下的优点：
-- 自动装配可以显著减少指定属性或构造函数参数的需要。（其他机制，如本章其他地方讨论的bean模板在这方面也很有价值。）
+- 自动装配可以显著减少指定属性或构造方法参数的需要。（其他机制，如本章其他地方讨论的bean模板在这方面也很有价值。）
 - 自动装配可以随着对象的发展而更新配置。例如，如果你需要给一个类添加一个依赖，则可以无需修改配置，自动满足该依赖关系。因此，自动装配在开发过程中特别有用，在代码库变得更加稳定时，无需切换到显式装配。
 
 当使用基于XML的配置元数据时，你使用&lt;bean/>元素上的autowire属性为bean定义指定自动装配模式。自动装配功能有四种模式。你可以指定自动装配每一个bean并且因此可以选择哪一个来自动装配。
@@ -1041,7 +1043,7 @@ Spring容器可以自动关联协作bean。你可以通过检查ApplicationConte
 |no|(默认)不自动装配。必须通过ref元素定义bean引用。对于大规模的部署不推荐改变此默认设置，因为明确指定协作者将给予更大的控制和清晰度。在某种程度上，它记录了系统的结构。|
 |byName|通过属性名自动装配。Spring会找到一个与需要自动装配的属性名称相同的bean。例如，如果bean定义被设置为通过名称自动装配，并且它包含一个master属性（也就是，它有一个setMaster(..)方法），Spring会查找一个名称为master的bean定义，并且使用它来设置属性|
 |byType|如果确实容器中存在该属性类型的一个bean，则允许该属性被自动装配。如果有超过一个的bean存在，会抛出一个致命异常，这表示你可能不会为该bean使用*byType*自动装配。如果这里没有匹配的bean存在，则什么也不会发生；属性没有被设置。|
-|constructor|类似与*byType*，但是只适用于给构造函数参数。如果在容器中没有一个构造函数参数类型的bean，则会引起一个致命错误。|
+|constructor|类似与*byType*，但是只适用于给构造方法参数。如果在容器中没有一个构造方法参数类型的bean，则会引起一个致命错误。|
 
 
 在*byType* 或*constructor*模式下，你可以装配数组和类型集合。在这种情况下，容器中所有在匹配预期类型的自动装配候选者，都被提供来满足依赖。如果期望的key类型是String，你可以自动装配强类型的Map。一个自动装配Map值会由匹配预期类型的所有bean实例组成，并且Map的key会包含相应的bean名称。
@@ -1055,7 +1057,7 @@ Spring容器可以自动关联协作bean。你可以通过检查ApplicationConte
 - 在property和constructor-arg中显式设置的依赖总是覆盖自动装配。你不能自动装配所谓的简单属性，例如原始类型，String和Class（以及这些简单属性的数组）。这种限制是设计的。
 - 自动装配不如显式写明精确。尽管，如上表所示，Spring小心避免在歧义的情况下猜测，这可能会有一个意想不到的结果，你的Spring管理对象之间的关系不再被明确记录。
 - 对于可能从Spring容器生成文档的工具可能无法使用装配信息。
-- 容器中的多个bean定义可能与由setter方法或构造函数参数指定的类型相匹配，从而进行自动装配。对于数组，集合或Map，这不一定是问题。然而，对于期望单个值的依赖，这种歧义不是任意解决的。如果没有唯一的bean定义可用，则抛出异常。
+- 容器中的多个bean定义可能与由setter方法或构造方法参数指定的类型相匹配，从而进行自动装配。对于数组，集合或Map，这不一定是问题。然而，对于期望单个值的依赖，这种歧义不是任意解决的。如果没有唯一的bean定义可用，则抛出异常。
 
 在后一种情况下，你有几个选项：
 - 放弃自动装配，明确写明依赖。
@@ -1772,7 +1774,7 @@ public interface ApplicationContextAware {
 ```
 因此bean可以编程式操作创建它们的ApplicationContext ，通过**ApplicationContext**接口或者将个引用转换为这个接口的一个已知子类，例如**ConfigurableApplicationContext**，它暴露了一些额外功能。这样做的一个用途是可以编程式检索其他的bean。有时这种能力是有用的;然而，一般你应该避免这样做，因为它将代码和Spring耦合在一起，并且没有遵循将协作者作为属性提供给bean的控制反转风格。**ApplicationContext**的其他方法提供对文件资源的访问，发布应用程序事件和访问**MessageSource**。这些附加功能在第7.15节[“ApplicationContext的附加功能"]()中描述。
 
-从Spring2.5开始，自动装配是另一种获取**ApplicationContext**引用的可选方法。“传统"的**constructor**和**byType**自动装配模式（如第4.5节[“自动装配协作者"](#自动装配协作者)中所述）可以分别为构造函数参数或setter方法参数提供**ApplicationContext**类型的依赖。为了更多的灵活性，包括自动装配字段和多参数方法的能力，请使用新的基于注解的自动装配功能。如果你这样做，**ApplicationContext**被自动装配到一个字段，构造函数参数或者方法参数上，如果相关期望**ApplicationContext**类型的字段，构造方法或方法带有@Autowired注解的话。更多信息，请参阅第9.2节[“@Autowired"](#@Autowired)。
+从Spring2.5开始，自动装配是另一种获取**ApplicationContext**引用的可选方法。“传统"的**constructor**和**byType**自动装配模式（如第4.5节[“自动装配协作者"](#自动装配协作者)中所述）可以分别为构造方法参数或setter方法参数提供**ApplicationContext**类型的依赖。为了更多的灵活性，包括自动装配字段和多参数方法的能力，请使用新的基于注解的自动装配功能。如果你这样做，**ApplicationContext**被自动装配到一个字段，构造方法参数或者方法参数上，如果相关期望**ApplicationContext**类型的字段，构造方法或方法带有@Autowired注解的话。更多信息，请参阅第9.2节[“@Autowired"](#@Autowired)。
 
 当**ApplicationContext**创建一个实现**org.springframework.beans.factory.BeanNameAware**接口的类时，该类将被提供一个对其关联对象定义中定义名称的引用。
 ```java
@@ -1807,7 +1809,7 @@ public interface BeanNameAware {
 ***
 # Bean定义继承
 ***
-一个bean定义可以包含很多配置信息，包括构造函数参数，属性值和容器特定信息，如初始化方法，静态工厂方法名称等。子bean定义从父定义继承配置数据。子定义可以根据需要覆盖某些值，或者添加其他值。使用父和子bean定义可以节省大量的输入。实际上，这是模板的一种形式。
+一个bean定义可以包含很多配置信息，包括构造方法参数，属性值和容器特定信息，如初始化方法，静态工厂方法名称等。子bean定义从父定义继承配置数据。子定义可以根据需要覆盖某些值，或者添加其他值。使用父和子bean定义可以节省大量的输入。实际上，这是模板的一种形式。
 
 如果以编程方式使用ApplicationContext接口，子Bean定义由ChildBeanDefinition类表示。大多数用户不能在这个级别上使用它们，而是以类似于ClassPathXmlApplicationContext的方式声明地配置bean定义。当你使用基于XML的配置元数据时，你通过使用parent属性指定一个子bean的定义，指定父bean作为此属性的值。
 ```xml
@@ -1826,7 +1828,7 @@ public interface BeanNameAware {
 ```
 一个自bean定义如果没有指定bean类的话则使用父级的定义，但也可以覆盖父级定义。在后一种情况，这个子bean必须兼容父级，也就是，它必须接受父级的属性值。
 
-子bean继承父级的域，构造函数参数值，属性值，和方法重写，并可以添加新值。你指定的任何域，初始化方法，销毁方法，和/或静态工厂方法会覆盖父级中相应的设置。
+子bean继承父级的域，构造方法参数值，属性值，和方法重写，并可以添加新值。你指定的任何域，初始化方法，销毁方法，和/或静态工厂方法会覆盖父级中相应的设置。
 
 其余设置始终采用自子定义：depends on，自动装配模式，依赖关系检查，单例，懒加载。
 
@@ -2034,7 +2036,7 @@ dataSource.url=jdbc:mysql:mydb
 ```
 此示例文件可以与包含称为dataSource的bean的容器定义一起使用，这个bean有一个driver和url属性。
 
-还支持复合属性名称，只要除了要被覆盖的最终属性外，路径的每个组件都已经是非null（可能由构造函数初始化）。在这个例子中...
+还支持复合属性名称，只要除了要被覆盖的最终属性外，路径的每个组件都已经是非null（可能由构造方法初始化）。在这个例子中...
 ```
 foo.fred.bob.sammy=123
 ```
@@ -2115,7 +2117,7 @@ public class SimpleMovieLister {
 ***
 > 以下示例中可以使用JSR 330的@Inject注解来代替Spring的@Autowired注解。请参阅 [这里]() 了解更多详情。
 
-你可以将@Autowired注解应用到构造函数：
+你可以将@Autowired注解应用到构造方法：
 ```java
 public class MovieRecommender {
 
@@ -2130,7 +2132,7 @@ public class MovieRecommender {
 
 }
 ```
-> 从Spring Framework 4.3开始，如果目标bean只定义一个构造函数，则@Autowired构造函数不再需要。如果有几个构造函数可用，至少必须注解一个构造函数来指导容器必须使用哪个构造函数。
+> 从Spring Framework 4.3开始，如果目标bean只定义一个构造方法，则@Autowired构造方法不再需要。如果有几个构造方法可用，至少必须注解一个构造方法来指导容器必须使用哪个构造方法。
 
 如预期的那样，你还可以将@Autowired注解应用于“传统"setter方法：
 ```java
@@ -2166,7 +2168,7 @@ public class MovieRecommender {
 
 }
 ```
-你也可以将@Autowired应用于字段，甚至将其与构造函数进行混合：
+你也可以将@Autowired应用于字段，甚至将其与构造方法进行混合：
 ```java
 public class MovieRecommender {
 
@@ -2227,7 +2229,7 @@ public class MovieRecommender {
 
 }
 ```
-默认情况下，自动装配会在没有候选bean可用时失败；默认行为是将注解的方法，构造函数和字段视为指明的必须依赖。这种行为可以如下演示来修改：
+默认情况下，自动装配会在没有候选bean可用时失败；默认行为是将注解的方法，构造方法和字段视为指明的必须依赖。这种行为可以如下演示来修改：
 ```java
 public class SimpleMovieLister {
 
@@ -2242,7 +2244,7 @@ public class SimpleMovieLister {
 
 }
 ```
-> 每个类只有一个注解的构造函数可以被标记为required，但是可以注解多个构造函数为非必须。在这种情况下，每个被考虑在候选之中，并且Spring使用最贪婪（greediest）的构造函数，也就是有最多参数的构造函数，该构造函数的依赖将被满足。**@AutoWired的required属性建议使用@Required注解。**required属性表示该属性对于自动装配目的不是必需的，如果不能被自动装配，那么该属性将被忽略。另一方面，@Required更强大，它强迫属性必须被容器支持的任何bean设置，如果没有注入值，则会引发相应的异常。
+> 每个类只有一个注解的构造方法可以被标记为required，但是可以注解多个构造方法为非必须。在这种情况下，每个被考虑在候选之中，并且Spring使用最贪婪（greediest）的构造方法，也就是有最多参数的构造方法，该构造方法的依赖将被满足。**@AutoWired的required属性建议使用@Required注解。**required属性表示该属性对于自动装配目的不是必需的，如果不能被自动装配，那么该属性将被忽略。另一方面，@Required更强大，它强迫属性必须被容器支持的任何bean设置，如果没有注入值，则会引发相应的异常。
 
 你还可以对于众所周知的可解析的依赖接口使用@Autowired：**BeanFactory**, **ApplicationContext**, **Environment**,** ResourceLoader**, **ApplicationEventPublisher**, 和 **MessageSource**。这些接口以及它们的拓展接口（比如**ConfigurableApplicationContext**或**ResourcePatternResolver**）是自动解析的，不需要特殊设置。
 ```java
@@ -2330,7 +2332,7 @@ public class MovieRecommender {
 
 }
 ```
-**@Qualifier**注解也可以在各个构造函数参数或方法参数中指定：
+**@Qualifier**注解也可以在各个构造方法参数或方法参数中指定：
 ```java
 public class MovieRecommender {
 
@@ -2349,7 +2351,7 @@ public class MovieRecommender {
 
 }
 ```
-相应的bean定义如下所示。具有qualifier值“main"的bean，使用具有相同值的qualifier的构造函数参数进行装配。
+相应的bean定义如下所示。具有qualifier值“main"的bean，使用具有相同值的qualifier的构造方法参数进行装配。
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -2383,7 +2385,7 @@ public class MovieRecommender {
 Qualifiers也适用于上面讨论的类型集合，例如Set&lt;MovieCatalog>。在这个情况下，根据声明的qualifier所有匹配的bean作为集合被注入。这意味着qualifier不一定是唯一的;它们只是构成过滤的标准。例如，你可以使用相同的qualifier值“action"定义多个MovieCatalog bean，所有这些都将注入到使用@Qualifier(“action")注解的Set&lt;MovieCatalog>中。
 
 > 如果你打算使用按名称的注解驱动注入，那么不要主要使用@Autowired，即使在技术上能够通过@Qualifier值引用一个bean名称。而是使用JSR-250 @Resource注解，它通过它的唯一名称语义定义识别一个指定的目标组件，声明的类型和匹配过程无关。@Autowired有不同的语义：在按类型选择候选bean之后，指定的String限定符值只有在这些类型选择的候选者才会被考虑，例如，匹配一个“account"限定符与与标记有相同限定符标签的bean。对于被定义为collection/map或数组类型的bean，@Resource是一个更好的解决方法，通过唯一名称来引用指定的集合或数组bean。也就是说，从4.3开始，只要元素类型信息保存在@Bean返回类型签名或集合继承层次结构中，就可以通过Spring的@Autowired类型匹配算法来匹配collection/map和数组类型。在这种情况下，限定符值可用于在相同类型的集合中进行选择，如前一段所述。
-从4.3开始，@Autowired还考虑注入自引用，即引用回目前注入的bean。注意自注入是一个回退；对其他组件的常规依赖性始终优先。在这个意义上，自我引用不参与正式的候选人选择，因此特别的从不会是primary;相反，他们总是作为最低的优先级。在实践中，仅使用自我引用只作为最后的手段。例如，通过bean的事务代理在同一个实例上调用其他方法：在这种情况下，考虑将受影响的方法分解为单独的委托bean。或者，使用@Resource，它可以通过其唯一的名称获取代理回到当前的bean。@Autowired适用于字段，构造函数和多参数方法，允许在参数级别缩小qualifier注解。相比之下，@Resource仅支持具有单个参数的字段和bean属性setter方法。因此，如果你的注入目标是构造函数或多参数方法，请坚持使用qualifier。
+从4.3开始，@Autowired还考虑注入自引用，即引用回目前注入的bean。注意自注入是一个回退；对其他组件的常规依赖性始终优先。在这个意义上，自我引用不参与正式的候选人选择，因此特别的从不会是primary;相反，他们总是作为最低的优先级。在实践中，仅使用自我引用只作为最后的手段。例如，通过bean的事务代理在同一个实例上调用其他方法：在这种情况下，考虑将受影响的方法分解为单独的委托bean。或者，使用@Resource，它可以通过其唯一的名称获取代理回到当前的bean。@Autowired适用于字段，构造方法和多参数方法，允许在参数级别缩小qualifier注解。相比之下，@Resource仅支持具有单个参数的字段和bean属性setter方法。因此，如果你的注入目标是构造方法或多参数方法，请坚持使用qualifier。
 
 你可以创建你自己的自定义qualifier注解。简单定一个一个注解，并且在你的定义中提供@Qualifier注解：
 ```java
@@ -2917,7 +2919,7 @@ public class FactoryMethodComponent {
 
 > 你可以将@Bean方法声明为static，允许调用它们，而无需创建它们包含的配置类作为实例。当定义后处理器时这尤其有意义，例如BeanFactoryPostProcessor和BeanPostProcessor类型，因为这样的bean将在容器生命周期早期初始化，并且应该避免在此时触发配置的其他部分。请注意，静态@Bean方法的调用永远不会被容器拦截，即使在@Configuration类中（见上文）。这是由于技术限制：CGLIB子类化只能覆盖非静态方法。因此，直接调用另一个@Bean方法将具有标准的Java语义，导致独立的实例直接从工厂方法返回。@Bean方法的Java语言可见性对Spring容器中生成的bean定义并没有立即的影响。你可以在非@Configuration类中以及任何地方的静态方法上自由声明你的工厂方法。但是，@Configuration类中的常规@Bean方法必须是可覆盖的，即不能将其声明为private或final。    
 @Bean方法也将在给定组件或配置类的基类上发现，以及由组件或配置类实现的接口中声明的Java 8 default 方法。这允许在组成复杂的配置布局上有很大的灵活性，甚至可以通过Java 8 default方法（从Spring 4.2起）实现多重继承。    
-最后，请注意，单个类可以为同一个bean持有多个@Bean方法，作为多个工厂方法的安排，以在运行根据可用依赖来使用。这与在其他配置方案中选择“greediest"构造函数或工厂方法的算法相同：具有最大数量的可满足依赖关系的变体将在构建时采用，类似于容器在多个@Autowired构造函数之间进行选择
+最后，请注意，单个类可以为同一个bean持有多个@Bean方法，作为多个工厂方法的安排，以在运行根据可用依赖来使用。这与在其他配置方案中选择“greediest"构造方法或工厂方法的算法相同：具有最大数量的可满足依赖关系的变体将在构建时采用，类似于容器在多个@Autowired构造方法之间进行选择
 
 ## 命名自动检测的组件
 ***
@@ -2937,7 +2939,7 @@ public class MovieFinderImpl implements MovieFinder {
 }
 ```
 
-> 如果你不想依赖于默认的bean命名策略，你可以提供自定义bean命名策略。首先，实现BeanNameGenerator接口，并确保包含一个默认的无参构造函数。然后，在配置扫描器时提供完全限定的类名称：
+> 如果你不想依赖于默认的bean命名策略，你可以提供自定义bean命名策略。首先，实现BeanNameGenerator接口，并确保包含一个默认的无参构造方法。然后，在配置扫描器时提供完全限定的类名称：
 
 ```java
 @Configuration
@@ -2966,7 +2968,7 @@ public class MovieFinderImpl implements MovieFinder {
 ```
 有关Web特定域的详细信息，请参见第5.4节[“Request, session, global session, application和 WebSocket域"](#Request, session, global session, application和 WebSocket域)。
 
-> 要为域解析提供自定义策略，而不是依赖基于注解的方式，请实现ScopeMetadataResolver接口，并确保包含一个默认的无参构造函数。然后，在配置扫描器时提供完全限定的类名称：
+> 要为域解析提供自定义策略，而不是依赖基于注解的方式，请实现ScopeMetadataResolver接口，并确保包含一个默认的无参构造方法。然后，在配置扫描器时提供完全限定的类名称：
 ```java
 @Configuration
 @ComponentScan(basePackages = "org.example", scopeResolver = MyScopeResolver.class)

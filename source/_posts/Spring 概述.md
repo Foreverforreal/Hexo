@@ -7,7 +7,21 @@ categories:
   - Spring
 date: 2017-07-24 10:29:00
 ---
-[原文链接:](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#dependency-management) Spring Framework是一个轻量级解决方案，也是构建企业级应用程序的潜在一站式服务。但是，Spring是模块化的，允许你只使用你所需的部分，而无需引用其他的部分。你可以在任何web框架的顶层使用IOC容器，但也可以仅使用 Hibernate integration code或 JDBC abstraction layer。Spring框架支持声明式事务管理，通过RMI或web service远程访问你的业务逻辑，以及用于数据持久化的各种选项。它提供了一个全功能的MVC框架，使你能够将AOP透明地集成到你的软件中。
+<style>
+strong {
+    margin: 2px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1px 3px 0;
+    text-shadow: none;
+    white-space: nowrap;
+	color: #6d180b;
+	font-weight: normal;
+}
+</style>
+
+[原文链接:](https://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#spring-introduction) Spring Framework是一个轻量级解决方案，也是构建企业级应用程序的潜在一站式服务。但是，Spring是模块化的，允许你只使用你所需的部分，而无需引用其他的部分。你可以在任何web框架的顶层使用IOC容器，但也可以仅使用 Hibernate integration code或 JDBC abstraction layer。Spring框架支持声明式事务管理，通过RMI或web service远程访问你的业务逻辑，以及用于数据持久化的各种选项。它提供了一个全功能的MVC框架，使你能够将AOP透明地集成到你的软件中。
 
 Spring被设计为非侵入式的，这意味着你的域逻辑代码通常不需要依赖框架本身。在你的集成层（比如数据访问层）中，将存在对数据访问技术和Spring库的一些依赖。但是，应该很容易将这些依赖关系与你的代码库的其余部分隔离开来。
 <!-- more -->
@@ -116,12 +130,12 @@ Web层由spring-web，spring-webmvc,spring-websocket和spring-webmvc-portlet模�
 Spring Framework还为Enterprise JavaBeans提供了一个访问和抽象层，使你能够重用现有的POJO，并将其包装在无状态会话bean中，以便在可能需要声明式安全性的可扩展的，故障安全的Web应用程序中使用。
 
 ### 依赖管理和命名惯例
-依赖管理和依赖注入是不同的事情。为了将Spring的这些不错的功能（如依赖注入）引入到应用程序中，你需要组合所有必须的库（jar文件），并且在运行时期将它们导入你的类路径中，也可能在编译时期。这些依赖不是注入的虚拟组件，而是文件系统中的物理资源（通常为）。依赖管理的过程包括定位这些资源，存储并添加它们到类路径。依赖可以是直接依赖（如我的程序在运行时期依赖Spring），或间接依赖（如我的程序依赖commons-dbcp，而它又依赖commons-pool）。间接依赖关系也被称为“传递性”，它们是最难识别和管理的依赖关系。
+依赖管理和依赖注入是不同的事情。为了将Spring的这些不错的功能（如依赖注入）引入到应用程序中，你需要组合所有必须的库（jar文件），并且在运行时期或编译时期将它们导入你的类路径中。这些依赖不是注入的虚拟组件，而是文件系统中的物理资源（通常为）。依赖管理的过程包括定位这些资源，存储并添加它们到类路径。依赖可以是直接依赖（如我的程序在运行时期依赖Spring），或间接依赖（如我的程序依赖commons-dbcp，而它又依赖commons-pool）。间接依赖关系也被称为“传递性”，它们是最难识别和管理的依赖关系。
 
 如果你要使用Spring，你需要获得一个包含你所需要的Spring部分的jar库的副本。为了使这更容易，Spring被打包成一系列的模块，这样可以尽可能地分离依赖关系，因此，例如如果你不想编写Web应用程序，则不需要spring-web模块。要在本指南中引用Spring库模块，我们使用一个简写命名约定spring-\*或spring-\*.jar，这里\*代表模块的简称（如spring-core, spring-webmvc, spring-jms，等等）。而实际你使用的jar文件名称通常是模块名后面连接着版本号（比如spring-core-4.3.10.RELEASE.jar）。
 
 Spring Framework的每个版本都会将artifacts发布到以下位置：
-- Maven Central，这是Maven查询的默认仓库，并且不需要任何特殊配置来使用。Spring的许多常见的库也可以从Maven Central获得，Spring社区的大部分使用Maven进行依赖关系管理，所以这对他们来说很方便。这里jar的名称是 spring-\*-&lt;version>.jar的形式，Maven groupId是*org.springframework*.
+- Maven Central，这是Maven查询的默认仓库，并且不需要任何特殊配置来使用。Spring的许多常见的库也可以从Maven Central获得，Spring社区的大部分使用Maven进行依赖关系管理，所以这对他们来说很方便。这里jar的名称是 spring - \* - &lt;version>.jar的形式，Maven groupId是*org.springframework*.
 - 在专门用于Spring的公共Maven仓库。除了最终的GA版本，这个仓库还托管这开发快照版和里程碑版。jar文件名称与Maven Central中使用同样的形式，所以这是一个对开发者有用的地方，可以让开发版本的Spring与在Maven Central中部署的其他库一起使用。该存储库还包含捆绑分发zip文件，其中包含所有Spring jar，捆绑在一起以便于下载。
 
 所以你需要决定的第一件事是如何管理你的依赖：我们通常建议使用像Maven，Gradle或Ivy这样的自动化系统，但你也可以通过自己下载所有的jar来手动进行操作。
@@ -385,7 +399,7 @@ Simple Logging Facade for Java (SLF4J) 是Spring常用的其他库使用的流�
 
 SLF4J提供绑定到许多常见的日志记录框架，包括Log4j，反过来也是在其他日志框架和它自身之间桥接。所以要在Spring使用SLF4J，你需要使用SLF4J-JCL桥接来替换commos-logging依赖。一旦你这么做，那么来自Spring内的日志记录调用将会被转换为SLF4J API的日志调用，所以如果在你的应用程序中的其他库使用这个API，那么你有一个地方来配置和管理日志记录。
 
-一个常见的选择可能是将Spring桥接到SLF4J，，然后提供一个从SLF4J到Log4j的明确绑定绑定。你需要提供几个个依赖（并且排除现有的commons-logging）：JCL桥，绑定到Log4j的SLF4j，和Log4j本身。在Maven你会这样做。
+一个常见的选择可能是将Spring桥接到SLF4J，然后提供一个从SLF4J到Log4j的显示绑定。你需要提供几个依赖（并排除现有的commons-logging）：JCL桥，绑定到Log4j的SLF4j，和Log4j本身。在Maven你会这样做。
 ```xml
 <dependencies>
     <dependency>
@@ -438,8 +452,8 @@ SLF4J提供绑定到许多常见的日志记录框架，包括Log4j，反过来�
 #### Commons Logging在WebSphere上
 Spring应用程序可以在本身提供JCL实现的容器上运行，例如IBM的WebSphere Application Server（WAS）。这本身并不引起问题，但是它导致有两个不同的场景需要理解：
 
-在“parent first”ClassLoader委托模型（WAS中的默认值）中，应用程序将始终拾取服务器提供的Commons Logging版本，委托给WAS记录子系统（实际上基于JUL）。JCL的应用程序提供的变体，无论是标准的Commons Logging还是JCL-over-SLF4J桥，都将被有效地被忽略，以及任何本地包含的日志提供程序。
+在“parent first”ClassLoader委托模型（WAS中的默认值）中，应用程序将始终拾取服务器提供的Commons Logging版本，委托给WAS记录子系统（实际上基于JUL）。JCL的应用程序提供的变体，无论是标准的Commons Logging还是JCL-over-SLF4J桥，实际都将被忽略，以及任何本地包含的日志提供程序。
 
-在你的应用程序中，使用“parent last”委托模式（这是常规Servlet容器中的默认值，但在WAS上明确配置了选项），应用程序提供的Commons Logging变体会被拾取，使你能够设置本地包含的日志提供程序，例如Log4j或Logback。在没有本地日志提供程序的情况下，常规Commons Logging将默认委托给JUL，有效地记录到WebSphere的日志记录子系统，像在“parent first”场景中。
+在你的应用程序中，使用“parent last”委托模式（这是常规Servlet容器中的默认值，但在WAS上是一个需要明确配置的选项），应用程序提供的Commons Logging变体会被采用，使你能够设置本地包含的日志提供程序，例如Log4j或Logback。在没有本地日志提供程序的情况下，常规Commons Logging将默认委托给JUL，有效地记录到WebSphere的日志记录子系统，像在“parent first”场景中。
 
 总而言之，我们建议将“Spring”应用程序部署在“parent last”模型中，因为它实际地允许本地提供程序以及服务器的日志子系统。
