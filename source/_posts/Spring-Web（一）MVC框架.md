@@ -41,13 +41,13 @@ Spring Web模型-视图-控制器（MVC）框架是围绕一个**DispatcherServl
 
 <div class="quote">
 “开放扩展..."在Spring Web MVC和Spring中的一个关键设计原则是“开放扩展，关闭修改"原则。<br/>
-Spring Web MVC的核心类中的一些方法被标记为final。作为开发人员，您不能覆盖这些方法来提供自己的行为。这并不是随意设计的，而是特别考虑到这个原则。<br/>
+Spring Web MVC的核心类中的一些方法被标记为final。作为开发人员，你不能覆盖这些方法来提供自己的行为。这并不是随意设计的，而是特别考虑到这个原则。<br/>
 有关这个原理的解释，请参考Seth Ladd的Expert Spring Web MVC和Web Flow;具体参见第一版第117页的“A Look At Design"一节。或者，参见
 [Bob Martin, The Open-Closed Principle (PDF)](https://www.cs.duke.edu/courses/fall07/cps108/papers/ocp.pdf)
-当您使用Spring MVC时，您不能向final方法添加advice 。例如，您不能向AbstractController.setSynchronizeOnSession()方法添加advice 。有关AOP代理的更多信息，以及为什么不能向final方法添加advice ，请参阅第11.6.1节“[了解AOP代理"](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#aop-understanding-aop-proxies)。
+当你使用Spring MVC时，你不能向final方法添加advice 。例如，你不能向AbstractController.setSynchronizeOnSession()方法添加advice 。有关AOP代理的更多信息，以及为什么不能向final方法添加advice ，请参阅第11.6.1节“[了解AOP代理"](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#aop-understanding-aop-proxies)。
 </div> 
 
-在Spring Web MVC中，你可以使用任何对象作为命令或表单支持对象;您不需要实现框架特定的接口或基类。Spring的数据绑定是高度灵活的：例如，它将类型不匹配视为可由应用程序评估的验证错误，而不是系统错误。因此，你不需要将业务对象的属性复制为表单对象中简单、无类型的字符串，仅用于处理无效提交，或者用于正确转换字符串。相反，它通常最好直接绑定到您的业务对象。   
+在Spring Web MVC中，你可以使用任何对象作为命令或表单支持对象;你不需要实现框架特定的接口或基类。Spring的数据绑定是高度灵活的：例如，它将类型不匹配视为可由应用程序评估的验证错误，而不是系统错误。因此，你不需要将业务对象的属性复制为表单对象中简单、无类型的字符串，仅用于处理无效提交，或者用于正确转换字符串。相反，它通常最好直接绑定到你的业务对象。   
 
 Spring的视图解析非常灵活。**Controller**通常负责准备一个带有数据和选择的视图名称的模型Map，但它也可以直接写入响应流并完成请求。视图名称解析是高度可配置的，通过文件拓展或Accept header content type negotiation，通过bean名称，一个属性文件，或甚至一个ViewResolver实现。这个model（MVC中的M）是一个Map接口，它允许对视图技术的完全抽象。你可以直接与基于模板的渲染技术（如JSP，Velocity和Freemarker）集成，或直接生成XML，JSON，Atom和许多其他类型的内容。model Map简单地被转换成适当的格式，如JSP请求属性，Velocity模板模型。      
 
@@ -57,7 +57,7 @@ Spring的视图解析非常灵活。**Controller**通常负责准备一个带有
 <div class="quote">
 Spring Web Flow
 Spring Web Flow（SWF）旨在成为管理Web应用程序页面流的最佳解决方案。<br/>
-在Servlet和Portlet环境中，SWF与Spring MVC和JSF等现有框架集成。如果您有一个业务流程会受益于会话模型而不是纯粹的请求模型，那么SWF可能是这个的解决方案。<br/>
+在Servlet和Portlet环境中，SWF与Spring MVC和JSF等现有框架集成。如果你有一个业务流程会受益于会话模型而不是纯粹的请求模型，那么SWF可能是这个的解决方案。<br/>
 SWF允许你捕获逻辑页面流作为自包含模块，以便可以在不同场景中重用，因此非常适合通过controller导航来引导用户驱动业务流程的Web应用程序模块。
 </div>
 
@@ -68,10 +68,10 @@ Spring的Web模块包含许多独特的Web支持功能：
 - *可重用的业务代码，不需要复制。*使用已有的业务对象作为命令或表单对象，而不是镜像它们来继承特定的框架基类。
 - *可定制的绑定和验证。*类型不匹配作为保持违规值的应用程序级验证错误，本地化日期和数字绑定等，而不是对只使用仅包含字符串的表单对象进行手动解析和转换为业务对象。
 - *可定制的处理器映射和视图解析。*处理器映射和视图解析策略的范围从简单的基于URL的配置到复杂的专用解析策略。Spring比那些需要特定技术的Web MVC框架更加灵活。
-- *灵活的model传递。*使用name/value Map的model传递支持与任何视图技术的轻松集成。
+- *灵活的 model 传递。*使用name/value Map的model传递支持与任何视图技术的轻松集成。
 - *可定制的区域设置，时区和主题解析，支持带有或不带有Spring标签库的JSP，支持JSTL，支持Velocity，无需额外的桥接等。*
-- *一个简单而强大的JSP标签库，被称为Spring标签库，为数据绑定和主题等功能提供支持。*自定义标签在标记代码方面允许具有最大的灵活性。有关标签库描述符的信息，请参见附录标题为[第43章，spring JSP标签库](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#spring-tld)
-- *在Spring 2.0中引入的JSP表单标签库，使得在JSP页面中的写入表单更容易。*有关标签库描述符的信息，请参见附录标题为[Chapter 44，spring-form JSP Tag Library](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#spring-form-tld)
+- *一个简单而强大的JSP标签库，被称为Spring标签库，为数据绑定和主题等功能提供支持。*自定义标签在标记代码方面允许具有最大的灵活性。有关标签库描述符的信息，请参见附录标题为[第43章，spring JSP标签库](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#spring-tld)
+- *在Spring 2.0中引入的JSP表单标签库，使得在JSP页面中的写入表单更容易。*有关标签库描述符的信息，请参见附录标题为[Chapter 44，spring-form JSP Tag Library](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#spring-form-tld)
 - *Bean的生命周期作用域在当前的HTTP请求或HTTP Session中* 这不是Spring MVC本身的一个特定功能，而是Spring MVC使用的WebApplicationContext容器。这些bean域在第7.5.4节[“Request, session, global session, application和 WebSocket域"](/2017/07/25/Spring-核心技术（一）IoC容器/#Request, session, global session, application和 WebSocket域
 )中描述
 
@@ -81,7 +81,7 @@ Spring的Web模块包含许多独特的Web支持功能：
 
 如果你不想使用Spring的Web MVC，但打算利用Spring提供的其他解决方案，你可以轻松地将Web MVC框架与你选择的Spring集成。通过它的**ContextLoaderListener**简单地启动一个Spring根应用程序上下文，并通过任何action对象中的ServletContext属性（或Spring的各自的帮助方法）访问它。没有涉及“插件"，因此不需要专门的集成。从Web层的角度来看，你只是将Spring作为库使用，将根应用程序上下文实例作为入口点。
 
-即使不使用Spring Web MVC,注册bean和Spring的Service也是唾手可得的。在这种情况下，Spring不会与其他Web框架竞争。它只是解决了纯Web MVC框架没有解决的许多事情，从bean配置到数据访问和事务处理。所以你可以使用Spring中间层和/或数据访问层来丰富您的应用程序，即使你只想使用JDBC或Hibernate的事务抽象。
+即使不使用Spring Web MVC,注册bean和Spring的Service也是唾手可得的。在这种情况下，Spring不会与其他Web框架竞争。它只是解决了纯Web MVC框架没有解决的许多事情，从bean配置到数据访问和事务处理。所以你可以使用Spring中间层和/或数据访问层来丰富你的应用程序，即使你只想使用JDBC或Hibernate的事务抽象。
 
 ***
 # DispatcherServlet
@@ -128,7 +128,7 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
 </web-app>
 ```
-如第7.15节[“ApplicationContext的附加功能"](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#context-introduction)中所述，Spring中的**ApplicationContext**实例可以被限定作用域。在Web MVC框架中，每个**DispatcherServlet**都有它自己的**WebApplicationContext**，这个上下文继承了在根**WebApplicationContext**中定义的所有bean。根**WebApplicationContext**应该包含应该在其他上下文和Servlet实例之间共享的所有的基础框架bean。这些继承的bean可以在特定servlet域内被覆盖，并且你可以在给定的Servlet实例本地定义一个新的特定域bean。
+如第7.15节[“ApplicationContext的附加功能"](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#context-introduction)中所述，Spring中的**ApplicationContext**实例可以被限定作用域。在Web MVC框架中，每个**DispatcherServlet**都有它自己的**WebApplicationContext**，这个上下文继承了在根**WebApplicationContext**中定义的所有bean。根**WebApplicationContext**应该包含应该在其他上下文和Servlet实例之间共享的所有的基础框架bean。这些继承的bean可以在特定servlet域内被覆盖，并且你可以在给定的Servlet实例本地定义一个新的特定域bean。
 
 *Spring Web MVC中的典型上下文层次结构*
 ![mvc](/images/spring/mvc-context-hierarchy.png)
@@ -155,7 +155,7 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
 *Spring Web MVC中的单个根上下文*
 ![mvc](/images/spring/mvc-root-context.png)
-这可以通过设置一个空的ContextConfigLocation servlet 初始化参数进行配置，如下所示：
+这可以通过设置一个空的l**ContextConfigLocationl** servlet 初始化参数进行配置，如下所示：
 ```xml
 <web-app>
     <context-param>
@@ -180,7 +180,7 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
     </listener>
 </web-app>
 ```
-**WebApplicationContext**是普通ApplicationContext的扩展，它有一些Web应用程序所需的额外功能。它与普通的ApplicationContext不同之处在于它能够解析主题（参见[第22.9节“使用主题"](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#mvc-themeresolver)），并且知道它与哪个Servlet相关联（通过链接到ServletContext）。**WebApplicationContext**绑定在**ServletContext**中，并且如果你需要访问它，可以通过在**RequestContextUtils**类上使用静态方法，随时查找**WebApplicationContext**。
+**WebApplicationContext**是普通ApplicationContext的扩展，它有一些Web应用程序所需的额外功能。它与普通的ApplicationContext不同之处在于它能够解析主题（参见[第22.9节“使用主题"](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#mvc-themeresolver)），并且知道它与哪个Servlet相关联（通过链接到ServletContext）。**WebApplicationContext**绑定在**ServletContext**中，并且如果你需要访问它，可以通过在**RequestContextUtils**类上使用静态方法，随时查找**WebApplicationContext**。
 
 请注意，我们可以通过基于Java的配置实现相同的配置：
 ```java
@@ -207,7 +207,7 @@ public class GolfingWebAppInitializer extends AbstractAnnotationConfigDispatcher
 ```
 ## WebApplicationContext中的特殊Bean类型
 ***
-Spring **DispatcherServlet**使用特殊的bean来处理请求并渲染适当的视图。这些bean是Spring MVC的一部分。您可以通过在**WebApplicationContext**中简单配置一个或多个选择要使用的特殊bean。但是，你最初不需要这样做，因为如果你没有做任何配置的话，Spring MVC已经维护了一个默认bean列表，。更多信息在下一节。首先看下表列出**DispatcherServlet**依赖的特殊bean类型。
+Spring **DispatcherServlet**使用特殊的bean来处理请求并渲染适当的视图。这些bean是Spring MVC的一部分。你可以通过在**WebApplicationContext**中简单配置一个或多个选择要使用的特殊bean。但是，你最初不需要这样做，因为如果你没有做任何配置的话，Spring MVC已经维护了一个默认bean列表，。更多信息在下一节。首先看下表列出**DispatcherServlet**依赖的特殊bean类型。
 
 *WebApplicationContext中的特殊bean类型*
 
@@ -236,7 +236,7 @@ Spring **DispatcherServlet**使用特殊的bean来处理请求并渲染适当的
 ***
 在你设置了一个**DispatcherServlet**，并且对于该特定**DispatcherServlet**进来了一个请求后，**DispatcherServlet**将按如下所示开始处理请求：
 - 在这个请求中**WebApplicationContext**被搜索和绑定为一个属性，这样控制器和其他元素在处理过程中可以使用。默认它被绑定到**DispatcherServlet.WEB\_APPLICATION\_CONTEXT\_ATTRIBUTE**这个key上。
-- 语言环境解析器被绑定到request上，这样使处理过程中的元素能够解析语言环境设置来在处理request时使用（渲染视图，准备数据等）。如果您不需要语言环境解析，则不需要它。
+- 语言环境解析器被绑定到request上，这样使处理过程中的元素能够解析语言环境设置来在处理request时使用（渲染视图，准备数据等）。如果你不需要语言环境解析，则不需要它。
 - 主题解析器被绑定到request上，使元素（如视图）决定要使用哪个主题。如果不使用主题，可以忽略它。
 - 如果你指定了multiparts文件解析器，则会检查该request的multipart;如果找到multipart，request会被包装在一个**MultipartHttpServletRequest**中，以便处理过程中的其他元素进一步处理。有关multiparts处理的更多信息，请参见[第10节“Spring的multipart（文件上传）支持"](#Spring的multipart（文件上传）支持)。
 - 搜索适当的处理器。如果找到一个处理器，与处理器关联的执行链（预处理器，后处理器和控制器）被执行，以便准备一个model或rendering。
@@ -259,9 +259,9 @@ Spring **DispatcherServlet**同样支持由Servlet API指定的*last-modificatio
 ***
 # 实现控制器
 ***
-控制器提供对应用程序行为的访问，这些行为你通常通过一个service接口定义。控制器解释用户输入并将其转换为一个model，该model通过视图表现给用户。Spring以一个非常抽象的方式实现控制器，使您能够创建各种各样的控制器。
+控制器提供对应用程序行为的访问，这些行为你通常通过一个service接口定义。控制器解释用户输入并将其转换为一个model，该model通过视图表现给用户。Spring以一个非常抽象的方式实现控制器，使你能够创建各种各样的控制器。
 
-Spring 2.5为MVC控制器引入了基于注解的编程式模型，它使用诸如**@RequestMapping**，**@RequestParam**，**@ModelAttribute**等注解。此注解支持可用于Servlet MVC和Portlet MVC。以这种样式实现的控制器不必扩展特定的基类或实现特定的接口。此外，它们通常不直接依赖于Servlet或Portlet API，尽管您可以轻松配置对Servlet或Portlet设施的访问。
+Spring 2.5为MVC控制器引入了基于注解的编程式模型，它使用诸如**@RequestMapping**，**@RequestParam**，**@ModelAttribute**等注解。此注解支持可用于Servlet MVC和Portlet MVC。以这种样式实现的控制器不必扩展特定的基类或实现特定的接口。此外，它们通常不直接依赖于Servlet或Portlet API，尽管你可以轻松配置对Servlet或Portlet设施的访问。
 
 > 在Github上的可用的[spring-projects Org](https://github.com/spring-projects/)，许多Web应用程序利用本节中描述的注解支持，包括MvcShowcase，MvcAjax，MvcBasic，PetClinic，PetCare等。
 
@@ -466,7 +466,7 @@ public String findOwner(@PathVariable("ownerId") String theOwner, Model model) {
     // 忽略实现
 }
 ```
-或者如果URI模板变量名称与方法参数名称匹配，则可以省略该详细信息。只要您的代码使用调试信息或Java 8上的-parameters编译器标记进行编译，Spring MVC会将方法参数与URI模板变量名称进行匹配：
+或者如果URI模板变量名称与方法参数名称匹配，则可以省略该详细信息。只要你的代码使用调试信息或Java 8上的-parameters编译器标记进行编译，Spring MVC会将方法参数与URI模板变量名称进行匹配：
 ```java
 @GetMapping("/owners/{ownerId}")
 public String findOwner(@PathVariable String ownerId, Model model) {
@@ -499,7 +499,7 @@ public class RelativePathUriTemplateController {
 
 }
 ```
-**@PathVariable**参数可以是任何简单的类型，如int，long，Date等。Spring会自动转换为适当的类型或抛出**TypeMismatchException**异常,如果Spring转换失败的话。您还可以注册解析其他数据类型的支持。请参见[“方法参数和类型转换"](#方法参数和类型转换)一节以及[“自定义WebDataBinder初始化"](#自定义WebDataBinder初始化)一节。
+**@PathVariable**参数可以是任何简单的类型，如int，long，Date等。Spring会自动转换为适当的类型或抛出**TypeMismatchException**异常,如果Spring转换失败的话。你还可以注册解析其他数据类型的支持。请参见[“方法参数和类型转换"](#方法参数和类型转换)一节以及[“自定义WebDataBinder初始化"](#自定义WebDataBinder初始化)一节。
 
 ### 使用正则表达式的URI模板模式
 有时你需要更精确地定义URI模板变量。考虑URL“/spring-web/spring-web-3.0.5.jar"。你怎么把它分解成多个部分？
@@ -573,7 +573,7 @@ public void findPet(@PathVariable String petId, @MatrixVariable int q) {
 
 }
 ```
-由于所有路径段都可能包含矩阵变量，因此在某些情况下，您需要更具体地确定变量预期位于何处：
+由于所有路径段都可能包含矩阵变量，因此在某些情况下，你需要更具体地确定变量预期位于何处：
 ```java
 // GET /owners/42;q=11/pets/21;q=22
 
@@ -614,7 +614,7 @@ public void findPet(
 ```
 请注意，为了使用矩阵变量，必须将**RequestMappingHandlerMapping**的**removeSemicolonContent**属性设置为**false**。默认设置为**true**。
 > MVC Java配置和MVC命名空间都提供了使用矩阵变量的选项。
-如果您使用Java配置，[使用MVC Java Config进行高级自定义](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#mvc-config-advanced-java)部分将介绍如何自定义**RequestMappingHandlerMapping**。    
+如果你使用Java配置，[使用MVC Java Config进行高级自定义](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#mvc-config-advanced-java)部分将介绍如何自定义**RequestMappingHandlerMapping**。    
 在MVC命名空间中，**&lt;mvc:annotation-driven>**元素有**enable-matrix-variables**属性,它应该被设置为**true**。默认情况下它被设置为**false**。 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -633,7 +633,7 @@ public void findPet(
 ```
 
 ### Consumable Media Types
-您可以通过指定Consumable Media Types的列表来缩小主要映射。只有当Content-Type请求头与指定的media type匹配时，才会匹配该请求。例如：
+你可以通过指定Consumable Media Types的列表来缩小主要映射。只有当Content-Type请求头与指定的media type匹配时，才会匹配该请求。例如：
 ```java
 @PostMapping(path = "/pets", consumes = "application/json")
 public void addPet(@RequestBody Pet pet, Model model) {
@@ -645,7 +645,7 @@ Consumable Media Types表达式也可以以**!text/plain**否定，以匹配所�
 > 在类型和方法级上支持consume条件。不想大多数其他条件，当用在类型级上，方法级consumable类型覆盖而不是拓展类型级consumable类型。
 
 ### Producible Media Types
-您可以通过指定Producible Media Types列表来缩小主映射。只有当**Accept**请求头匹配这些值之一时，才会匹配该请求。此外，使用produce条件确保用于产生响应的实际内容类型与produce条件中指定的媒体类型相关。例如：
+你可以通过指定Producible Media Types列表来缩小主映射。只有当**Accept**请求头匹配这些值之一时，才会匹配该请求。此外，使用produce条件确保用于产生响应的实际内容类型与produce条件中指定的媒体类型相关。例如：
 ```java
 @GetMapping(path = "/pets/{petId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @ResponseBody
@@ -812,7 +812,7 @@ public void handle(@RequestBody String body, Writer writer) throws IOException {
 
 有关这些转换器的更多信息，请参阅["消息转换器"](#消息转换器)。另请注意，如果使用MVC命名空间或MVC Java配置，默认情况下会注册更广泛的消息转换器。有关详细信息，请参见[第16.1节“启用MVC Java配置或MVC XML命名空间"](#启用MVC Java配置或MVC XML命名空间)。
 
-如果您打算读写XML，则需要使用**org.springframework.oxm**包中的具体的**Marshaller**和**Unmarshaller**实现配置**MarshallingHttpMessageConverter**。下面的示例显式了如何直接在配置中执行此操作，但是如果您的应用程序通过MVC命名空间或MVC Java配置进行配置，请参阅[第16.1节“启用MVC Java配置或MVC XML命名空间"](#启用MVC Java配置或MVC XML命名空间)。
+如果你打算读写XML，则需要使用**org.springframework.oxm**包中的具体的**Marshaller**和**Unmarshaller**实现配置**MarshallingHttpMessageConverter**。下面的示例显式了如何直接在配置中执行此操作，但是如果你的应用程序通过MVC命名空间或MVC Java配置进行配置，请参阅[第16.1节“启用MVC Java配置或MVC XML命名空间"](#启用MVC Java配置或MVC XML命名空间)。
 
 ```xml
 <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
@@ -857,7 +857,7 @@ public String helloWorld() {
 ### 使用@RestController注解创建REST控制器
 控制器实现REST API是一个非常常见的用例，从而仅提供JSON，XML或自定义的MediaType内容。为了方便起见，相比使用**@ResponseBody**注解你的所有的**@RequestMapping**方法，你可以使用**@RestController**注解你的控制器类。
 
-**@RestController**是一个结合了**@ResponseBody**和**@Controller**的模型注解。更重要的是，它给您的控制器提供了更多的意义，并且可能在将来的框架版本中携带额外的语义。
+**@RestController**是一个结合了**@ResponseBody**和**@Controller**的模型注解。更重要的是，它给你的控制器提供了更多的意义，并且可能在将来的框架版本中携带额外的语义。
 与常规的**@Controller**一样，**@RestController**可以由**@ControllerAdvice**或@**RestControllerAdvice **beans协助。有关更多详细信息，请参阅[“使用@ControllerAdvice和@RestControllerAdvice通知控制器"](#使用@ControllerAdvice和@RestControllerAdvice通知控制器)一节。
 
 ### 使用HttpEntity
@@ -916,7 +916,7 @@ public void populateModel(@RequestParam String number, Model model) {
 ### 在方法参数上使用@ModelAttribute
 如上一节所述，**@ModelAttribute**可以在方法或方法参数上使用。本节介绍了其在方法参数中的用法。
 
-方法参数上的**@ModelAttribute**表示这个参数应该从model中检索。如果model中不存在，参数首先被实例化，然后添加到model中。一旦model中存在，这个参数的字段会从所有名称相匹配的请求参数中填充。这在Spring MVC中被称为的数据绑定，这是一个非常有用的机制，可以节省您逐个解析每个表单字段时间。
+方法参数上的**@ModelAttribute**表示这个参数应该从model中检索。如果model中不存在，参数首先被实例化，然后添加到model中。一旦model中存在，这个参数的字段会从所有名称相匹配的请求参数中填充。这在Spring MVC中被称为的数据绑定，这是一个非常有用的机制，可以节省你逐个解析每个表单字段时间。
 ```java
 @PostMapping("/owners/{ownerId}/pets/{petId}/edit")
 public String processSubmit(@ModelAttribute Pet pet) { }
@@ -953,7 +953,7 @@ public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result
 ```
 使用**BindingResult**可以检查是否发现错误，在通常呈现相同表单的情况吓,这里可以在Spring的&lt;errors>表单标签的帮助下显式错误。
 
-注意，在某些情况下，不使用数据绑定来获取访问modle中的属性可能是有用的。对于这种情况，您可以将**Model**注入控制器，或者作为选择的在注解上使用**binding**标志：
+注意，在某些情况下，不使用数据绑定来获取访问modle中的属性可能是有用的。对于这种情况，你可以将**Model**注入控制器，或者作为选择的在注解上使用**binding**标志：
 ```java
 @ModelAttribute
 public AccountForm setUpForm() {
@@ -986,7 +986,7 @@ public String processSubmit(@ModelAttribute("pet") Pet pet, BindingResult result
 
 }
 ```
-或者您可以通过添加JSR-303 **@Valid**注解来自动调用验证：
+或者你可以通过添加JSR-303 **@Valid**注解来自动调用验证：
 ```java
 @PostMapping("/owners/{ownerId}/pets/{petId}/edit")
 public String processSubmit(@Valid @ModelAttribute("pet") Pet pet, BindingResult result) {
@@ -999,7 +999,7 @@ public String processSubmit(@Valid @ModelAttribute("pet") Pet pet, BindingResult
 
 }
 ```
-有关如何配置和使用验证的详细信息，请参见第9.8节[“Spring验证"](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#validation-beanvalidation)和[第9章“验证，数据绑定和类型转换“](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#validation)。
+有关如何配置和使用验证的详细信息，请参见第9.8节[“Spring验证"](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#validation-beanvalidation)和[第9章“验证，数据绑定和类型转换“](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#validation)。
 
 ### 使用@SessionAttributes在请求之间的HTTP session中存储模型属性
 类型级**@SessionAttributes**注解声明特定处理器使用的session属性。这通常将列出模型属性名称或模型属性的类型，这些模型属性或类型应该透明地存储在会话或某些会话存储中，作为后续请求之间的表单支持bean。
@@ -1014,7 +1014,7 @@ public class EditPetForm {
 }
 ```
 ### 使用@SessionAttribute访问预先存在的全局session属性
-如果您需要访问全局管理的预先存在的session属性，即控制器之外的（如一个过滤器），并且它可能或不存在，则可以在方法参数上使用**@SessionAttribute**注解：
+如果你需要访问全局管理的预先存在的session属性，即控制器之外的（如一个过滤器），并且它可能或不存在，则可以在方法参数上使用**@SessionAttribute**注解：
 ```java
 @RequestMapping("/")
 public String handle(@SessionAttribute User user) {
@@ -1299,7 +1299,7 @@ deferredResult.setResult(data);
 - **DispatcherServlet**再次被调用，并且从异步生成的结果开始继续处理。
 
 ### 异步请求的异常处理
-如果从控制器方法返回的**Callable**在执行时引发异常，会发生什么？简答是这与控制器方法引发异常时发生的情况一样。它经历了常规异常处理机制。更长的解释是，当**Callable**引发一个异常，Spring MVC以这个**Exception**为结果调度回Servlet容器，并导致以异常而不是控制器方法返回值为开始恢复请求处理。当使用**DeferredResult**时，您可以选择是否使用**Exception**实例调用**setResult**或**setErrorResult**。
+如果从控制器方法返回的**Callable**在执行时引发异常，会发生什么？简答是这与控制器方法引发异常时发生的情况一样。它经历了常规异常处理机制。更长的解释是，当**Callable**引发一个异常，Spring MVC以这个**Exception**为结果调度回Servlet容器，并导致以异常而不是控制器方法返回值为开始恢复请求处理。当使用**DeferredResult**时，你可以选择是否使用**Exception**实例调用**setResult**或**setErrorResult**。
 
 ### 拦截异步请求
 一个**HandlerInterceptor**还可以实现**AsyncHandlerInterceptor**，是为了能够实现**afterConcurrentHandlingStarted**回调，，当异步处理开始时，该回调被调用，而不是**postHandle**和**afterCompletion**方法。
@@ -1410,7 +1410,7 @@ MVC Java配置和MVC命名空间提供了配置异步请求处理的选项。**W
 如果需要覆盖特定**DeferredResult**的默认超时值，可以使用适当的类构造函数。类似地，对于**Callable**，你可以将其包装在**WebAsyncTask**中，并使用适当的类构造函数自定义超时值。**WebAsyncTask**的类构造函数也允许提供一个**AsyncTaskExecutor**。
 
 ## 测试控制器
-spring-test模块对于测试带注解的控制器提供一流的支持。请参见[第15.6节“Spring MVC测试框架”](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#spring-mvc-test-framework)。
+spring-test模块对于测试带注解的控制器提供一流的支持。请参见[第15.6节“Spring MVC测试框架”](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#spring-mvc-test-framework)。
 
 
 ***
@@ -1422,7 +1422,7 @@ spring-test模块对于测试带注解的控制器提供一流的支持。请参
 - **defaultHandler**：当映射器处理器在一次映射处理器时没有映射结果，默认使用的处理器，
 - **order**：基于order属性的值（请参阅org.springframework.core.Ordered接口），Spring会排序上下文中可用的所有处理器映射器，并应用第一个匹配的处理器。
 - **alwaysUseFullPath**：如果为true，Spring将使用当前Servlet上下文中的完整路径来查找适当的处理程序。如果为false（默认值），则使用当前Servlet映射中的路径。例如，如果一个Servlet使用/testing/\*映射，并且将alwaysUseFullPath属性设置为true，则使用/testing/viewPage.html，而如果属性设置为false，则使用/viewPage.html。
-- **urlDecode**：默认为true，从Spring 2.5开始。如果您喜欢比较编码路径，请将此标志设置为false。但是，HttpServletRequest始终以解码形式公开Servlet路径。请注意，当与编码路径比较时，Servlet路径将不匹配。
+- **urlDecode**：默认为true，从Spring 2.5开始。如果你喜欢比较编码路径，请将此标志设置为false。但是，HttpServletRequest始终以解码形式公开Servlet路径。请注意，当与编码路径比较时，Servlet路径将不匹配。
 
 以下示例说明如何配置拦截器
 ```xml
@@ -1490,13 +1490,13 @@ public class TimeBasedAccessInterceptor extends HandlerInterceptorAdapter {
     }
 }
 ```
-由此映射器处理的任何请求都将被**TimeBasedAccessInterceptor**拦截。如果当前时间在办公时间之外，用户将被重定向到静态HTML文件，例如，您只能在办公时间内访问该网站。
+由此映射器处理的任何请求都将被**TimeBasedAccessInterceptor**拦截。如果当前时间在办公时间之外，用户将被重定向到静态HTML文件，例如，你只能在办公时间内访问该网站。
 
 > 当使用**RequestMappingHandlerMapping**时，实际的处理器是**HandlerMethod**的一个实例，它标识将被调用的特定控制器方法。
 
 你可以看到，Spring适配器类**HandlerInterceptorAdapter**使得更容易扩展**HandlerInterceptor**接口。
 
-> 在上面的示例中，配置的拦截器将应用于使用注解控制器方法处理的所有请求。如果要缩小拦截器应用的URL路径，你可以使用MVC命名空间或MVC Java配置，或声明类型为MappedInterceptor的bean实例来执行此操作。请参见第[16.1节“启用MVC Java配置或MVC XML命名空间”](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#mvc-config-enable)。
+> 在上面的示例中，配置的拦截器将应用于使用注解控制器方法处理的所有请求。如果要缩小拦截器应用的URL路径，你可以使用MVC命名空间或MVC Java配置，或声明类型为MappedInterceptor的bean实例来执行此操作。请参见第[16.1节“启用MVC Java配置或MVC XML命名空间”](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#mvc-config-enable)。
 
 请注意，**HandlerInterceptor的postHandle**方法并不总是适用于**@ResponseBody**和**ResponseEntity**方法。在这种情况下，**HttpMessageConverter**在调用**postHandle**之前写入并提交响应，这使得不可能再更改响应，例如添加一个响应头。相反，应用程序可以实现**ResponseBodyAdvice**，并将其声明为**@ControllerAdvice** bean或直接在**RequestMappingHandlerAdapter**上进行配置。
 
@@ -1517,7 +1517,7 @@ public class TimeBasedAccessInterceptor extends HandlerInterceptorAdapter {
 |**XmlViewResolver**|ViewResolver的实现，它接受用XML编写的配置文件，与Spring的XML bean工厂具有相同的DTD。。默认配置文件为/WEB-INF/views.xml。|
 |**ResourceBundleViewResolver**|ViewResolver的实现，它使用ResourceBundle中的bean定义，由bundle基本名称指定。通常你在属性文件中定义bundle，该属性文件位于类路径中。默认文件名为views.properties。|
 |**UrlBasedViewResolver**|ViewResolver接口的简单实现，它直接解析逻辑视图名称到URL，而不需要定义显式的映射。这比较适合在逻辑视图名与你的视图资源名相匹配的情况下使用，这样就不用显式地指定映射了。|
-|**InternalResourceViewResolver**|UrlBasedViewResolver的便利子类，支持InternalResourceView（实际上是Servlets和JSP）和子类，如JstlView和TilesView。您可以使用setViewClass(..)为此解析器生成的所有视图指定视图类。有关详细信息，请参阅UrlBasedViewResolver的javadocs。|
+|**InternalResourceViewResolver**|UrlBasedViewResolver的便利子类，支持InternalResourceView（实际上是Servlets和JSP）和子类，如JstlView和TilesView。你可以使用setViewClass(..)为此解析器生成的所有视图指定视图类。有关详细信息，请参阅UrlBasedViewResolver的javadocs。|
 |**VelocityViewResolver**/**FreeMarkerViewResolver**|UrlBasedViewResolver的便利子类，分别支持VelocityView（实际上是Velocity模板）或FreeMarkerView，以及它们的自定义子类。|
 |**ContentNegotiatingViewResolver**|ViewResolver接口的实现，它根据请求文件名或Accept头来解析视图。参见[第5.4节， “ContentNegotiatingViewResolver”](#ContentNegotiatingViewResolver)。|
 
@@ -1532,7 +1532,7 @@ public class TimeBasedAccessInterceptor extends HandlerInterceptorAdapter {
 ```
 当返回test作为逻辑视图名称时，此视图解析器将请求转发到**RequestDispatcher**，它会发送请求到/WEB-INF/jsp/test.jsp。
 
-当您在Web应用程序中组合不同的视图技术时，可以使用ResourceBundleViewResolver：
+当你在Web应用程序中组合不同的视图技术时，可以使用ResourceBundleViewResolver：
 ```xml
 <bean id="viewResolver"
         class="org.springframework.web.servlet.view.ResourceBundleViewResolver">
@@ -1540,7 +1540,7 @@ public class TimeBasedAccessInterceptor extends HandlerInterceptorAdapter {
     <property name="defaultParentView" value="parentView"/>
 </bean>
 ```
-**ResourceBundleViewResolver**检查由basename标识的**ResourceBundle**，对于每个应该解析的视图，它使用属性**[viewname].(class)**的值作为视图类，并且属性**[viewname] .url**的值为视图url。示例可以在涵盖视图技术的下一章中找到。如你看到的，你可以识别一个父视图，它时这个属性文件中所有视图"拓展"自的。这样，您可以指定默认视图类。
+**ResourceBundleViewResolver**检查由basename标识的**ResourceBundle**，对于每个应该解析的视图，它使用属性**[viewname].(class)**的值作为视图类，并且属性**[viewname] .url**的值为视图url。示例可以在涵盖视图技术的下一章中找到。如你看到的，你可以识别一个父视图，它时这个属性文件中所有视图"拓展"自的。这样，你可以指定默认视图类。
 
 > **AbstractCachingViewResolver**的子类缓存它们解析的视图实例。缓存提高了某些视图技术的性能。可以通过将cache属性设置为false来关闭缓存。此外，如果你必须在运行时刷新某个视图（例如，当Velocity模板被修改时），可以使用**removeFromCache(String viewName，Locale loc)**方法。
 
@@ -1583,7 +1583,7 @@ Spring支持多个视图解析器。因此，你可以链接解析器，例如�
 强迫重定向作为控制器响应结果的一个方式是控制器创建并返回一个Spring的**RedirectView**实例。在这种情况下，**DispatcherServlet**不使用通常的视图解析机制。而是因为该实例已经给出了（重定向）视图，**DispatcherServlet**只是指示视图来完成它的工作。反过来**RedirectView**的调用**HttpServletResponse.sendRedirect()**将HTTP重定向发送到客户端浏览器。
 
 
-如果你使用RedirectView并且该视图是由控制器本身创建的，建议您将重定向URL配置为要注入到控制器中，这样的话，就不会与这个controller耦合太大，而只是在context的配置文件中配置了这个视图名。“‘redirect:’前缀”这节有助于此解耦。
+如果你使用RedirectView并且该视图是由控制器本身创建的，建议你将重定向URL配置为要注入到控制器中，这样的话，就不会与这个controller耦合太大，而只是在context的配置文件中配置了这个视图名。“‘redirect:’前缀”这节有助于此解耦。
 
 ### 传递数据到重定向目标
 默认情况下，所有模型属性都被认为是重定向URL中的URI模板变量。其余的原始类型或原始类型的collections/arrays都被自动添加为一个查询参数。
@@ -1612,7 +1612,7 @@ public String upload(...) {
  请注意，如果控制器的处理器被**@ResponseStatus**所注解，注解的值是优先于被**RedirectView**设置的response status(响应状态)。
   
 ### “forward: ”前缀
-对于最终由**UrlBasedViewResolver**和它的子类解析的视图名称，也可能使用一个特殊的前缀**forward: **。这会为除前缀外的其余视图名创建一个InternalResourceView（它最终会执行一个RequestDispatcher.forward()）,其余视图名也被视为一个URL。因此，这个前缀与InternalResourceViewResolver和InternalResourceView（对于JSP）一起使用时就没有了。但是当你主要使用的是(除JSP外)其他的视图技术时，这个前缀就很有用，但是它还是会强制使用Servlet/JSP引擎来处理对资源的forward操作（请注意，您也可以链接多个视图解析器。）。
+对于最终由**UrlBasedViewResolver**和它的子类解析的视图名称，也可能使用一个特殊的前缀**forward: **。这会为除前缀外的其余视图名创建一个InternalResourceView（它最终会执行一个RequestDispatcher.forward()）,其余视图名也被视为一个URL。因此，这个前缀与InternalResourceViewResolver和InternalResourceView（对于JSP）一起使用时就没有了。但是当你主要使用的是(除JSP外)其他的视图技术时，这个前缀就很有用，但是它还是会强制使用Servlet/JSP引擎来处理对资源的forward操作（请注意，你也可以链接多个视图解析器。）。
 
 如“redirect: ”前缀一样，如果带有“forward: ”前缀的视图名被注入到控制器中，控制器在处理响应方面不会检测到有什么特别的事情发生。
 
@@ -1773,7 +1773,7 @@ UriComponents uriComponents = MvcUriComponentsBuilder
 
 URI uri = uriComponents.encode().toUri();
 ```
-在上面的例子中，我们提供了实际的方法参数值，在这种情况下，long值21被用作路径变量并插入到URL中。此外，我们提供了值42，以填充任何剩余的URI变量，例如从类型级请求映射继承的“hotel”变量。如果该方法有更多的参数，您可以为URL不需要的参数提供null。一般来说，只有**@PathVariable**和**@RequestParam**参数与构造URL相关。
+在上面的例子中，我们提供了实际的方法参数值，在这种情况下，long值21被用作路径变量并插入到URL中。此外，我们提供了值42，以填充任何剩余的URI变量，例如从类型级请求映射继承的“hotel”变量。如果该方法有更多的参数，你可以为URL不需要的参数提供null。一般来说，只有**@PathVariable**和**@RequestParam**参数与构造URL相关。
 
 还有其他方式使用MvcUriComponentsBuilder。例如，你可以使用某种类似mock测试的技术，，以避免通过名称引用控制器方法（该示例假定静态导入MvcUriComponentsBuilder.on）：
 ```java
@@ -1782,7 +1782,7 @@ UriComponents uriComponents = MvcUriComponentsBuilder
 
 URI uri = uriComponents.encode().toUri();
 ```
-以上示例在MvcUriComponentsBuilder中使用静态方法。在内部，他们依靠ServletUriComponentsBuilder从当前请求的scheme, host, port, context path和servlet path中准备一个基本URL。这在大多数情况下运行良好，但有时可能还不够。例如，你可能不在请求的上下文中（比如:链接准备时的批量处理过程），或者您可能需要插入路径前缀（例如: 本地前缀从请求路径中被移除了，并且需要重新添加到链接中）。
+以上示例在MvcUriComponentsBuilder中使用静态方法。在内部，他们依靠ServletUriComponentsBuilder从当前请求的scheme, host, port, context path和servlet path中准备一个基本URL。这在大多数情况下运行良好，但有时可能还不够。例如，你可能不在请求的上下文中（比如:链接准备时的批量处理过程），或者你可能需要插入路径前缀（例如: 本地前缀从请求路径中被移除了，并且需要重新添加到链接中）。
 
 对于这种情况，你可以使用接受UriComponentsBuilder的静态“fromXxx”重载方法来使用基本URL。或者你可以使用基本URL创建一个MvcUriComponentsBuilder的实例，然后使用基于实例的“withXxx”方法。例如：
 ```java
@@ -1871,7 +1871,7 @@ Spring的内置多部件支持处理Web应用程序中的文件上传。你可�
 
 </bean>
 ```
-当然，你还需要将适当的jar放在您的类路径中，以使多部件解析器工作。在使用**CommonsMultipartResolver**的情况下，你需要使用**commons-fileupload.jar**。
+当然，你还需要将适当的jar放在你的类路径中，以使多部件解析器工作。在使用**CommonsMultipartResolver**的情况下，你需要使用**commons-fileupload.jar**。
 
 当Spring **DispatcherServlet**检测到multi-part请求时，它激活已经声明在你的上下文中的解析器，并且将请求交给它。然后解析器包装当前的**HttpServletRequest**到**MultipartHttpServletRequest**中，后者支持多部件文件上传。使用**MultipartHttpServletRequest**，你可以获取关于该请求包含的多部件的信息，并且在你的控制器中实际访问多部件文件。
 
@@ -1879,7 +1879,7 @@ Spring的内置多部件支持处理Web应用程序中的文件上传。你可�
 ***
 为了使用基于Servlet 3.0的多部件解析鹅，你需要在**web.xml**中使用“multipart-config”部分标记**DispatcherServlet**，或者在编程式的Servlet注册中使用**javax.servlet.MultipartConfigElement**，或者在自定义Servlet类的情况下，可能在你的Servlet类上使用**javax.servlet.annotation.MultipartConfig**注解。配置设置，例如最大大小或存储位置需要在Servlet注册级别上应用，因为Servlet 3.0不允许从MultipartResolver完成这些设置。
 
-一旦使用上述方法启用了Servlet 3.0多部分解析，你可以将**StandardServletMultipartResolver**添加到您的Spring配置中：
+一旦使用上述方法启用了Servlet 3.0多部分解析，你可以将**StandardServletMultipartResolver**添加到你的Spring配置中：
 ```xml
 <bean id="multipartResolver"
         class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
@@ -1967,7 +1967,7 @@ Content-Transfer-Encoding: 8bit
 ```
 你可以使用**@RequestParam("meta-data") String metadata**控制器方法参数访问名为“meta-data”的部分。但是，你可能更希望接受一个强类型对象，它是从请求部分的正文中的JSON格式的数据初始化而来，这非常类似于**@RequestBody**，借助于一个HttpMessageConverter将非多部件请求的正文转换为目标对象的方式。
 
-为此，您可以使用@RequestPart注解来代替@RequestParam注解。它允许你拥有特定多部件的内容，并通过HttpMessageConverter来转换成”Content-Type”报头里理想的多部件对象。
+为此，你可以使用@RequestPart注解来代替@RequestParam注解。它允许你拥有特定多部件的内容，并通过HttpMessageConverter来转换成”Content-Type”报头里理想的多部件对象。
 ```java
 @PostMapping("/someUrl")
 public String onSubmit(@RequestPart("meta-data") MetaData metadata,
@@ -1986,7 +1986,7 @@ public String onSubmit(@RequestPart("meta-data") MetaData metadata,
 ***
 Spring **HandlerExceptionResolver**实现处理在控制器执行期间发生的意外异常。**HandlerExceptionResolver**有点类似于可以在Web应用程序描述符web.xml中定义的异常映射。但是，它提供了一种更灵活的方法。例如，它提供有关在抛出异常时正在执行哪个处理器的信息。此外，编程式的异常处理可以在请求转发到另一个URL之前提供更多的响应选项（与使用Servlet特定的异常映射有相同的最终结果）。
 
-除了实现**HandlerExceptionResolver**接口，它只是实现**resolveException(Exception, Handler)**方法并返回一个**ModelAndView**，你还可以使用提供的**SimpleMappingExceptionResolver**或者创建**@ExceptionHandler**方法。**SimpleMappingExceptionResolver**使您能够获取可能抛出的任何异常的类名，并将其映射到视图名上。这在功能上等同于Servlet API的异常映射功能，但是，它在不同的处理器中，可以更精细地实现异常的映射。另一方面，**@ExceptionHandler**注解可以用于应该被调用来处理异常的方法。这样的方法可以在**@Controller**中本地定义，也可以在**@ControllerAdvice**类中定义，这时将应用于许多**@Controller**类。以下部分将对此进行更详细的解释。
+除了实现**HandlerExceptionResolver**接口，它只是实现**resolveException(Exception, Handler)**方法并返回一个**ModelAndView**，你还可以使用提供的**SimpleMappingExceptionResolver**或者创建**@ExceptionHandler**方法。**SimpleMappingExceptionResolver**使你能够获取可能抛出的任何异常的类名，并将其映射到视图名上。这在功能上等同于Servlet API的异常映射功能，但是，它在不同的处理器中，可以更精细地实现异常的映射。另一方面，**@ExceptionHandler**注解可以用于应该被调用来处理异常的方法。这样的方法可以在**@Controller**中本地定义，也可以在**@ControllerAdvice**类中定义，这时将应用于许多**@Controller**类。以下部分将对此进行更详细的解释。
 
 ## @ExceptionHandler
 ***
@@ -2154,7 +2154,7 @@ public class DisplayShoppingCartController implements Controller {
 - **x.y.User**实例，添加时会生成一个**user**名称。
 - **x.y.Registration**实例，添加时会生成一个**registration**名称。
 - **x.y.Foo**实例，添加时会生成一个**foo**名称。
-- **java.util.HashMap**，添加时实例会生成一个**hashMap**名称。在这种情况下，您可能想要明确指定名称，因为**hashMap**不太直观。
+- **java.util.HashMap**，添加时实例会生成一个**hashMap**名称。在这种情况下，你可能想要明确指定名称，因为**hashMap**不太直观。
 - 添加null会导致一个**IllegalArgumentException**被抛出。如果要添加的对象可以为null，你也需要显式地指定其名。
 
 <div class="quote">什么？居然没有自动多元？
@@ -2217,7 +2217,7 @@ public class RegistrationController implements Controller {
 ```
 注意在**handleRequest(..)**方法实现中，没有在返回的**ModelAndView**上设置任何**View**或逻辑视图名。**DefaultRequestToViewNameTranslator**负责从请求的URL生成逻辑视图名。上面例子中，**RegistrationController**与**ControllerClassNameHandlerMapping**结合使用，一个请求URL{%raw%}http://localhost/registration.html{%endraw%}导致一个逻辑视图名**registration**被**DefaultRequestToViewNameTranslator**生成。然后，该逻辑视图名称由**InternalResourceViewResolver** bean解析为**/WEB-INF/jsp/registration.jsp**视图。
 
-> 您不需要显式定义一个**DefaultRequestToViewNameTranslator** bean。如果你喜欢**DefaultRequestToViewNameTranslator**的默认设置，则可以依靠Spring Web MVC **DispatcherServlet**来实例化此类的实例，如果未明确配置该实例的话。
+> 你不需要显式定义一个**DefaultRequestToViewNameTranslator** bean。如果你喜欢**DefaultRequestToViewNameTranslator**的默认设置，则可以依靠Spring Web MVC **DispatcherServlet**来实例化此类的实例，如果未明确配置该实例的话。
 
 当然，如果你需要更改默认设置，那么你需要显式配置自己的**DefaultRequestToViewNameTranslator** bean。有关可配置的各种属性的详细信息，请参阅综合的**DefaultRequestToViewNameTranslator** javadocs。
 
@@ -2862,7 +2862,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 ```xml
 <mvc:resources mapping="/resources/**" location="/, classpath:/META-INF/public-web-resources/"/>
 ```
-当部署新版本的应用程序时可能会更改的资源时，建议您将版本字符串合并到用于请求资源的映射模式中，以便你可以强制客户端请求新部署的应用程序资源版本。版本化URL的支持内置在框架中，可以通过在资源处理器上配置资源链来启用。该链包含一个**ResourceResolver**实例，后跟一个或多个**ResourceTransformer**实例。他们一起可以提供资源的任意解析和转换。
+当部署新版本的应用程序时可能会更改的资源时，建议你将版本字符串合并到用于请求资源的映射模式中，以便你可以强制客户端请求新部署的应用程序资源版本。版本化URL的支持内置在框架中，可以通过在资源处理器上配置资源链来启用。该链包含一个**ResourceResolver**实例，后跟一个或多个**ResourceTransformer**实例。他们一起可以提供资源的任意解析和转换。
 
 内置的**VersionResourceResolver**可以配置不同的策略。例如，**FixedVersionStrategy**可以使用属性，日期或其他作为版本。**ContentVersionStrategy**使用从资源内容计算的MD5哈希值（称为“指纹识别”URL）。注意，当提供资源服务时，**VersionResourceResolver**会自动使用这个解析的version字符串作为HTTP ETag头
 
@@ -3044,7 +3044,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
 ## 使用MVC Java Config进行高级自定义
 ***
-从上面的例子中可以看出，MVC Java配置和MVC命名空间提供了高级别构造，它不需要深入了解为你创建的底层bean。相反，它可以帮助您专注于你的应用程序需求。但是，在某些时候，您可能需要更细致的控制，或者您可能只想了解底层配置。
+从上面的例子中可以看出，MVC Java配置和MVC命名空间提供了高级别构造，它不需要深入了解为你创建的底层bean。相反，它可以帮助你专注于你的应用程序需求。但是，在某些时候，你可能需要更细致的控制，或者你可能只想了解底层配置。
 
 更精细控制的第一步是查看为你创建的底层bean。在MVC Java配置中，你可以在WebMvcConfigurationSupport中看到javadocs和@Bean方法。这个类中的配置是通过@EnableWebMvc注解自动导入。事实上，如果你打开@EnableWebMvc你可以看到@Import语句。
 
@@ -3068,7 +3068,7 @@ public class WebConfig extends DelegatingWebMvcConfiguration {
 }
 ```
 
-> 应用程序应该只有一个配置继承**DelegatingWebMvcConfiguration**或一个**@EnableWebMvc**注解类，因为它们都注册了相同的底层bean。以这种方式修改bean不会阻止您使用本节之前显式的任何更高级别的构造。 **WebMvcConfigurerAdapter**子类和**WebMvcConfigurer**实现仍在使用中。
+> 应用程序应该只有一个配置继承**DelegatingWebMvcConfiguration**或一个**@EnableWebMvc**注解类，因为它们都注册了相同的底层bean。以这种方式修改bean不会阻止你使用本节之前显式的任何更高级别的构造。 **WebMvcConfigurerAdapter**子类和**WebMvcConfigurer**实现仍在使用中。
 
 ## 使用MVC命名空间进行高级自定义
 ***
