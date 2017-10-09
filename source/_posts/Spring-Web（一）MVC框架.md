@@ -517,9 +517,9 @@ public void handle(@PathVariable String version, @PathVariable String extension)
 ### 路径模式比较
 当一个URL匹配多个模式时，使用排序来查找最具体的匹配。
 
-具有较低数量的URI变量和通配符的模式被认为更具体。例如/hotels/{hotel}/\*有一个URI变量和一个通配符，它被认为比有一个URI变量和两个通配符的/hotels/{hotel}/\*\*更具体。
+具有较低数量的URI变量和通配符的模式被认为更具体。例如**/hotels/{hotel}/\***有一个URI变量和一个通配符，它被认为比有一个URI变量和两个通配符的**/hotels/{hotel}/\*\***更具体。
 
-如果两个模式有相同的数量，那么更长的那个被认为更具体。例如，/foo/bar\*比/foo/\*更长，因此也被认为更具体。
+如果两个模式有相同的数量，那么更长的那个被认为更具体。例如，**/foo/bar\***比**/foo/\***更长，因此也被认为更具体。
 
 当两个模式有相同的数量和长度，那么有更少通配符的会被认为更具体。例如/hotels/{hotel}比/hotels/\*更具体。
 
@@ -530,12 +530,12 @@ public void handle(@PathVariable String version, @PathVariable String extension)
 有关详细信息，请参阅**AntPathMatcher**中的**AntPatternComparator**。注意，**PathMatcher**可以进行自定义（参见章节16.11“配置Spring MVC"中的[第16.11节“路径匹配"](#路径匹配)）。
 
 ### 有占位符的路径模式
-@RequestMapping注解中的模式支持对本地属性和/或系统属性和环境变量的$ {...}占位符。在一个控制器需要映射的路径可能需要通过配置自定义的情况下，这很有用。关于占位符的更多信息，请参阅PropertyPlaceholderConfigurer类的javadocs 。
+**@RequestMapping**注解中的模式支持对本地属性和/或系统属性和环境变量的**$ {...}**占位符。在一个控制器需要映射的路径可能需要通过配置自定义的情况下，这很有用。关于占位符的更多信息，请参阅**PropertyPlaceholderConfigurer**类的javadocs 。
 
 ### 后缀模式匹配
-默认情况下，Spring MVC执行“.\*"后缀模式匹配，以便映射到/person的控制器也隐式映射到/person.\*上。这使得通过URL路径可以轻松地请求资源的不同表示（例如/person.pdf，/person.xml）。
+默认情况下，Spring MVC执行“**.\***"后缀模式匹配，以便映射到**/person**的控制器也隐式映射到**/person.\***上。这使得通过URL路径可以轻松地请求资源的不同表示（例如/person.pdf，/person.xml）。
 
-后缀模式匹配可以关闭或限制为一组明确注册用于内容协商的路径扩展。通常建议通过使用诸如/person/{id}之类的普通请求映射来减少歧义，这里其中的点可能不表示文件扩展名，例如/person/joe@email.com vs /person/joe@email.com.json。此外，如下面的注释中所说明的，后缀模式匹配以及内容协商可能在某些情况下被用于尝试恶意攻击，因此有充分的理由有意义地限制它们。
+后缀模式匹配可以关闭或限制为一组明确注册用于内容协商的路径扩展。通常建议通过使用诸如**/person/{id}**之类的普通请求映射来减少歧义，这里其中的点可能不表示文件扩展名，例如/person/joe@email.com vs /person/joe@email.com.json。此外，如下面的注释中所说明的，后缀模式匹配以及内容协商可能在某些情况下被用于尝试恶意攻击，因此有充分的理由有意义地限制它们。
 
 对于后缀模式匹配请参见[第16.11，“路径匹配"](#路径匹配),对于内容协商配置请参见[第16.6，“内容协商"](#内容协商)。
 
@@ -557,7 +557,7 @@ Trustwave在2014年的论文中首次描述了反射文件下载 — Reflected f
 ### 矩阵变量
 URI规范RFC 3986定义了在路径片段中包含name-value对的可能性。规范中没有使用特定的术语。一般的“URI路径参数"可能适用，尽管来自Tim Berners-Lee的旧帖子的更独特的“Matrix URI"也经常被使用并且是相当熟知的。在Spring MVC中，这些被称为矩阵变量（Matrix Variables）。
 
-矩阵变量可以出现在任何路径段中，每个矩阵变量用“;"（分号）分隔。例如：“/cars;color=red;year=2012"。多个值可以是“,"（逗号）分隔“color=red,green,blue"，或者变量名称可以重复“color=red; color=green; color=blue"。
+矩阵变量可以出现在任何路径段中，每个矩阵变量用“;"（分号）分隔。例如**:“/cars;color=red;year=2012"**。多个值可以是“,"（逗号）分隔**“color=red,green,blue"**，或者变量名称可以重复**“color=red; color=green; color=blue"**。
 
 如果URL期望包含矩阵变量，则请求映射模式必须使用URI模板来表示它们。这确保了请求可以正确匹配，无论矩阵变量是否存在，以及它们以什么顺序提供。
 
@@ -642,7 +642,7 @@ public void addPet(@RequestBody Pet pet, Model model) {
 ```
 Consumable Media Types表达式也可以以**!text/plain**否定，以匹配所有**Content-Type**不是**text/plain**的请求。也可以考虑使用**MediaType**中提供的常量，例如**APPLICATION_JSON_VALUE**和**APPLICATION_JSON_UTF8_VALUE**。
 
-> 在类型和方法级上支持consume条件。不想大多数其他条件，当用在类型级上，方法级consumable类型覆盖而不是拓展类型级consumable类型。
+> 在类型和方法级上支持consume条件。不像大多数其他条件，当用在类型级上时，方法级上的consumable类型覆盖而不是拓展类型级consumable类型。
 
 ### Producible Media Types
 你可以通过指定Producible Media Types列表来缩小主映射。只有当**Accept**请求头匹配这些值之一时，才会匹配该请求。此外，使用produce条件确保用于产生响应的实际内容类型与produce条件中指定的媒体类型相关。例如：
@@ -709,7 +709,7 @@ public class RelativePathUriTemplateController {
 以下是支持的方法参数类型：
 - **Request**或**response**对象（Servlet API）。选择任何具体的request或response类型，例如ServletRequest或HttpServletRequest。
 - **Session**对象（Servlet API）：类型为**HttpSession**。这个类型的参数强制存在相应的session。因此，这样的参数从不为**null**。
-> **Session**访问可能不是线程安全的，特别在Servlet环境中。如果允许多个request同时访问session，请考虑将**RequestMappingHandlerAdapter**的“synchronizeOnSession"标志设置为“true"。
+> **Session**访问可能不是线程安全的，特别在Servlet环境中。如果允许多个request同时访问session，请考虑将**RequestMappingHandlerAdapter**的“**synchronizeOnSession**"标志设置为“**true**"。
 
 - **org.springframework.web.context.request.WebRequest**或**org.springframework.web.context.request.NativeWebRequest**。允许通用请求参数访问以及request/session属性访问，与本地Servlet/Portlet API无关。
 - **java.util.Locale**——当前的请求语言环境，由最具体的语言环境解析器确定，实际上是在MVC环境中配置的LocaleResolver/LocaleContextResolver。
@@ -1416,12 +1416,12 @@ spring-test模块对于测试带注解的控制器提供一流的支持。请参
 ***
 # 处理器映射
 ***
-在以前的Spring版本中，用户需要在Web应用程序上下文中定义一个或多个HandlerMapping bean，以将传入的Web请求映射到适当的处理器。随着注解控制器的引入，你一般不需要再这样做，因为**RequestMappingHandlerMapping**会自动在所有的**@Controller** bean上查找**@RequestMapping**注解。但是，请记住，从**AbstractHandlerMapping**扩展的所有**HandlerMapping**类都具有以下可用于自定义其行为的属性：
+在以前的Spring版本中，用户需要在Web应用程序上下文中定义一个或多个**HandlerMapping** bean，以将传入的Web请求映射到适当的处理器。随着注解控制器的引入，你一般不需要再这样做，因为**RequestMappingHandlerMapping**会自动在所有的**@Controller** bean上查找**@RequestMapping**注解。但是，请记住，从**AbstractHandlerMapping**扩展的所有**HandlerMapping**类都具有以下可用于自定义其行为的属性：
 
 - **interceptors**：要使用的拦截器列表。HandlerInterceptors在第4.1节“使用HandlerInterceptor拦截请求”中讨论。
 - **defaultHandler**：当映射器处理器在一次映射处理器时没有映射结果，默认使用的处理器，
 - **order**：基于order属性的值（请参阅org.springframework.core.Ordered接口），Spring会排序上下文中可用的所有处理器映射器，并应用第一个匹配的处理器。
-- **alwaysUseFullPath**：如果为true，Spring将使用当前Servlet上下文中的完整路径来查找适当的处理程序。如果为false（默认值），则使用当前Servlet映射中的路径。例如，如果一个Servlet使用/testing/\*映射，并且将alwaysUseFullPath属性设置为true，则使用/testing/viewPage.html，而如果属性设置为false，则使用/viewPage.html。
+- **alwaysUseFullPath**：如果为true，Spring将使用当前Servlet上下文中的完整路径来查找适当的handler。如果为false（默认值），则使用当前Servlet映射中的路径。例如，如果一个Servlet使用/testing/\*映射，并且将alwaysUseFullPath属性设置为true，则使用/testing/viewPage.html，而如果属性设置为false，则使用/viewPage.html。
 - **urlDecode**：默认为true，从Spring 2.5开始。如果你喜欢比较编码路径，请将此标志设置为false。但是，HttpServletRequest始终以解码形式公开Servlet路径。请注意，当与编码路径比较时，Servlet路径将不匹配。
 
 以下示例说明如何配置拦截器
@@ -1437,7 +1437,7 @@ spring-test模块对于测试带注解的控制器提供一流的支持。请参
 
 ## 用HandlerInterceptor拦截请求
 ***
-Spring的处理器映射机制包括处理器拦截器，当你希望将特定功能应用于某些请求时很有用，例如，检查主体。
+Spring的处理器映射机制包括处理器拦截器，当你希望将特定功能应用于某些请求时很有用，例如，检查请求体。
 
 位于处理器映射器中的拦截器必须实现**org.springframework.web.servlet**包中**HandlerInterceptor**。这个接口定义了三个方法：**preHandle(..)**在处理器实际执行之前调用;**postHandle(..)**在处理器执行后调用;**afterCompletion(..)**在完整的请求完成后调用。这三种方法应提供足够的灵活性进行各种预处理和后处理。
 
@@ -1498,7 +1498,7 @@ public class TimeBasedAccessInterceptor extends HandlerInterceptorAdapter {
 
 > 在上面的示例中，配置的拦截器将应用于使用注解控制器方法处理的所有请求。如果要缩小拦截器应用的URL路径，你可以使用MVC命名空间或MVC Java配置，或声明类型为MappedInterceptor的bean实例来执行此操作。请参见第[16.1节“启用MVC Java配置或MVC XML命名空间”](http://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/htmlsingle/#mvc-config-enable)。
 
-请注意，**HandlerInterceptor的postHandle**方法并不总是适用于**@ResponseBody**和**ResponseEntity**方法。在这种情况下，**HttpMessageConverter**在调用**postHandle**之前写入并提交响应，这使得不可能再更改响应，例如添加一个响应头。相反，应用程序可以实现**ResponseBodyAdvice**，并将其声明为**@ControllerAdvice** bean或直接在**RequestMappingHandlerAdapter**上进行配置。
+请注意，**HandlerInterceptor**的**postHandle**方法并不总是适用于**@ResponseBody**和**ResponseEntity**方法。在这种情况下，**HttpMessageConverter**在调用**postHandle**之前写入并提交响应，这使得不可能再更改响应，例如添加一个响应头。相反，应用程序可以实现**ResponseBodyAdvice**，并将其声明为**@ControllerAdvice** bean或直接在**RequestMappingHandlerAdapter**上进行配置。
 
 ***
 # 解析视图
@@ -2095,7 +2095,7 @@ public class ErrorController {
  
 ## ControllerClassNameHandlerMapping控制器
 ***
-ControllerClassNameHandlerMapping类是一个HandlerMapping实现，它使用约定来确定请求URL和要处理这些请求的Controller实例之间的映射。
+**ControllerClassNameHandlerMapping**类是一个**HandlerMapping**实现，它使用约定来确定请求URL和要处理这些请求的Controller实例之间的映射。
 
 考虑以下简单的Controller实现。请特别注意类的名称。
 ```java
@@ -2124,11 +2124,11 @@ public class ViewShoppingCartController implements Controller {
 - **IndexController**映射到**/index\***请求URL
 - **RegisterController**映射到**/register\***请求URL
 
-在MultiActionController处理器类的情况下，生成的映射稍微复杂一点。以下示例中的Controller名称假定为MultiActionController实现：
+在**MultiActionController**处理器类的情况下，生成的映射稍微复杂一点。以下示例中的Controller名称假定为MultiActionController实现：
 - **AdminController**映射到**/admin/\***请求URL
 - **CatalogController**映射到**/catalog/***请求URL
 
-如果你遵循将Controller实现命名为xxxController的惯例，ControllerClassNameHandlerMapping会将你从定义和维护一个潜在的无聊SimpleUrlHandlerMapping（或类似的）中解救出来。
+如果你遵循将Controller实现命名为xxxController的惯例，**ControllerClassNameHandlerMapping**会将你从定义和维护一个潜在的无聊**SimpleUrlHandlerMapping**（或类似的）中解救出来。
 
 ## ModelMap模型（ModelAndView）
 ***
