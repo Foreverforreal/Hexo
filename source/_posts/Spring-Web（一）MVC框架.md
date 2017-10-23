@@ -1986,7 +1986,7 @@ public String onSubmit(@RequestPart("meta-data") MetaData metadata,
 ***
 Spring **HandlerExceptionResolver**实现处理在控制器执行期间发生的意外异常。**HandlerExceptionResolver**有点类似于可以在Web应用程序描述符web.xml中定义的异常映射。但是，它提供了一种更灵活的方法。例如，它提供有关在抛出异常时正在执行哪个处理器的信息。此外，编程式的异常处理可以在请求转发到另一个URL之前提供更多的响应选项（与使用Servlet特定的异常映射有相同的最终结果）。
 
-除了实现**HandlerExceptionResolver**接口，它只是实现**resolveException(Exception, Handler)**方法并返回一个**ModelAndView**，你还可以使用提供的**SimpleMappingExceptionResolver**或者创建**@ExceptionHandler**方法。**SimpleMappingExceptionResolver**使你能够获取可能抛出的任何异常的类名，并将其映射到视图名上。这在功能上等同于Servlet API的异常映射功能，但是，它在不同的处理器中，可以更精细地实现异常的映射。另一方面，**@ExceptionHandler**注解可以用于应该被调用来处理异常的方法。这样的方法可以在**@Controller**中本地定义，也可以在**@ControllerAdvice**类中定义，这时将应用于许多**@Controller**类。以下部分将对此进行更详细的解释。
+除了实现**HandlerExceptionResolver**接口，实现该接口只需要重写**resolveException(Exception,Handler)**方法并返回一个**ModelAndView**，你还可以使用提供的**SimpleMappingExceptionResolver**或者创建**@ExceptionHandler**方法。**SimpleMappingExceptionResolver**使你能够获取可能抛出的任何异常的类名，并将其映射到视图名上。这在功能上等同于Servlet API的异常映射功能，但是，它在不同的处理器中，可以更精细地实现异常的映射。另一方面，**@ExceptionHandler**注解可以用于应该被调用来处理异常的方法。这样的方法可以在**@Controller**中本地定义，也可以在**@ControllerAdvice**类中定义，这时将应用于许多**@Controller**类。以下部分将对此进行更详细的解释。
 
 ## @ExceptionHandler
 ***
@@ -2007,15 +2007,15 @@ public class SimpleController {
 
 }
 ```
-@ExceptionHandler的值可以设置为异常类型的数组。如果一个异常被抛出，并且该异常与列表中的类型之一相匹配，那么使用相匹配@ExceptionHandler注解的方法就会被调用。如果没有设置注解值，则使用列为方法参数的异常类型。
+**@ExceptionHandler**的值可以设置为异常类型的数组。如果一个异常被抛出，并且该异常与列表中的类型之一相匹配，那么使用相匹配**@ExceptionHandler**注解的方法就会被调用。如果没有设置注解值，则使用列为方法参数的异常类型。
 
-很像使用@RequestMapping注解注解的标准控制器方法，@ExceptionHandler方法的方法参数和返回值也是很灵活的。例如，可以在Servlet环境中访问HttpServletRequest，并在Portlet环境中访问PortletRequest。返回类型可以是一个String，它会被解释为一个视图名称，也可以是一个ModelAndView对象，一个ResponseEntity，或者你也可以添加@ResponseBody，使方法返回值被消息转换器转换并写入到响应流。
+很像使用**@RequestMapping**注解注解的标准控制器方法，**@ExceptionHandler**方法的方法参数和返回值也是很灵活的。例如，可以在Servlet环境中访问**HttpServletRequest**，并在Portlet环境中访问PortletRequest。返回类型可以是一个**String**，它会被解释为一个视图名称，也可以是一个**ModelAndView**对象，一个**ResponseEntity**，或者你也可以添加**@ResponseBody**，使方法返回值被消息转换器转换并写入到响应流。
 
 ## 处理标准的Spring MVC异常
 ***
 Spring MVC可能会在处理请求时引发许多异常。**SimpleMappingExceptionResolver**可以根据需要轻松将任何异常映射到默认的错误视图。然而，当需要运行于一些自动解析响应的客户端的时候，你可能会想要在响应里设置特定的状态码。根据异常产生的状态码来代表客户端的4xx错误和服务器的5xx错误。
 
-**DefaultHandlerExceptionResolver**将Spring MVC异常转换为特定的错误状态代码。它默认被MVC名称空间，MVC Java配置以及DispatcherServlet注册（即不使用MVC命名空间或Java配置时）注册。下面列出了这个解析器处理的一些异常和相应的状态代码：
+**DefaultHandlerExceptionResolver**将Spring MVC异常转换为特定的错误状态代码。它默认被MVC命名空间、MVC Java配置以及**DispatcherServlet**注册（即不使用MVC命名空间或Java配置时）注册。下面列出了这个解析器处理的一些异常和相应的状态代码：
 
 |异常|HTTP状态码|
 |-----|-------|
