@@ -7,7 +7,6 @@ categories:
   - Spring
 date: 2017-07-25 21:17:00
 ---
-
 <style>
 strong {
     margin: 2px;
@@ -1538,7 +1537,7 @@ beanFactory.registerScope("thread", threadScope);
 
 ***
 # 定制bean性质
-*
+***
 ## 生命周期回调
 ***
 要与容器的bean生命周期管理进行交互，可以实现Spring **InitializingBean**和**DisposableBean**接口。容器为前者调用**afterPropertiesSet()**，并为后者调用**destroy()**，以允许bean在初始化和销毁bean时执行某些操作。
@@ -3029,8 +3028,3 @@ public class CachingMovieCatalog implements MovieCatalog {
 ***
 # 基于Java的容器配置
 ***
-
-
-
-
-
