@@ -654,7 +654,7 @@ Lock对象非常向同步代码块使用的隐式锁。与隐式锁一样，一�
 
 ### Executor接口
 java.util.concurrent包定义了三个执行器接口：
-- **Executor**，一个支持启动新任务的简单界面。
+- **Executor**，一个支持启动新任务的简单接口。
 - **ExecutorService**，Executor的一个子接口，它增加了帮助管理独立任务和执行者本身生命周期的功能。
 - **ScheduledExecutorService**，ExecutorService的一个子接口，支持将来和/或定期执行任务。
 
