@@ -4,6 +4,7 @@ author: 不识
 tags: []
 categories:
   - java 基础
+  - java 并发
 date: 2017-09-13 17:10:00
 ---
 通过Java编程语言和Java类库中的基本并发支持，Java平台被设计为从根本上支持并行编程。自5.0版本以来，Java平台还包括高级并发API。本课介绍了平台的基本并发支持，并总结了java.util.concurrent包中的一些高级API。
@@ -176,7 +177,7 @@ t.join();
 ***
 Java内存模型在JVM内部被使用，将内存分为**线程栈**（stack）和**堆**（heap）。下面示图从逻辑角度说明了Java内存模型：
 ![Java内存模型1](/images/java base/java-memory-model-1.png)
-每个Java虚拟机上运行的线程都有它自己的线程栈。<font style="color:#ec70ae;">线程栈包含了线程达到当前执行点调用方法的信心。此外还包含每个正执行方法(调用栈中的所有方法)的局部变量</font>。一个线程只可以访问自己的线程栈，由线程栈创建的局部变量对其他线程都不可见，即使两个线程执行相同的代码。
+每个Java虚拟机上运行的线程都有它自己的线程栈。<font style="color:#ec70ae;">线程栈包含了线程达到当前执行点调用方法的信息。此外还包含每个正执行方法(调用栈中的所有方法)的局部变量</font>。一个线程只可以访问自己的线程栈，由线程栈创建的局部变量对其他线程都不可见，即使两个线程执行相同的代码。
 
 所有原始类型 ( boolean, byte, short, char, int, long, float, double)的局部变量都完全存储在**线程栈**上，因此对其他线程不可见。**堆**包含所有你的Java应用程序创建的对象，无论是哪个线程创建的。不管一个对象是被创建并分配给一个局部变量，或者作为其他对象的成员变量创建，这个对象依旧存储在堆上。
 
@@ -262,7 +263,7 @@ Thread B:
 ```
 由于线程A在写入volatile变量sharedObject.counter之前写入了变量sharedObject.counter,那么在线程A写入sharedObject.counter（volatile）时，sharedObject.nonVolatile和sharedObject.counter都会被写入到主内存。
 
-由于线程B受限读取volatile变量sharedObject.counter，那么sharedObject.counter和sharedObject.nonVolatile都会从主内存读取到线程B使用的CPU缓存中。当线程B读取sharedObject.nonVolatile时，它将看到线程A写入最新值。
+由于线程B首先读取volatile变量sharedObject.counter，那么sharedObject.counter和sharedObject.nonVolatile都会从主内存读取到线程B使用的CPU缓存中。当线程B读取sharedObject.nonVolatile时，它将看到线程A写入最新值。
 
 JVM不会重排序volatile变量读写指令意思如下：
 ```java

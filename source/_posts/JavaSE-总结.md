@@ -232,9 +232,9 @@ class BlockDemo {
 
 ## 流程控制语句
 ***
-流程控制语句可以改变默认的代码执行顺序，它包括**决策语句**（if-then, if-then-else, switch），**循环语句**（for, while, do-while）和**分支语句**（break, continue, return）。
+流程控制语句可以改变默认的代码执行顺序，它包括**判断语句**（if-then, if-then-else, switch），**循环语句**（for, while, do-while）和**分支语句**（break, continue, return）。
 
-### 决策语句
+### 判断语句
 if语句形式
 ```java
 // if-then 语句1
