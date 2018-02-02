@@ -84,7 +84,7 @@ Java 8同样在java.util.funciton中提供了一系列的通用函数式接口�
 下面是Lambda表达式的基本结构
 
 ![Lambda表达式](https://i.stack.imgur.com/RRcfc.png?_=6564813)
-上图中fi是一个类的单例,就和实现了FuctionalInterface接口的匿名类一样,它以{System.out.println("Hello"); }这段方法体重写了接口的抽象方法,换而言之,上面的等同于
+上图中fi是一个类的单例,就和实现了**FuctionalInterface**接口的匿名类一样,它以{System.out.println("Hello"); }这段方法体重写了接口的抽象方法,换而言之,上面的等同于
 ```java 
 FunctionalInterface fi = new FunctionalInterface() {
     @Override

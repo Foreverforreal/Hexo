@@ -90,16 +90,16 @@ public class Person {
 # Stream
 ***
 从理解意义上来说，聚合操作可以看成包含数据的流在管道内的流动的过程，但是就代码形式来言，聚合操作是集合获取的Stream对象调用自身的一系列方法，处理元素的过程。而这一系列的操作我们在上文中称为管道.
-管道中有中间操作和终端操作两种类型，除此之外，还有一种操作被称为short-circuiting,它用来处理一个无限大的Stream,一个中间操作或者终端操作，可以同时是一个short-circuiting.
+管道中有 ***中间操作*** 和 ***终端操作*** 两种类型，除此之外，还有一种操作被称为short-circuiting,它用来处理一个无限大的Stream,一个中间操作或者终端操作，可以同时是一个short-circuiting.
 - 对于一个 intermediate 操作，如果它接受的是一个无限大（infinite/unbounded）的 Stream，但返回一个有限的新 Stream。
 - 对于一个 terminal 操作，如果它接受的是一个无限大的 Stream，但能在有限的时间计算出结果。
 
 依照这些操作，我们可以将Stream一些常用方法分类。
-- 中间操作（intermediate operations）  
+- **中间操作**（intermediate operations）  
 map (mapToInt, flatMap 等)、 filter、 distinct、 sorted、 peek、 limit、 skip、 parallel、 sequential、 unordered
-- 终端操作（terminal operation）  
+- **终端操作**（terminal operation）  
 forEach、 forEachOrdered、 toArray、 reduce、 collect、 min、 max、 count、 anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 iterator
-- 短路（short-circuting）
+- **短路**（short-circuting）
 anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 limit
 
 ## 中间操作
@@ -217,9 +217,9 @@ Person first = roster.stream().findFirst().get();
 min/max是返回流内元素的Optional类型的最小/最大值。
 ```java
 Integer minAge = roster.stream()
-	  					.map(Person::getAge)
-	  					.min(Integer::max)
-	  					.get()
+	.map(Person::getAge)
+	.min(Integer::max)
+	.get()
 ```
 例子为获取roster中最大的年龄
 
@@ -230,8 +230,8 @@ count返回流内元素个数
 Integer[] array={1,2,3,4,5,6,7};
 List<Integer> list = Arrays.asList(array);
 long count=list.stream()
-				.filter(i -> i>4)
-			   .count()
+	.filter(i -> i>4)
+	.count()
 ```
 输出
 >3
@@ -240,17 +240,17 @@ long count=list.stream()
 这个方法的主要作用是把 Stream 元素组合起来。它提供一个起始值（种子），然后依照运算规则（BinaryOperator），和前面 Stream 的第一个、第二个、第 n 个元素组合。如果没有起始值的情况，这时会把 Stream 的前面两个元素组合起来，返回的是 Optional。从这个意义上说，字符串拼接、数值的 sum、min、max、average 都是特殊的 reduce。
 ```java
 roster.stream() 
-	  .map(Person::getAge)
-    .reduce(0, Integer::sum);
+	.map(Person::getAge)
+	.reduce(0, Integer::sum);
 ```
 上面例子中返回了roster所有人的年龄之和
 ### collect
 collect是一个收集器功能方法，它将流内元素收集到一个容器内，collect也有两种形式，但是通常使用的是与Collectors相结合，
 ```java
-List<Person> list = roster.stream()
-						  .collect(Collectors.toList());
+List<Person> list = roster.stream().collect(Collectors.toList());
 
-Map<Person.Sex, List<Person>> byGender = roster.stream().collect(Collectors.groupingBy(Person::getGender));
+Map<Person.Sex, List<Person>> byGender = 
+roster.stream().collect(Collectors.groupingBy(Person::getGender));
 
 ```
 # 并行计算
@@ -263,13 +263,11 @@ Map<Person.Sex, List<Person>> byGender = roster.stream().collect(Collectors.grou
 如果我们想要执行流并行计算，可以使用两种方式，要么Collection.parallelStream，或者调用BaseStream.parrallel.聚合操作的并行计算相当于多个管道同时处理流。
 ```java
 //Collection.parallelStream
- roster
-	.parallelStream()
+ roster.parallelStream()
 	.forEach(p -> System.out.println(p.getName()));
     
 //BaseStream.parrallel
- roster
-	.stream()
+ roster.stream()
 	.parallel()
 	.forEach(p -> System.out.println(p.getName()));
 ```
@@ -277,7 +275,7 @@ Map<Person.Sex, List<Person>> byGender = roster.stream().collect(Collectors.grou
 ## 顺序
 管道处理流的顺序取决于我们使用的是并行流还是串行流,当使用并行流的时候，管道执行的顺序是由JVM来决定的,在并行流中如果想要包装元素处理的顺序的话，可以使用forEachOrder方法，但需要注意的是使用这个方法可能无法发挥出并行计算的好处。
 ```java
- Integer[] intArray = {1, 2, 3, 4, 5, 6, 7, 8 };
+ 		   Integer[] intArray = {1, 2, 3, 4, 5, 6, 7, 8 };
         List<Integer> listOfIntegers =
                 new ArrayList<>(Arrays.asList(intArray));
 
