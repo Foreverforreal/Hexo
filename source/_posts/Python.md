@@ -172,9 +172,37 @@ import sound.effects.echo
 ```python
 sound.effects.echo.echofilter(input, output, delay=0.7, atten=4)
 ```
+导入子模块的另一种方法是：
+```python
+from sound.effects import echo
+```
+这也加载了子模块echo，并让它可以在不包含它的包前缀的情况下可用，因此可以如下使用它：
+```python
+echo.echofilter(input, output, delay=0.7, atten=4)
+```
+另一种变体是直接导入所需的函数或变量：
+```python
+from sound.effects.echo import echofilter
+```
+再次，这加载了子模块echo，但它的函数echofilter()可以直接使用：
+```python
+echofilter(input, output, delay=0.7, atten=4)
+```
+请注意，当使用**from package import item**，item可以是包的子模块（或子包），也可以是包中定义的其他名称，如函数，类或变量。**import**语句首先测试item是否定义在包中;如果不是，它假定它是一个模块并尝试加载它。如果找不到它，则会引发**ImportError**异常。
 
+### import * from package
+import语句使用以下约定：如果一个包的**\_\_init\_\_.py**代码定义了一个名为**\_\_all\_\_**的list，它被认为是执行from package import *  时应该导入的模块名称的列表。如果未定义**\_\_all\_\_**，则该语句不会导入该包下的任何模块到当前命名空间，它只确保包本身（可能在**\_\_init\_\_.py**文件中的初始化代码）被导入，然后导入包中定义的任何名称。这包括**\_\_init\_\_.py**定义的任何名称（以及明确加载的子模块）。它还包括由前面的**import**语句显式加载的包的任何子模块。考虑如下代码：
+```python
+import sound.effects.echo
+import sound.effects.surround
+from sound.effects import *
+```
+echo和surround模块等同于使用from...import导入形式。
 
+### 多目录中的包
+包还支持一个更特殊的属性**\_\_path\_\_**。在执行该文件中的代码之前，它被初始化为一个包含了所有包含**\_\_init\_\_.py**文件的目录名称的列表。这个变量可以修改;但这样做会影响将来对包中包含的模块和子包的搜索。
 
+虽然通常不需要此功能，但它可用于扩展程序包中找到的一组模块。
 ***
 # 错误与异常
 ***
