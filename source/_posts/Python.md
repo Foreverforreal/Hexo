@@ -109,7 +109,72 @@ $ python fibo.py 50
 初始化之后，Python程序可以修改sys.path。运行脚本所在的目录在搜索路径开头，位于标准库路径之前。这意味着如果标准库目录下有与该目录下的相同名字的脚本，实际执行的是该目录下脚本。
 
 ### "编译"Python文件
-为了加速模块加载，Python在**\_\_pycache\_\_**目录下缓存每个模块的编译版本，并在**module.version.pyc**名称的文件中。
+为了加速模块加载，Python在**\_\_pycache\_\_**目录下缓存每个模块的编译版本，并存储在名为**module.version.pyc**文件中。其中version对文件编码，他通常包含Python的版本号。这个命名约定允许来自不同版本和不同版本的Python的编译模块共存。
+Python根据编译后的版本检查源代码的修改日期，看它是否过期并需要重新编译。这是一个完全自动的过程。另外，编译后的模块是独立于平台的，因此可以在不同架构的系统之间共享相同的库。
+在两种情况下，Python不会检查缓存。第一种，从命令行直接加载的模块总是重新编译，并且不存储模块的结果。第二种，如果没有源模块，则不会检查缓存。要支持非源代码（仅编译）分发，编译的模块必须位于源代码目录中，并且不得有源模块。
+
+## 标准模块
+***
+Python带有一个标准模块库，在一个单独的文档中描述，即Python库参考 Python Library Reference （以下简称“库参考”）。一些模块是内置在解释器中的；它们提供了一些访问不属于该语言核心部分的操作，比如无论是为了提高效率还是对操作系统原函数的访问操作。这些模块的集是一个配置选项，它也取决于底层平台。例如，**winreg** 模块仅在Windows系统上提供。一个特定的模块**sys**值得注意：它被内置进了每个Python解释器。变量**sys.ps1** 和**sys.ps2** 定义用作主要和次要提示的字符串：
+```python
+>>> import sys
+>>> sys.ps1
+'>>> '
+>>> sys.ps2
+'... '
+>>> sys.ps1 = 'C> '
+C> print('Yuck!')
+Yuck!
+C>
+```
+这两个变量只在解释器处于交互模式时才被定义。
+变量**sys.path**是一个字符串列表，它决定了解释器的模块搜索路径。它被初始化为从环境变量**PYTHONPATH**获取的默认路径，或者如果未设置**PYTHONPATH**则从内置默认路径初始化。你可以使用标准的list操作修改它
+```python
+>>> import sys
+>>> sys.path.append('/ufs/guido/lib/python')
+```
+
+## 包
+***
+**包（Package）**是通过使用“点分割模块名称”来构造Python模块命名空间的一种方式。例如，模块名称A.B在名为A的包中指定名为B的子模块。假设你想设计一个模块集（一个“包”）来统一处理声音文件和声音数据。一下是可能的包结构：
+```
+sound/                          顶层的包
+      __init__.py              初始化sound包
+      formats/                  用于文件格式转换的子包
+              __init__.py
+              wavread.py
+              wavwrite.py
+              aiffread.py
+              aiffwrite.py
+              auread.py
+              auwrite.py
+              ...
+      effects/                  用作声音效果的子包
+              __init__.py
+              echo.py
+              surround.py
+              reverse.py
+              ...
+      filters/                  用作过滤器的子包装
+              __init__.py
+              equalizer.py
+              vocoder.py
+              karaoke.py
+              ...
+```
+当导入包时，Python将搜索**sys.path**上的目录，查找包子目录。
+如果想要Python将一个目标视为包，则该目录下必须有**__init__.py**文件。这是为了防止具有通用名称（例如String）的目录无意中隐藏稍后在模块搜索路径中查找到的有效模块。在最简单的情况下，**\_\_init\_\_.py**可以只是一个空文件，但它也可以执行包的初始化代码或设置**\_\_all\_\_**变量。
+包的使用者可以从包中导入单个模块，例如：
+```python
+import sound.effects.echo
+```
+这会加载子模块**sound.effects.echo**。它必须以全名引用。
+```python
+sound.effects.echo.echofilter(input, output, delay=0.7, atten=4)
+```
+
+
+
 ***
 # 错误与异常
 ***
