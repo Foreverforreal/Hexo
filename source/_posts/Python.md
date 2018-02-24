@@ -24,6 +24,89 @@ date: 2018-02-05 15:54:00
 # 数据结构
 ***
 
+##  List
+***
+List是使用方括号（[]）括起来，并使用逗号分隔的元素集，List可以包含不同数据类型的元素，但通常元素都是相同类型的
+```python
+>>> squares = [1, 4, 9, 16, 25]
+>>> squares
+[1, 4, 9, 16, 25]
+```
+同string一样（包括所有的内置sequence类型），list也可以被索引（index）和切片（slice），所有的切片操作都会返回一个包含所请求项的新的list：
+```python
+>>> squares[0]  # 索引返回项
+1
+>>> squares[-1]
+25
+>>> squares[-3:]  # 切片返回一个新的list
+[9, 16, 25]
+>>> squares[:]
+[1, 4, 9, 16, 25]
+```
+list还支持拼接等操作：
+```python
+>>> squares + [36, 49, 64, 81, 100]
+[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+```
+**不像string是一个不可变类型，list是一个可变类型**，也就是list的内容可以更改。此时对切​​片的重新赋值也是可能的，这甚至可以改变list的大小或完全清除它：
+```python
+>>> letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+>>> letters
+['a', 'b', 'c', 'd', 'e', 'f', 'g']
+>>> # 替换一些值
+>>> letters[2:5] = ['C', 'D', 'E']
+>>> letters
+['a', 'b', 'C', 'D', 'E', 'f', 'g']
+>>> # 现在移除他们
+>>> letters[2:5] = []
+>>> letters
+['a', 'b', 'f', 'g']
+>>> # 通过使用一个空list替换掉所有元素来清空list
+>>> letters[:] = []
+>>> letters
+[]
+```
+
+### list方法
+
+|方法名|描述|
+|----------|-------|
+|**append(x)**|再list尾部添加一个元素，等同 a[len(a):] = [x]|
+|**extend(iterable)**|通过附加iterable中的所有项来扩展list。等同于[len(a):] =iterable。|
+|**insert(i,x)**|在给定位置插入一个元素|
+|**remove(x)**|从list中删除值为x的第一个元素。如果没有这样的元素，会抛出错误。|
+|**pop([i])**|删除list中给定位置的元素，并返回它。如果没有指定索引，则a.pop()将弹出list中的最后一个元素。|
+|**clear()**|从list中删除所有元素。相当于del a [:]。|
+|**index(x[,start[,end]])**|返回list中第一个值为x的元素的基于0的索引。如果没有这样的元素会抛出一个ValueError|
+|**count(x)**|返回x出现在list中的次数。|
+|**sort(key=None,reverse=False)**|对list中的元素进行排序（参数可用于自定义排序，请参阅sorted（）以获取其解释）。|
+|**reverse(x)**|反转list中的元素。|
+|**copy(x)**|返回list的浅拷贝。等同于a[:]|
+
+### list推断
+list推断提供了一种简明的创建list的方式。通常应用创建一个新的list，该list中每个元素都是应用于另一个序列的每个成员或迭代的某些操作的结果，或者创建满足特定条件的那些元素的子序列。
+例如，假设我们创建一个list
+```python
+>>> squares = []
+>>> for x in range(10):
+...     squares.append(x**2)
+...
+>>> squares
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
+注意，这样创建（或覆盖）一个名为x的变量在循环结束后依然存在，我们可以使用以下方法计算无任何副作用的list：
+```python
+squares = list(map(lambda x: x**2, range(10)))
+```
+或者等同于
+```python
+squares = [x**2 for x in range(10)]
+```
+这样更加简明易读。
+list推断由一个方括号组成，括号中包含一个表达式，后跟一个for子句，然后零或更多的for或if子句。
+
+
+
 ***
 # 模块
 ***
