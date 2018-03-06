@@ -1,4 +1,4 @@
-title: Python
+title: 'Pythonhttp://localhost:4000/admin/#/'
 id: 1517817251663
 author: 不识
 tags:
