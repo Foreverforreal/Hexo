@@ -83,8 +83,8 @@ list还支持拼接等操作：
 |**reverse(x)**|反转list中的元素。|
 |**copy(x)**|返回list的浅拷贝。等同于a[:]|
 
-### list推断
-list推断提供了一种简明的创建list的方式。通常应用创建一个新的list，该list中每个元素都是应用于另一个序列的每个成员或迭代的某些操作的结果，或者创建满足特定条件的那些元素的子序列。
+### list推导
+list推导提供了一种简明的创建list的方式。通常应用创建一个新的list，该list中每个元素都是应用于另一个序列的每个成员或迭代的某些操作的结果，或者创建满足特定条件的那些元素的子序列。
 例如，假设我们创建一个list
 ```python
 >>> squares = []
@@ -103,9 +103,126 @@ squares = list(map(lambda x: x**2, range(10)))
 squares = [x**2 for x in range(10)]
 ```
 这样更加简明易读。
-list推断由一个方括号组成，括号中包含一个表达式，后跟一个for子句，然后零或更多的for或if子句。
+list推导由一个方括号组成，括号中包含一个表达式，后跟一个for子句，然后零或更多的for或if子句。结果将成为一个新的list，通过评估后面的for和if子句的内容中产生。例如下面的list推导组合了两个list不相同的元素：
+```python 
+>>> [(x, y) for x in [1,2,3] for y in [3,1,4] if x != y]
+[(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
+```
+它等同于
+```python
+>>> combs = []
+>>> for x in [1,2,3]:
+...     for y in [3,1,4]:
+...         if x != y:
+...             combs.append((x, y))
+...
+>>> combs
+[(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
+```
+请注意在这两个代码片段中for和if语句的顺序是相同的。
+如果表达式是一个元组（例如前面例子中的（x，y）），它必须加上括号。
+```python
+>>> vec = [-4, -2, 0, 2, 4]
+>>> # 使用值*2创建新的list
+>>> [x*2 for x in vec]
+[-8, -4, 0, 4, 8]
+>>> # 过滤list排除掉负数
+>>> [x for x in vec if x >= 0]
+[0, 2, 4]
+>>> # 对每个元素应用函数
+>>> [abs(x) for x in vec]
+[4, 2, 0, 2, 4]
+>>> # 在每个元素上调用方法
+>>> freshfruit = ['  banana', '  loganberry ', 'passion fruit  ']
+>>> [weapon.strip() for weapon in freshfruit]
+['banana', 'loganberry', 'passion fruit']
+>>> # 创建一个双元组的列表，如（数字，平方）
+>>> [(x, x**2) for x in range(6)]
+[(0, 0), (1, 1), (2, 4), (3, 9), (4, 16), (5, 25)]
+>>> # 元组必须加括号，否则会引发错误
+>>> [x, x**2 for x in range(6)]
+  File "<stdin>", line 1, in <module>
+    [x, x**2 for x in range(6)]
+               ^
+SyntaxError: invalid syntax
+>>> # 使用两个'for'使用listcomp展开list
+>>> vec = [[1,2,3], [4,5,6], [7,8,9]]
+>>> [num for elem in vec for num in elem]
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+### 嵌套list推导
+list推导中的初始表达式可以是任意的表达式，包括另一个list推导。
+考虑以下3个4长度为4的list的实例：
+```python
+>>> matrix = [
+...     [1, 2, 3, 4],
+...     [5, 6, 7, 8],
+...     [9, 10, 11, 12],
+... ]
+```
+以下list推导将转置行和列：
+```python
+>>> [[row[i] for row in matrix] for i in range(4)]
+[[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
+```
+正如我们在前面的章节中看到的那样，嵌套的listcomp是在它后面的for的上下文中计算的，所以这个例子相当于：
+```python
+>>> transposed = []
+>>> for i in range(4):
+...     transposed.append([row[i] for row in matrix])
+...
+>>> transposed
+[[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
+```
+这反过来又是一样的：
+```python
+>>> transposed = []
+>>> for i in range(4):
+...     # 下面三行实现了嵌套的listcomp
+...     transposed_row = []
+...     for row in matrix:
+...         transposed_row.append(row[i])
+...     transposed.append(transposed_row)
+...
+>>> transposed
+[[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
+```
+在实际工作中，你应该更喜欢内置函数来处理复杂的流程语句。对于这个用例，**zip()**函数可以做很好的工作：
+```python
+>>> list(zip(*matrix))
+[(1, 5, 9), (2, 6, 10), (3, 7, 11), (4, 8, 12)]
+```
+## del语句
+***
 
+## 元组和序列
+***
+我们看到列表和字符串有许多共同的属性，如索引和切片操作。它们是**序列（sequence）**数据类型的两个示例（请参见序列类型 - 列表，元组，范围）。由于Python是一种不断发展的语言，因此可能会添加其他序列数据类型。还有另一种标准的序列数据类型：**元组（tuple）**。
+元组由多个用逗号分隔的值组成，例如：
+```python
+>>> t = 12345, 54321, 'hello!'
+>>> t[0]
+12345
+>>> t
+(12345, 54321, 'hello!')
+>>> # 元组可能是嵌套的:
+... u = t, (1, 2, 3, 4, 5)
+>>> u
+((12345, 54321, 'hello!'), (1, 2, 3, 4, 5))
+>>> # 元组是不可变的:
+... t[0] = 88888
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'tuple' object does not support item assignment
+>>> # 但是它可以包含可变对象:
+... v = ([1, 2, 3], [3, 2, 1])
+>>> v
+([1, 2, 3], [3, 2, 1])
+```
+正如你所看到的，在输出中，元组总是被包含在圆括号中，以便嵌套元组被正确解释;它们可能输入时带有或不带括号，尽管通常括号是必要的（如果元组是更大表达式的一部分）。无法给元组的单个项赋值，但可以创建一个包含可变对象（如list）的元组。
 
+## Set
+***
 
 ***
 # 模块
