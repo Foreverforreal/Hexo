@@ -8,6 +8,22 @@ categories:
   - Spring Boot
 date: 2018-05-05 09:49:00
 ---
+[原文链接](https://docs.spring.io/spring-boot/docs/2.0.2.RELEASE/reference/htmlsingle/)
+
+<style>
+strong {
+    margin: 2px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1px 3px 0;
+    text-shadow: none;
+    white-space: nowrap;
+	color: #6d180b;
+	font-weight: normal;
+}
+</style>
+
 ***
 # Spring Boot入门
 ***
@@ -27,7 +43,7 @@ Spring Boot可以轻松创建你可以运行的独立的，生产级的基于Spr
 ***
 Spring Boot 2.0.1.RELEASE需要Java 8或9以及Spring Framework 5.0.5.RELEASE或更高版本。为Maven 3.2+和Gradle 4提供了明确的构建支持。
 
-### serclet容器
+### servlet容器
 Spring Boot支持以下嵌入式servlet容器：
 
 |名称|servlet版本|
@@ -355,8 +371,7 @@ Starters包含很多依赖项，您需要快速启动并快速运行项目，并
 
 |名称|描述|Pom|
 |---|----|-----|
-|**spring-boot-starter**| | |
-|****| 核心入门者，包括自动配置支持，日志记录和YAML| |
+|**spring-boot-starter**| 核心入门者，包括自动配置支持，日志记录和YAML| |
 |**spring-boot-starter-activemq**| | |
 |**spring-boot-starter-amqp**| | |
 |**spring-boot-starter-aop**| | |
@@ -476,4 +491,10 @@ Spring Boot支持基于Java的配置。虽然可以将**SpringApplication**与XM
 ### 导入其他配置类
 你不需要把你所有的**@Configuration**放到一个类中。 **@Import**注解可用于导入其他配置类。或者，您可以使用**@ComponentScan**自动获取所有Spring组件，包括**@Configuration**类。
 
+### 导入XML配置
+如果您绝对必须使用基于XML的配置，我们建议您仍以**@Configuration**类开始。然后您可以使用**@ImportResource**注解来加载XML配置文件。
 
+## 自动配置
+Spring Boot自动配置会尝试根据您添加的jar依赖自动配置您的Spring应用程序。例如，如果**HSQLDB**在您的类路径中，并且您尚未手动配置任何数据库连接Bean，则Spring Boot会自动配置一个内存数据库。
+
+> 您应该只添加一个**@SpringBootApplication**或**@EnableAutoConfiguration**注解。我们通常建议您将一个或另一个添加到您的主要**@Configuration**类中。

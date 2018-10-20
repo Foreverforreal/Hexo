@@ -1181,9 +1181,9 @@ public class AssignableTypesAdvice {}
 查看@ControllerAdvice[文档](http://docs.spring.io/spring-framework/docs/4.3.10.RELEASE/javadoc-api/org/springframework/web/bind/annotation/ControllerAdvice.html)了解更多详细信息。
 
 ### Jackson序列化视图支持
-有时根据上下文过滤将被序列化到HTTP响应主体的对象是有用的。为了提供这样的功能，Spring MVC内置了对Jackson的Serialization Views进行渲染的支持。
+有时根据上下文过滤将被序列化到HTTP响应主体的对象是有用的。为了提供这样的功能，Spring MVC内置了对**Jackson**的Serialization Views进行渲染的支持。
 
-要将它与使用@ResponseBody控制器方法或返回ResponseEntity的控制器方法一起使用，只需使用指定要使用的视图类或接口的类参数添加@JsonView注解：
+要将它与使用**@ResponseBody**控制器方法或返回**ResponseEntity**的控制器方法一起使用，只需使用指定要使用的视图类或接口的类参数添加**@JsonView**注解：
 ```java
 @RestController
 public class UserController {
@@ -1222,9 +1222,9 @@ public class User {
     }
 }
 ```
-> 请注意，尽管@JsonView允许指定多个类，但用在控制器方法上只支持一个类参数。如果需要启用多个视图，请考虑使用复合接口。
+> 请注意，尽管**@JsonView**允许指定多个类，但用在控制器方法上只支持一个类参数。如果需要启用多个视图，请考虑使用复合接口。
 
-对于依赖于视图解析的控制器，只需将序列化视图类添加到模型中：
+对于依赖于视图解析的控制器，只需将序列化视图类添加到model中：
 ```java
 @Controller
 public class UserController extends AbstractController {
